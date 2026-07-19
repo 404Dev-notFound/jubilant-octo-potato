@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODECOLLAB - Open Source Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Geist:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">try{
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "on-secondary": "#470083",
+                "on-tertiary-container": "#ffffff",
+                "inverse-on-surface": "#2e3037",
+                "secondary-fixed-dim": "#dbb8ff",
+                "secondary-fixed": "#efdbff",
+                "surface-container-highest": "#32353c",
+                "on-background": "#e1e2eb",
+                "on-primary": "#002e6b",
+                "on-primary-container": "#ffffff",
+                "on-secondary-fixed": "#2b0052",
+                "on-tertiary": "#00382d",
+                "secondary-container": "#6807ba",
+                "tertiary-fixed": "#6bfad8",
+                "secondary": "#dbb8ff",
+                "tertiary-container": "#00866f",
+                "primary-fixed": "#d8e2ff",
+                "surface-container": "#1d2026",
+                "error": "#ffb4ab",
+                "surface-container-low": "#191c22",
+                "surface-variant": "#32353c",
+                "surface-container-lowest": "#0b0e14",
+                "outline": "#8b90a0",
+                "surface-tint": "#aec6ff",
+                "on-error-container": "#ffdad6",
+                "on-surface-variant": "#c1c6d7",
+                "tertiary": "#48ddbc",
+                "on-secondary-fixed-variant": "#6600b7",
+                "background": "#10131a",
+                "primary-fixed-dim": "#aec6ff",
+                "error-container": "#93000a",
+                "primary-container": "#0070f3",
+                "primary": "#aec6ff",
+                "surface-dim": "#10131a",
+                "on-primary-fixed-variant": "#004397",
+                "on-surface": "#e1e2eb",
+                "on-tertiary-fixed": "#002019",
+                "surface-container-high": "#272a31",
+                "on-primary-fixed": "#001a43",
+                "on-tertiary-fixed-variant": "#005142",
+                "surface": "#10131a",
+                "tertiary-fixed-dim": "#48ddbc",
+                "on-secondary-container": "#d0a6ff",
+                "inverse-surface": "#e1e2eb",
+                "on-error": "#690005",
+                "outline-variant": "#414754",
+                "inverse-primary": "#0059c5",
+                "surface-bright": "#363940"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+              },
+              "spacing": {
+                "sm": "1rem",
+                "container-max": "1200px",
+                "md": "1.5rem",
+                "lg": "2rem",
+                "gutter": "24px",
+                "base": "4px",
+                "xs": "0.5rem",
+                "xl": "3rem"
+              },
+              "fontFamily": {
+                "headline-lg": ["Geist"],
+                "display": ["Geist"],
+                "body-lg": ["Geist"],
+                "label-sm": ["JetBrains Mono"],
+                "body-md": ["Geist"],
+                "label-md": ["JetBrains Mono"],
+                "headline-md": ["Geist"],
+                "body-sm": ["Geist"]
+              }
+            }
+          }
+        }
+    }catch(_e){}</script>
+
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <style>
+        #nebula-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.5; /* Default for non-home pages */
+            transition: opacity 0.5s, transform 0.1s;
+            pointer-events: none; /* Let clicks pass through */
+        }
+        #nebula-canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body-md min-h-screen flex flex-col relative overflow-x-hidden">
+    <!-- Rose Nebula Background -->
+    <div id="nebula-bg"></div>
+
+    <!-- Shared Navigation Bar -->
+    <nav class="fixed top-0 w-full z-50 bg-[#0B0E14]/80 backdrop-blur-xl border-b border-white/10">
+        <div class="max-w-[1400px] mx-auto px-lg h-[70px] flex items-center justify-between">
+            <a href="#home" class="flex items-center gap-sm group">
+                <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">terminal</span>
+                <span class="font-display text-[20px] font-bold tracking-tight text-on-surface">CODECOLLAB</span>
+            </a>
+            
+            <div class="hidden lg:flex items-center gap-lg font-label-sm">
+                <a href="#dashboard" class="text-on-surface-variant hover:text-primary transition-colors">DASHBOARD</a>
+                <a href="#explore" class="text-on-surface-variant hover:text-primary transition-colors">EXPLORE</a>
+                <a href="#issues" class="text-on-surface-variant hover:text-primary transition-colors">ISSUES</a>
+                <a href="#community" class="text-on-surface-variant hover:text-primary transition-colors">COMMUNITY</a>
+                <a href="#ai_workspace" class="text-on-surface-variant hover:text-tertiary transition-colors flex items-center gap-xs">
+                    <span class="material-symbols-outlined text-[16px] text-tertiary">smart_toy</span> AI
+                </a>
+            </div>
+
+            <div class="flex items-center gap-sm">
+                <div class="relative hidden sm:block">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+                    <input type="text" placeholder="Search projects, users..." class="bg-surface-variant border border-white/5 rounded-full pl-xl pr-md py-[6px] text-sm text-on-surface outline-none focus:border-primary/50 transition-all w-[200px] focus:w-[280px]">
+                </div>
+                
+                <a href="#ai_chat" data-action="modal" data-target="ai-assistant-modal" class="p-xs text-on-surface-variant hover:text-tertiary transition-colors relative cursor-pointer" title="AI Assistant">
+                    <span class="material-symbols-outlined">psychology</span>
+                </a>
+                
+                <a href="#notifications" class="p-xs text-on-surface-variant hover:text-primary transition-colors relative">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full animate-pulse"></span>
+                </a>
+                
+                <!-- Profile Menu Dropdown Trigger -->
+                <div class="relative group cursor-pointer ml-sm">
+                    <div class="w-[32px] h-[32px] rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm hover:ring-2 hover:ring-primary/50 transition-all">
+                        U
+                    </div>
+                    <!-- Dropdown -->
+                    <div class="absolute right-0 mt-2 w-48 bg-surface-container-high rounded-xl border border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
+                        <div class="p-xs flex flex-col">
+                            <a href="#user_profile" class="px-md py-sm text-sm text-on-surface hover:bg-surface-variant rounded-lg transition-colors">Profile</a>
+                            <a href="#settings" class="px-md py-sm text-sm text-on-surface hover:bg-surface-variant rounded-lg transition-colors">Settings</a>
+                            <div class="h-[1px] bg-outline-variant w-full my-xs"></div>
+                            <a href="#login" class="px-md py-sm text-sm text-error hover:bg-error/10 rounded-lg transition-colors">Sign out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- App Content Injection Point -->
+    <div id="app-content" class="flex-1 w-full relative pt-[70px]">
+        <div class="flex items-center justify-center min-h-[50vh]">
+            <span class="material-symbols-outlined animate-spin text-[40px] text-primary">progress_activity</span>
+        </div>
+    </div>
+    
+    <!-- Comprehensive Footer -->
+    <footer class="bg-surface-container-lowest border-t border-white/5 mt-auto relative z-10">
+        <div class="max-w-[1400px] mx-auto px-lg py-xl">
+            <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-xl">
+                <div class="lg:col-span-2">
+                    <a href="#home" class="flex items-center gap-sm mb-md">
+                        <span class="material-symbols-outlined text-primary text-[24px]">terminal</span>
+                        <span class="font-display text-[20px] font-bold text-on-surface">CODECOLLAB</span>
+                    </a>
+                    <p class="text-on-surface-variant text-sm mb-lg max-w-sm">
+                        Connecting developers, maintainers, and organizations through open-source collaboration and intelligent code review.
+                    </p>
+                    <div class="flex gap-sm">
+                        <a href="#" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-variant transition-all"><span class="material-symbols-outlined text-[18px]">code</span></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-variant transition-all"><span class="material-symbols-outlined text-[18px]">forum</span></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-variant transition-all"><span class="material-symbols-outlined text-[18px]">public</span></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-on-surface mb-md">Platform</h4>
+                    <ul class="space-y-sm text-sm text-on-surface-variant">
+                        <li><a href="#explore" class="hover:text-primary transition-colors">Explore Projects</a></li>
+                        <li><a href="#ai_workspace" class="hover:text-primary transition-colors">AI Workspace</a></li>
+                        <li><a href="#organizations" class="hover:text-primary transition-colors">Organizations</a></li>
+                        <li><a href="#leaderboard" class="hover:text-primary transition-colors">Leaderboard</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-on-surface mb-md">Resources</h4>
+                    <ul class="space-y-sm text-sm text-on-surface-variant">
+                        <li><a href="#documentation" class="hover:text-primary transition-colors">Documentation</a></li>
+                        <li><a href="#learning_center" class="hover:text-primary transition-colors">Learning Center</a></li>
+                        <li><a href="#events" class="hover:text-primary transition-colors">Events & Hackathons</a></li>
+                        <li><a href="#community" class="hover:text-primary transition-colors">Community Forum</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-on-surface mb-md">Company</h4>
+                    <ul class="space-y-sm text-sm text-on-surface-variant">
+                        <li><a href="#about" class="hover:text-primary transition-colors">About Us</a></li>
+                        <li><a href="#contact" class="hover:text-primary transition-colors">Contact</a></li>
+                        <li><a href="#terms" class="hover:text-primary transition-colors">Terms of Service</a></li>
+                        <li><a href="#privacy" class="hover:text-primary transition-colors">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="h-[1px] bg-white/5 w-full my-lg"></div>
+            
+            <div class="flex flex-col md:flex-row items-center justify-between text-xs text-on-surface-variant">
+                <p>&copy; 2026 CodeCollab Inc. All rights reserved.</p>
+                <p>Version 2.0.0-rc1</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Global Modal Container -->
+    <div id="modal-container" class="fixed inset-0 z-[100] flex items-center justify-center p-lg opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm modal-overlay"></div>
+        <div id="modal-content" class="relative z-10 w-full max-w-2xl transform scale-95 transition-transform duration-300"></div>
+    </div>
+    
+    <!-- Shared Toast Container -->
+    <div id="toast-container" class="fixed bottom-lg right-lg z-[100] flex flex-col gap-sm"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/app.js"></script>
+    
+    <!-- Nebula Script (Modified) -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+        // CONFIG
+        const COUNT = 15000;
+        const SPEED_MULT = 0.7;
+        const AUTO_SPIN = true;
+
+        // SETUP
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.01);
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 0, 100);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        
+renderer.domElement.id = 'nebula-canvas';
+document.getElementById('nebula-bg').appendChild(renderer.domElement);
+
+
+        /* OrbitControls disabled for background */
+        
+        
+        
+
+        // POST PROCESSING
+        const composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.strength = 1.8; bloomPass.radius = 0.4; bloomPass.threshold = 0;
+        composer.addPass(bloomPass);
+
+        // SWARM OBJECTS
+        const dummy = new THREE.Object3D();
+        const color = new THREE.Color();
+        const target = new THREE.Vector3();
+        const pColor = new THREE.Color(); // Kept for safety, for potential references
+        
+        // INSTANCED MESH
+        const geometry = new THREE.TetrahedronGeometry(0.25);
+        const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        
+        const instancedMesh = new THREE.InstancedMesh(geometry, material, COUNT);
+        instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        scene.add(instancedMesh);
+
+        // DATA ARRAYS
+        const positions = [];
+        for(let i=0; i<COUNT; i++) {
+            positions.push(new THREE.Vector3((Math.random()-0.5)*100, (Math.random()-0.5)*100, (Math.random()-0.5)*100));
+            instancedMesh.setColorAt(i, color.setHex(0x00ff88)); // Init Color
+        }
+
+        // CONTROL STUBS
+        const PARAMS = {"nebulaSize":30,"petalCurl":1.15,"rotationRate":0.32,"cloudDepth":3.4,"corePulse":0.75,"turbulence":0.7};
+        const addControl = (id, label, min, max, val) => {
+            return PARAMS[id] !== undefined ? PARAMS[id] : val;
+        };
+        const setInfo = () => {};
+        const annotate = () => {};
+
+        // ANIMATION LOOP
+        const clock = new THREE.Clock();
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime() * SPEED_MULT;
+            
+            // Shader Time Update
+            if(material.uniforms && material.uniforms.uTime) {
+                material.uniforms.uTime.value = time;
+            }
+
+            
+
+            
+camera.position.x = Math.sin(time * 0.1) * 100;
+camera.position.z = Math.cos(time * 0.1) * 100;
+camera.lookAt(0, 0, 0);
+// SWARM LOGIC
+
+            const count = COUNT; // Alias for user code compatibility
+            for(let i=0; i<COUNT; i++) {
+                 // USER CODE INJECTION START
+                 const nebulaSize = addControl(
+                 "nebulaSize",
+                 "Rose Bloom Radius",
+                 12.0,
+                 48.0,
+                 30.0
+                 );
+                 
+                 const petalCurl = addControl(
+                 "petalCurl",
+                 "Petal Curl",
+                 0.2,
+                 2.4,
+                 1.15
+                 );
+                 
+                 const rotationRate = addControl(
+                 "rotationRate",
+                 "Nebular Rotation",
+                 0.0,
+                 1.5,
+                 0.32
+                 );
+                 
+                 const cloudDepth = addControl(
+                 "cloudDepth",
+                 "Cloud Depth",
+                 0.5,
+                 8.0,
+                 3.4
+                 );
+                 
+                 const corePulse = addControl(
+                 "corePulse",
+                 "Core Pulse",
+                 0.0,
+                 2.5,
+                 0.75
+                 );
+                 
+                 const turbulence = addControl(
+                 "turbulence",
+                 "Gas Turbulence",
+                 0.0,
+                 2.0,
+                 0.7
+                 );
+                 
+                 const safeCount = Math.max(1.0, count);
+                 const unitIndex = i / safeCount;
+                 
+                 const tau = Math.PI * 2.0;
+                 const goldenAngle = 2.399963229728653;
+                 const phaseTime = time * rotationRate;
+                 
+                 /*
+                 Deterministic pseudo-random values.
+                 
+                 These remain stable between frames, preventing the nebula
+                 from flickering like particles generated with Math.random().
+                 */
+                 const hashA = Math.sin((i + 1.0) * 12.9898) * 43758.5453;
+                 const hashB = Math.sin((i + 1.0) * 78.233) * 24634.6345;
+                 const hashC = Math.sin((i + 1.0) * 39.425) * 15731.7431;
+                 
+                 const randA = hashA - Math.floor(hashA);
+                 const randB = hashB - Math.floor(hashB);
+                 const randC = hashC - Math.floor(hashC);
+                 
+                 const signedA = randA * 2.0 - 1.0;
+                 const signedB = randB * 2.0 - 1.0;
+                 const signedC = randC * 2.0 - 1.0;
+                 
+                 let px = 0.0;
+                 let py = 0.0;
+                 let pz = 0.0;
+                 
+                 let hue = 0.93;
+                 let saturation = 0.9;
+                 let lightness = 0.5;
+                 
+                 /*
+                 70% OF PARTICLES:
+                 Layered rose-shaped ionized-gas petals.
+                 */
+                 if (unitIndex < 0.70) {
+                 const local = unitIndex / 0.70;
+                 
+                 const layerPosition = local * 7.0;
+                 const layer = Math.min(6.0, Math.floor(layerPosition));
+                 const layerFraction = layerPosition - layer;
+                 
+                 /*
+                 Inner layers contain fewer petals.
+                 Outer layers contain more petals and greater spread.
+                 */
+                 const petalCount = 7.0 + layer;
+                 
+                 const petalPosition = layerFraction * petalCount;
+                 const petal = Math.floor(petalPosition);
+                 const along = petalPosition - petal;
+                 
+                 const petalArc = Math.sin(Math.PI * along);
+                 const layerScale = layer / 6.0;
+                 
+                 const breathing =
+                 1.0 +
+                 0.035 *
+                 Math.sin(
+                 time * corePulse +
+                 layer * 0.9
+                 );
+                 
+                 const baseAngle =
+                 (petal / petalCount) * tau +
+                 layer * goldenAngle * 0.34;
+                 
+                 const curlAngle =
+                 baseAngle +
+                 phaseTime * (0.34 - layerScale * 0.18) +
+                 petalCurl *
+                 (along - 0.18) *
+                 (0.75 + layerScale * 0.85) +
+                 signedC * 0.045 * turbulence;
+                 
+                 const radialStart =
+                 nebulaSize *
+                 (0.08 + layerScale * 0.43);
+                 
+                 const radialGrowth =
+                 nebulaSize *
+                 (0.20 + layerScale * 0.22) *
+                 along;
+                 
+                 const radialRipple =
+                 nebulaSize *
+                 0.018 *
+                 turbulence *
+                 Math.sin(
+                 along * 13.0 +
+                 layer * 2.1 +
+                 time * 0.42
+                 );
+                 
+                 const radius =
+                 (radialStart + radialGrowth + radialRipple) *
+                 breathing;
+                 
+                 /*
+                 Particle displacement across each petal produces
+                 broad, cloudy structures instead of thin lines.
+                 */
+                 const petalWidth =
+                 nebulaSize *
+                 (0.025 + layerScale * 0.055) *
+                 petalArc *
+                 (0.35 + 0.65 * randB);
+                 
+                 const sideOffset = signedA * petalWidth;
+                 
+                 const ca = Math.cos(curlAngle);
+                 const sa = Math.sin(curlAngle);
+                 
+                 const tangentAngle =
+                 curlAngle + Math.PI * 0.5;
+                 
+                 const ct = Math.cos(tangentAngle);
+                 const st = Math.sin(tangentAngle);
+                 
+                 px =
+                 ca * radius +
+                 ct * sideOffset;
+                 
+                 pz =
+                 sa * radius +
+                 st * sideOffset;
+                 
+                 py =
+                 signedB *
+                 cloudDepth *
+                 petalArc *
+                 (0.35 + layerScale * 0.95) +
+                 Math.sin(
+                 curlAngle * 3.0 -
+                 time * 0.28 +
+                 layer
+                 ) *
+                 cloudDepth *
+                 0.12 *
+                 turbulence;
+                 
+                 /*
+                 Alternating brightness creates dark dusty channels
+                 between the luminous emission regions.
+                 */
+                 const dustLane =
+                 0.5 +
+                 0.5 *
+                 Math.sin(
+                 petal * 2.7 +
+                 along * 18.0 +
+                 layer * 1.3
+                 );
+                 
+                 const edgeGlow =
+                 Math.pow(petalArc, 0.45);
+                 
+                 hue =
+                 0.955 -
+                 layerScale * 0.085 +
+                 signedC * 0.018;
+                 
+                 saturation =
+                 0.72 +
+                 edgeGlow * 0.26;
+                 
+                 lightness =
+                 0.14 +
+                 edgeGlow * 0.48 +
+                 (1.0 - layerScale) * 0.10 -
+                 dustLane * 0.10;
+                 }
+                 
+                 /*
+                 14% OF PARTICLES:
+                 Dense central cluster and hot glowing nebular core.
+                 */
+                 else if (unitIndex < 0.84) {
+                 const local =
+                 (unitIndex - 0.70) / 0.14;
+                 
+                 const coreRadius =
+                 nebulaSize *
+                 0.16 *
+                 Math.pow(local, 0.36);
+                 
+                 const coreTheta =
+                 i * goldenAngle +
+                 phaseTime * 0.8;
+                 
+                 const coreY =
+                 1.0 - 2.0 * randB;
+                 
+                 const coreRing =
+                 Math.sqrt(
+                 Math.max(
+                 0.0,
+                 1.0 - coreY * coreY
+                 )
+                 );
+                 
+                 const pulse =
+                 1.0 +
+                 0.13 *
+                 Math.sin(
+                 time * corePulse * 2.0 +
+                 i * 0.013
+                 );
+                 
+                 px =
+                 Math.cos(coreTheta) *
+                 coreRing *
+                 coreRadius *
+                 pulse;
+                 
+                 py =
+                 coreY *
+                 coreRadius *
+                 pulse;
+                 
+                 pz =
+                 Math.sin(coreTheta) *
+                 coreRing *
+                 coreRadius *
+                 pulse;
+                 
+                 hue =
+                 0.07 +
+                 randC * 0.05;
+                 
+                 saturation =
+                 0.52 +
+                 randA * 0.28;
+                 
+                 lightness =
+                 0.56 +
+                 (1.0 - local) * 0.38;
+                 }
+                 
+                 /*
+                 12% OF PARTICLES:
+                 Diffuse violet and magenta outer nebular halo.
+                 */
+                 else if (unitIndex < 0.96) {
+                 const local =
+                 (unitIndex - 0.84) / 0.12;
+                 
+                 const haloAngle =
+                 i * goldenAngle +
+                 phaseTime * 0.12;
+                 
+                 const haloRadius =
+                 nebulaSize *
+                 (
+                 0.72 +
+                 local * 0.66 +
+                 signedA * 0.08
+                 );
+                 
+                 const haloWarp =
+                 1.0 +
+                 0.10 *
+                 Math.sin(
+                 haloAngle * 5.0 +
+                 time * 0.25
+                 ) +
+                 0.05 *
+                 turbulence *
+                 Math.sin(
+                 haloAngle * 11.0 -
+                 time * 0.17
+                 );
+                 
+                 px =
+                 Math.cos(haloAngle) *
+                 haloRadius *
+                 haloWarp;
+                 
+                 pz =
+                 Math.sin(haloAngle) *
+                 haloRadius *
+                 haloWarp;
+                 
+                 py =
+                 signedB *
+                 cloudDepth *
+                 (1.2 + local * 1.8) +
+                 Math.sin(
+                 haloAngle * 2.0 +
+                 time * 0.2
+                 ) *
+                 cloudDepth *
+                 0.35;
+                 
+                 hue =
+                 0.79 +
+                 randC * 0.13;
+                 
+                 saturation =
+                 0.58 +
+                 randA * 0.30;
+                 
+                 lightness =
+                 0.12 +
+                 (1.0 - local) * 0.22 +
+                 randB * 0.12;
+                 }
+                 
+                 /*
+                 4% OF PARTICLES:
+                 Sparse background stars surrounding the nebula.
+                 */
+                 else {
+                 const local =
+                 (unitIndex - 0.96) / 0.04;
+                 
+                 const starAngle =
+                 i * goldenAngle;
+                 
+                 const starY =
+                 signedB;
+                 
+                 const starRing =
+                 Math.sqrt(
+                 Math.max(
+                 0.0,
+                 1.0 - starY * starY
+                 )
+                 );
+                 
+                 const starRadius =
+                 nebulaSize *
+                 (
+                 1.25 +
+                 local * 1.10 +
+                 randA * 0.55
+                 );
+                 
+                 const twinkle =
+                 0.5 +
+                 0.5 *
+                 Math.sin(
+                 time *
+                 (1.2 + randC * 2.2) +
+                 i * 0.17
+                 );
+                 
+                 px =
+                 Math.cos(starAngle) *
+                 starRing *
+                 starRadius;
+                 
+                 py =
+                 starY *
+                 starRadius *
+                 0.72;
+                 
+                 pz =
+                 Math.sin(starAngle) *
+                 starRing *
+                 starRadius;
+                 
+                 hue =
+                 0.55 +
+                 randC * 0.12;
+                 
+                 saturation =
+                 0.18 +
+                 randA * 0.35;
+                 
+                 lightness =
+                 0.32 +
+                 twinkle * 0.50;
+                 }
+                 
+                 /*
+                 Final stability and colour-range protection.
+                 */
+                 lightness = Math.max(
+                 0.02,
+                 Math.min(0.98, lightness)
+                 );
+                 
+                 saturation = Math.max(
+                 0.0,
+                 Math.min(1.0, saturation)
+                 );
+                 
+                 hue = hue - Math.floor(hue);
+                 
+                 target.set(px, py, pz);
+                 color.setHSL(
+                 hue,
+                 saturation,
+                 lightness
+                 );
+                 
+                 if (i === 0) {
+                 setInfo(
+                 "The Cosmic Rose Nebula",
+                 "A blooming stellar nursery formed from luminous gas petals, dark dusty lanes, a pulsing young star cluster, and a faint expanding halo."
+                 );
+                 
+                 annotate(
+                 "rose_core",
+                 new THREE.Vector3(0, 0, 0),
+                 "Young Star Cluster"
+                 );
+                 
+                 annotate(
+                 "rose_petals",
+                 new THREE.Vector3(
+                 nebulaSize * 0.58,
+                 cloudDepth * 0.4,
+                 0
+                 ),
+                 "Ionized Gas Petals"
+                 );
+                 
+                 annotate(
+                 "rose_halo",
+                 new THREE.Vector3(
+                 -nebulaSize * 1.05,
+                 -cloudDepth * 0.3,
+                 0
+                 ),
+                 "Outer Nebular Halo"
+                 );
+                 }
+                 // USER CODE INJECTION END
+
+                 // LERP & UPDATE
+                 positions[i].lerp(target, 0.1);
+                 dummy.position.copy(positions[i]);
+                 dummy.updateMatrix();
+                 instancedMesh.setMatrixAt(i, dummy.matrix);
+                 instancedMesh.setColorAt(i, color); // Fix: Use 'color' which user modifies
+            }
+            instancedMesh.instanceMatrix.needsUpdate = true;
+            instancedMesh.instanceColor.needsUpdate = true;
+
+            composer.render();
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+/* Global Custom Styles for CODECOLLAB SPA */
+
+/* Prevent scroll jump on route change */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Base body style for deep space theme */
+body {
+    background-color: var(--surface-container-lowest);
+    color: var(--on-surface);
+}
+
+/* Glassmorphism Panel - The core UI component */
+.glass-panel {
+    background: rgba(21, 25, 33, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-panel:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Custom Scrollbar for a premium feel */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface-container-lowest);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--outline-variant);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--outline);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#app-content > * {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Hide tailwind scrollbars utility if missing */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}

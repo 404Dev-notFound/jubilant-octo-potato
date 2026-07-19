@@ -1,0 +1,11 @@
+How to Start CodeCollab Locally
+
+Follow these 3 simple steps to view the website:
+
+1. Open your terminal (Command Prompt or PowerShell).
+2. Navigate to this project folder using the command: 
+   cd "c:\Users\Dell\Downloads\overall\dev\obsidian\projects and it's code\codecollab_v2"
+3. Run the following command to start a local server:
+   python -m http.server 8080
+4. Open your web browser and go to:
+   http://localhost:8080/

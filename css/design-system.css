@@ -1,0 +1,78 @@
+:root {
+  --surface: #10131a;
+  --surface-dim: #10131a;
+  --surface-bright: #363940;
+  --surface-container-lowest: #0b0e14;
+  --surface-container-low: #191c22;
+  --surface-container: #1d2026;
+  --surface-container-high: #272a31;
+  --surface-container-highest: #32353c;
+  --on-surface: #e1e2eb;
+  --on-surface-variant: #c1c6d7;
+  --inverse-surface: #e1e2eb;
+  --inverse-on-surface: #2e3037;
+  --outline: #8b90a0;
+  --outline-variant: #414754;
+  --surface-tint: #aec6ff;
+  --primary: #aec6ff;
+  --on-primary: #002e6b;
+  --primary-container: #0070f3;
+  --on-primary-container: #ffffff;
+  --inverse-primary: #0059c5;
+  --secondary: #dbb8ff;
+  --on-secondary: #470083;
+  --secondary-container: #6807ba;
+  --on-secondary-container: #d0a6ff;
+  --tertiary: #48ddbc;
+  --on-tertiary: #00382d;
+  --tertiary-container: #00866f;
+  --on-tertiary-container: #ffffff;
+  --error: #ffb4ab;
+  --on-error: #690005;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+  --primary-fixed: #d8e2ff;
+  --primary-fixed-dim: #aec6ff;
+  --on-primary-fixed: #001a43;
+  --on-primary-fixed-variant: #004397;
+  --secondary-fixed: #efdbff;
+  --secondary-fixed-dim: #dbb8ff;
+  --on-secondary-fixed: #2b0052;
+  --on-secondary-fixed-variant: #6600b7;
+  --tertiary-fixed: #6bfad8;
+  --tertiary-fixed-dim: #48ddbc;
+  --on-tertiary-fixed: #002019;
+  --on-tertiary-fixed-variant: #005142;
+  --background: #10131a;
+  --on-background: #e1e2eb;
+  
+  --font-family-display: 'Geist', sans-serif;
+  --font-family-body: 'Geist', sans-serif;
+  --font-family-mono: 'JetBrains Mono', monospace;
+
+  --rounded-sm: 0.25rem;
+  --rounded-DEFAULT: 0.5rem;
+  --rounded-md: 0.75rem;
+  --rounded-lg: 1rem;
+  --rounded-xl: 1.5rem;
+  --rounded-full: 9999px;
+
+  --spacing-base: 4px;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  --spacing-container-max: 1200px;
+  --spacing-gutter: 24px;
+}
+
+/* Glassmorphism utilities */
+.glass-panel {
+    background: rgba(21, 25, 33, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.glass-panel:hover {
+    border-color: rgba(0, 112, 243, 0.4);
+}

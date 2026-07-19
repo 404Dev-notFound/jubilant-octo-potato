@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://api.fontshare.com/v2/font-family/geist?display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "on-secondary": "#470083",
+                            "on-tertiary-container": "#ffffff",
+                            "inverse-on-surface": "#2e3037",
+                            "secondary-fixed-dim": "#dbb8ff",
+                            "secondary-fixed": "#efdbff",
+                            "surface-container-highest": "#32353c",
+                            "on-background": "#e1e2eb",
+                            "on-primary": "#002e6b",
+                            "on-primary-container": "#ffffff",
+                            "on-secondary-fixed": "#2b0052",
+                            "on-tertiary": "#00382d",
+                            "secondary-container": "#6807ba",
+                            "tertiary-fixed": "#6bfad8",
+                            "secondary": "#dbb8ff",
+                            "tertiary-container": "#00866f",
+                            "primary-fixed": "#d8e2ff",
+                            "surface-container": "#1d2026",
+                            "error": "#ffb4ab",
+                            "surface-container-low": "#191c22",
+                            "surface-variant": "#32353c",
+                            "surface-container-lowest": "#0b0e14",
+                            "outline": "#8b90a0",
+                            "surface-tint": "#aec6ff",
+                            "on-error-container": "#ffdad6",
+                            "on-surface-variant": "#c1c6d7",
+                            "tertiary": "#48ddbc",
+                            "on-secondary-fixed-variant": "#6600b7",
+                            "background": "#0b0e14",
+                            "primary-fixed-dim": "#aec6ff",
+                            "error-container": "#93000a",
+                            "primary-container": "#0070f3",
+                            "primary": "#aec6ff",
+                            "surface-dim": "#10131a",
+                            "on-primary-fixed-variant": "#004397",
+                            "on-surface": "#e1e2eb",
+                            "on-tertiary-fixed": "#002019",
+                            "surface-container-high": "#272a31",
+                            "on-primary-fixed": "#001a43",
+                            "on-tertiary-fixed-variant": "#005142",
+                            "surface": "#10131a",
+                            "tertiary-fixed-dim": "#48ddbc",
+                            "on-secondary-container": "#d0a6ff",
+                            "inverse-surface": "#e1e2eb",
+                            "on-error": "#690005",
+                            "outline-variant": "#414754",
+                            "inverse-primary": "#0059c5",
+                            "surface-bright": "#363940"
+                        },
+                        "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                        },
+                        "spacing": {
+                            "sm": "1rem",
+                            "container-max": "1200px",
+                            "md": "1.5rem",
+                            "lg": "2rem",
+                            "gutter": "24px",
+                            "base": "4px",
+                            "xs": "0.5rem",
+                            "xl": "3rem"
+                        },
+                        "fontFamily": {
+                            "headline-lg": ["Geist"],
+                            "display": ["Geist"],
+                            "body-lg": ["Geist"],
+                            "label-sm": ["JetBrains Mono"],
+                            "body-md": ["Geist"],
+                            "label-md": ["JetBrains Mono"],
+                            "headline-md": ["Geist"],
+                            "body-sm": ["Geist"],
+                            "headline-lg-mobile": ["Geist"]
+                        },
+                        "fontSize": {
+                            "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                            "display": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                            "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                            "label-sm": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                            "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                            "label-md": ["13px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                            "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                            "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                            "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                        }
+                    },
+                },
+            }
+        } catch (_e) {}
+    </script>
+<meta charset="utf-8"/>
+</head>
+<body class="flex flex-col min-h-screen bg-surface-container-lowest text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface-container-lowest/80 backdrop-blur-md border-b border-white/5 shadow-sm">
+<div class="flex items-center gap-md">
+<span class="font-display text-headline-md font-bold text-primary tracking-tighter">CODECOLLAB</span>
+<div class="hidden md:flex gap-sm items-center ml-lg">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors duration-200" href="#">Explore</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors duration-200" href="#">Community</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors duration-200" href="#">Workspace</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors duration-200" href="#">Dashboard</a>
+<a class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary pb-1" href="#">About</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container-low border-white/5 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary w-64 transition-all text-on-surface placeholder:text-on-surface-variant/50" placeholder="Search documentation..." type="text"/>
+</div>
+<div class="flex gap-sm items-center">
+<button class="p-2 hover:bg-white/5 rounded-full transition-colors"><span class="material-symbols-outlined text-on-surface-variant">notifications</span></button>
+<button class="p-2 hover:bg-white/5 rounded-full transition-colors"><span class="material-symbols-outlined text-on-surface-variant">smart_toy</span></button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-white/10">
+<img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK7vkVGPw_eDrkU2LMYnUMjlyJmwra1_l5880IZlAXAlS_7UroMxjpiAoaVhlb0Y_nIDmp-ldEVKTf69dsgp6_vAoN0eKVfRfZ6Paq9UfA9A10pSCSVPq-8tFe4Ub7EiD2sYmoVCwkks7Sp-bSHZAtF9NRxrgaIOKfsZlsb5KLeNPP47TaBmMHgvWgWPRo-J4gH1iI0YOHomwskmlT41FNWMCf5uUaEnDfxw9VT6Bj_Pvx0e6nvNGcTg"/>
+</div>
+</div>
+</div>
+</nav>
+<div class="flex pt-16 flex-1">
+<!-- Side Sidebar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-surface-container-low border-r border-white/5 flex flex-col p-md gap-xs overflow-y-auto hidden lg:flex">
+<div class="mb-lg">
+<div class="flex items-center gap-sm mb-1">
+<span class="material-symbols-outlined text-primary">book</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Documentation</span>
+</div>
+<div class="text-[11px] text-on-surface-variant uppercase tracking-widest font-bold opacity-50 px-3 mt-4 mb-2">Getting Started</div>
+<nav class="flex flex-col gap-1">
+<a class="px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-variant/20 rounded-lg transition-all flex items-center justify-between group" href="#">
+                        Introduction
+                        <span class="material-symbols-outlined text-xs opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</a>
+<a class="px-3 py-2 text-sm text-white bg-primary-container rounded-lg transition-all flex items-center justify-between" href="#">
+                        Quick Start Guide
+                        <span class="material-symbols-outlined text-xs">chevron_right</span>
+</a>
+<a class="px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-variant/20 rounded-lg transition-all flex items-center justify-between group" href="#">
+                        Installation
+                        <span class="material-symbols-outlined text-xs opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</a>
+</nav>
+<div class="text-[11px] text-on-surface-variant uppercase tracking-widest font-bold opacity-50 px-3 mt-6 mb-2">API Reference</div>
+<nav class="flex flex-col gap-1">
+<a class="px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-variant/20 rounded-lg transition-all" href="#">Authentication</a>
+<a class="px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-variant/20 rounded-lg transition-all" href="#">Endpoints</a>
+<a class="px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-variant/20 rounded-lg transition-all" href="#">Rate Limiting</a>
+</nav>
+<div class="text-[11px] text-on-surface-variant uppercase tracking-widest font-bold opacity-50 px-3 mt-6 mb-2">CLI Tools</div>
+<nav class="flex flex-col gap-1">
+<a class="px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-variant/20 rounded-lg transition-all" href="#">Configuration</a>
+<a class="px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-variant/20 rounded-lg transition-all" href="#">Command List</a>
+</nav>
+<div class="text-[11px] text-on-surface-variant uppercase tracking-widest font-bold opacity-50 px-3 mt-6 mb-2">AI Integration</div>
+<nav class="flex flex-col gap-1">
+<a class="px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-variant/20 rounded-lg transition-all" href="#">Setting up LLMs</a>
+<a class="px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-variant/20 rounded-lg transition-all" href="#">Copilot Config</a>
+</nav>
+</div>
+<div class="mt-auto pt-lg border-t border-white/5">
+<a class="flex items-center gap-sm p-3 text-sm text-on-surface-variant hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-sm">menu_book</span>
+                    Documentation
+                </a>
+<a class="flex items-center gap-sm p-3 text-sm text-on-surface-variant hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-sm">help</span>
+                    Support
+                </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 lg:ml-64 p-lg max-w-5xl mx-auto w-full">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-xs text-xs text-on-surface-variant mb-lg font-label-sm">
+<a class="hover:text-primary transition-colors" href="#">Docs</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Getting Started</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-on-surface">Quick Start Guide</span>
+</div>
+<!-- Header Section -->
+<header class="mb-xl">
+<h1 class="font-headline-lg text-headline-lg mb-sm text-on-surface">Quick Start Guide</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant leading-relaxed max-w-3xl">
+                    Get up and running with CODECOLLAB in under five minutes. This guide covers the basics of workspace setup, repository connection, and starting your first AI-assisted sprint.
+                </p>
+</header>
+<!-- Feature Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md mb-xl">
+<div class="bg-surface-container-low border border-white/5 rounded-xl p-lg hover:border-primary/40 transition-all duration-300 group">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-md group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary">rocket_launch</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-xs text-on-surface">Fast Onboarding</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Import your existing GitHub or GitLab repositories with a single click. Our zero-config setup handles dependencies automatically.</p>
+</div>
+<div class="bg-surface-container-low border border-white/5 rounded-xl p-lg hover:border-primary/40 transition-all duration-300 group">
+<div class="w-10 h-10 rounded-lg bg-tertiary/10 flex items-center justify-center mb-md group-hover:bg-tertiary/20 transition-colors">
+<span class="material-symbols-outlined text-tertiary">smart_toy</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-xs text-on-surface">AI Assistance</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Enable autonomous agents to monitor your PRs and suggest structural improvements based on your team's unique coding style.</p>
+</div>
+</div>
+<!-- Content Section: Code Snippet -->
+<section class="mb-xl">
+<h2 class="font-headline-md text-headline-md mb-md flex items-center gap-sm text-on-surface">
+<span class="material-symbols-outlined text-primary">terminal</span>
+                    1. Installing CLI Tools
+                </h2>
+<p class="text-body-md font-body-md text-on-surface-variant mb-md">
+                    The CODECOLLAB CLI is the fastest way to interact with your workspace from your local environment. Use the following command to install it globally via npm:
+                </p>
+<div class="rounded-xl overflow-hidden bg-surface-container-lowest border border-white/10 group relative">
+<div class="flex items-center justify-between px-md py-2 bg-surface-container-low border-b border-white/5">
+<div class="flex gap-2">
+<div class="w-3 h-3 rounded-full bg-error/40"></div>
+<div class="w-3 h-3 rounded-full bg-secondary/40"></div>
+<div class="w-3 h-3 rounded-full bg-tertiary/40"></div>
+</div>
+<span class="text-[10px] font-label-sm text-on-surface-variant uppercase tracking-tighter">Terminal — Bash</span>
+<button class="p-1.5 hover:bg-white/5 rounded transition-colors text-on-surface-variant flex items-center gap-1 group/btn" onclick="copyCode(this)">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+<span class="text-[11px] font-label-sm">Copy</span>
+</button>
+</div>
+<div class="p-md">
+<pre class="text-label-md font-label-md leading-relaxed text-primary"><code>npm install -g @codecollab/cli
+cc auth login
+cc project init --template node-standard</code></pre>
+</div>
+</div>
+</section>
+<!-- Table of Contents -->
+<section class="mb-xl border-l-4 border-primary/20 pl-md py-2">
+<h4 class="font-label-md text-label-md font-bold mb-sm text-primary uppercase">What's Next?</h4>
+<ul class="space-y-3">
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-1">check_circle</span>
+<div>
+<span class="font-bold text-on-surface">Connect Repositories:</span>
+<p class="text-sm text-on-surface-variant">Learn how to link your source control accounts.</p>
+</div>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-1">check_circle</span>
+<div>
+<span class="font-bold text-on-surface">Invite Teammates:</span>
+<p class="text-sm text-on-surface-variant">Set up roles and permissions for your development squad.</p>
+</div>
+</li>
+</ul>
+</section>
+<!-- Image Asset -->
+<div class="mb-xl rounded-2xl overflow-hidden border border-white/10 bg-surface-container-low shadow-2xl">
+<img alt="Dashboard screenshot" class="w-full h-auto aspect-video object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDi0g7QnvpYK3nAjBCgr8PhB2gHEmms6J05Gsjv50FOoG459a4-c8NOZM9jgFwc2VJTpdvmrUKP5ynE889HViy73cSclftoFLhf0bLFZMUzsN5rlqrVOIZmKolOh3eW_RiTxC1DoOaPzf4aR5_lplMfySwskHYAmXGMomISEH4fQtDXJabvflI-sbw1Ih6bHMEtYnYU9_X08eYztLn7zEvyDBkxOamVMmjRO3uSijyhH24X1aXplInUg"/>
+</div>
+<!-- Footer Navigation -->
+<div class="flex justify-between items-center py-xl border-t border-white/5">
+<a class="flex flex-col gap-1 text-on-surface-variant hover:text-primary transition-all group" href="#">
+<span class="text-xs font-label-sm uppercase opacity-50">Previous</span>
+<span class="flex items-center gap-1 font-bold text-on-surface group-hover:text-primary">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+                        Introduction
+                    </span>
+</a>
+<a class="flex flex-col items-end gap-1 text-on-surface-variant hover:text-primary transition-all group" href="#">
+<span class="text-xs font-label-sm uppercase opacity-50">Next</span>
+<span class="flex items-center gap-1 font-bold text-on-surface group-hover:text-primary">
+                        Installation
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</span>
+</a>
+</div>
+</main>
+</div>
+<!-- Global Footer -->
+<footer class="w-full py-xl px-lg bg-surface-container-lowest border-t border-white/5">
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-lg">
+<div class="col-span-1 md:col-span-2">
+<span class="font-display text-headline-sm text-on-surface font-bold mb-md block">CODECOLLAB</span>
+<p class="text-body-sm font-body-sm text-on-surface-variant max-w-sm mb-md">
+                    The complete developer workflow orchestration platform. Built by developers, for developers who demand precision and speed.
+                </p>
+<div class="flex gap-md">
+<a class="text-on-surface-variant hover:text-primary transition-all" href="#"><span class="material-symbols-outlined">public</span></a>
+<a class="text-on-surface-variant hover:text-primary transition-all" href="#"><span class="material-symbols-outlined">terminal</span></a>
+<a class="text-on-surface-variant hover:text-primary transition-all" href="#"><span class="material-symbols-outlined">chat</span></a>
+</div>
+</div>
+<div>
+<h5 class="font-label-sm text-label-sm text-primary uppercase mb-md font-bold">Resources</h5>
+<ul class="flex flex-col gap-2">
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-all" href="#">Documentation</a></li>
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-all" href="#">API Reference</a></li>
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-all" href="#">CLI Tools</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-label-sm text-label-sm text-primary uppercase mb-md font-bold">Legal</h5>
+<ul class="flex flex-col gap-2">
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-all" href="#">Privacy Policy</a></li>
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-all" href="#">Terms of Service</a></li>
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-all" href="#">Security</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-container-max mx-auto mt-xl pt-lg border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-md">
+<p class="text-xs text-on-surface-variant">© 2024 CODECOLLAB. Engineered for performance.</p>
+<div class="flex gap-md">
+<a class="text-xs text-on-surface-variant hover:text-primary underline transition-all" href="#">Back to Home</a>
+</div>
+</div>
+</footer>
+<script>
+        function copyCode(button) {
+            const pre = button.closest('.group').querySelector('pre');
+            const code = pre.innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const label = button.querySelector('span:last-child');
+                const icon = button.querySelector('.material-symbols-outlined');
+                const originalText = label.innerText;
+                const originalIcon = icon.innerText;
+                
+                label.innerText = 'Copied!';
+                icon.innerText = 'check';
+                button.classList.add('text-tertiary');
+                
+                setTimeout(() => {
+                    label.innerText = originalText;
+                    icon.innerText = originalIcon;
+                    button.classList.remove('text-tertiary');
+                }, 2000);
+            });
+        }
+
+        // Search highlight interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+        });
+    </script>
+</body></html>

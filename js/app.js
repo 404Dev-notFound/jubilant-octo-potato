@@ -63,12 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Parallax Scrolling for Nebula Background
+    // Scroll Progress for Nebula Background (Camera animation driven in index.html)
     window.addEventListener('scroll', () => {
-        if (nebulaBg) {
-            const scrolled = window.scrollY;
-            nebulaBg.style.transform = `translateY(${scrolled * 0.4}px)`;
-        }
+        // No longer translating the nebulaBg directly, it remains fixed.
+        // The ThreeJS script in index.html will read window.scrollY.
     });
 
     // Global Link Interceptor & Action Handler

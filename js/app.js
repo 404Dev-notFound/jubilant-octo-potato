@@ -79,7 +79,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.hash = href.substring(1) || 'home';
             }
         }
-        
+        const formBtn = e.target.closest('[data-form]');
+        if (formBtn) {
+            e.preventDefault();
+            const formName = formBtn.getAttribute('data-form');
+            if (viewCache[formName]) {
+                window.UI.openModal(viewCache[formName]);
+            } else {
+                fetch(`forms/${formName}.html`)
+                    .then(res => {
+                        if (!res.ok) throw new Error('Form not found');
+                        return res.text();
+                    })
+                    .then(html => {
+                        viewCache[formName] = html;
+                        window.UI.openModal(html);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        window.UI.showToast('Error loading form', 'error');
+                    });
+            }
+            return;
+        }
+
         const actionBtn = e.target.closest('[data-action]');
         if (actionBtn) {
             const action = actionBtn.getAttribute('data-action');

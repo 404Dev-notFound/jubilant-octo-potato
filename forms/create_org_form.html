@@ -1,0 +1,42 @@
+<div class="glass-panel rounded-2xl border-t-4 border-t-secondary overflow-hidden shadow-2xl max-w-md w-full mx-auto animate-fade-in-up max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center p-md border-b border-white/5 bg-surface-container sticky top-0 z-10 backdrop-blur-md">
+        <h3 class="font-bold text-xl text-on-surface flex items-center gap-xs">
+            <span class="material-symbols-outlined text-secondary">domain_add</span>
+            Create Organization
+        </h3>
+        <button data-close-modal class="text-on-surface-variant hover:text-error transition-colors p-1">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    
+    <div class="p-xl">
+        <p class="text-on-surface-variant mb-lg text-sm text-center">Form an organization to manage multiple projects and team members in one place.</p>
+        
+        <form id="createOrgForm" class="space-y-md" onsubmit="event.preventDefault(); window.UI.closeModal(); window.UI.showToast('Organization created successfully!', 'success');">
+            
+            <div>
+                <label class="block text-sm font-label-sm text-on-surface mb-xs">Organization Name</label>
+                <input type="text" required placeholder="e.g. OpenSource Heroes" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-label-sm text-on-surface mb-xs">Description</label>
+                <textarea rows="3" required placeholder="What is the mission of your organization?" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors resize-none"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-label-sm text-on-surface mb-xs">Website URL</label>
+                <input type="url" placeholder="https://opensourceheroes.org" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
+            </div>
+            
+            <div class="flex justify-end gap-sm pt-md border-t border-white/5">
+                <button type="button" data-close-modal class="px-xl py-md bg-surface-variant text-on-surface rounded-xl font-bold hover:bg-outline-variant transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" class="px-xl py-md bg-secondary text-on-secondary rounded-xl font-bold shadow-lg shadow-secondary/20 hover:scale-[1.02] transition-transform flex items-center gap-xs">
+                    Create <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

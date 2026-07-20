@@ -1,0 +1,530 @@
+==========================================
+CODECOLLAB - DATABASE SETUP JOURNEY
+==========================================
+
+Date: 21 July 2026
+
+------------------------------------------
+WHAT WAS THE PROBLEM?
+------------------------------------------
+
+Initially Prisma was not able to connect to PostgreSQL.
+
+Error:
+
+P1000: Authentication failed against database server.
+
+At first it looked like the username/password was wrong, but the actual issue was completely different.
+
+I had two PostgreSQL servers running on my system:
+
+1. Local PostgreSQL installed on Windows.
+2. PostgreSQL running inside Docker.
+
+Both were trying to use port 5432.
+
+Because of this Prisma was connecting to the local PostgreSQL instead of the Docker database, which caused the authentication error.
+
+So the credentials were actually correct, but Prisma was reaching the wrong database.
+
+==========================================
+EVERYTHING WE DID (STEP BY STEP)
+==========================================
+
+STEP 1
+Checked system virtualization.
+
+Confirmed virtualization was enabled.
+
+------------------------------------------
+
+STEP 2
+
+Verified WSL installation.
+
+Command:
+
+wsl --status
+
+Result:
+
+Default Distribution: docker-desktop
+Default Version: 2
+
+WSL2 was already configured.
+
+------------------------------------------
+
+STEP 3
+
+Verified Docker installation.
+
+Command:
+
+docker --version
+
+Docker was installed successfully.
+
+------------------------------------------
+
+STEP 4
+
+Verified Docker Engine.
+
+Command:
+
+docker ps
+
+Docker Engine was running correctly.
+
+------------------------------------------
+
+STEP 5
+
+Checked project structure.
+
+Verified these files already existed:
+
+✔ docker-compose.yml
+✔ .env
+✔ prisma/
+✔ package.json
+
+No need to recreate them.
+
+------------------------------------------
+
+STEP 6
+
+Verified docker-compose.yml
+
+Container:
+
+codecollab_db
+
+Database:
+
+codecollab
+
+User:
+
+postgres
+
+Password:
+
+postgrespassword
+
+Port:
+
+5432
+
+Everything was configured correctly.
+
+------------------------------------------
+
+STEP 7
+
+Verified .env
+
+DATABASE_URL
+
+postgresql://postgres:postgrespassword@localhost:5432/codecollab?schema=public
+
+Everything matched docker-compose.
+
+------------------------------------------
+
+STEP 8
+
+Started PostgreSQL.
+
+Command:
+
+docker compose up -d
+
+Container started successfully.
+
+------------------------------------------
+
+STEP 9
+
+Verified Prisma schema.
+
+Datasource:
+
+PostgreSQL
+
+Model:
+
+Project
+
+Schema was valid.
+
+------------------------------------------
+
+STEP 10
+
+Tried:
+
+npx prisma generate
+
+Problem:
+
+PowerShell execution policy blocked npx.
+
+Fixed by running:
+
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+
+------------------------------------------
+
+STEP 11
+
+Generated Prisma Client.
+
+New problem appeared.
+
+Prisma 7 no longer supports:
+
+url = env("DATABASE_URL")
+
+inside schema.prisma.
+
+------------------------------------------
+
+STEP 12
+
+Checked installed version.
+
+Found:
+
+Prisma 7.8.0
+
+------------------------------------------
+
+STEP 13
+
+Decision:
+
+Downgrade to Prisma 6.
+
+Reason:
+
+Stable
+Less configuration
+Better documentation
+Compatible with existing schema
+
+------------------------------------------
+
+STEP 14
+
+Removed Prisma 7.
+
+npm uninstall prisma @prisma/client
+
+------------------------------------------
+
+STEP 15
+
+Installed Prisma 6.
+
+npm install prisma@6.16.3 @prisma/client@6.16.3
+
+------------------------------------------
+
+STEP 16
+
+Removed:
+
+prisma.config.ts
+
+Not required in Prisma 6.
+
+------------------------------------------
+
+STEP 17
+
+Generated Prisma Client.
+
+Command:
+
+npx prisma generate
+
+Success.
+
+------------------------------------------
+
+STEP 18
+
+Tried:
+
+npx prisma db push
+
+Got:
+
+P1000 Authentication Failed
+
+------------------------------------------
+
+STEP 19
+
+Checked Docker container environment.
+
+Verified:
+
+POSTGRES_USER
+
+POSTGRES_PASSWORD
+
+POSTGRES_DB
+
+Everything was correct.
+
+------------------------------------------
+
+STEP 20
+
+Deleted container and Docker volume.
+
+Commands:
+
+docker compose down -v
+
+Reason:
+
+Maybe old PostgreSQL credentials were stored.
+
+------------------------------------------
+
+STEP 21
+
+Recreated PostgreSQL.
+
+docker compose up -d
+
+Still got P1000.
+
+------------------------------------------
+
+STEP 22
+
+Connected directly inside Docker.
+
+Command:
+
+docker exec -it codecollab_db psql -U postgres -d codecollab
+
+Successfully entered PostgreSQL.
+
+This proved:
+
+✔ Database works
+✔ Credentials work
+✔ Docker works
+
+Meaning the problem was somewhere outside PostgreSQL.
+
+------------------------------------------
+
+STEP 23
+
+Checked active services.
+
+Command:
+
+netstat -ano | findstr :5432
+
+Found TWO processes listening on port 5432.
+
+------------------------------------------
+
+STEP 24
+
+Identified both processes.
+
+Process 1
+
+postgres.exe
+
+(Local PostgreSQL)
+
+Process 2
+
+com.docker.backend.exe
+
+(Docker PostgreSQL)
+
+Finally found the real issue.
+
+------------------------------------------
+
+STEP 25
+
+Stopped Windows PostgreSQL service.
+
+Now only Docker was using port 5432.
+
+------------------------------------------
+
+STEP 26
+
+Ran:
+
+npx prisma db push
+
+Success.
+
+Database synced successfully.
+
+Prisma Client generated.
+
+Everything worked.
+
+==========================================
+CURRENT STATUS
+==========================================
+
+✔ Docker Installed
+
+✔ WSL2 Working
+
+✔ PostgreSQL Running
+
+✔ Docker Container Running
+
+✔ Prisma 6 Installed
+
+✔ Prisma Client Generated
+
+✔ Database Connected
+
+✔ Schema Synced
+
+✔ Project Table Created
+
+Database setup is now complete.
+
+==========================================
+NEXT TODO
+==========================================
+
+1.
+
+Create seed.js
+
+------------------------------------------
+
+2.
+
+Insert demo data.
+
+Projects:
+
+• CODECOLLAB (Pinned)
+
+• 15 Demo Projects
+
+------------------------------------------
+
+3.
+
+Configure package.json
+
+Add:
+
+"prisma": {
+  "seed": "node prisma/seed.js"
+}
+
+------------------------------------------
+
+4.
+
+Run:
+
+npx prisma db seed
+
+------------------------------------------
+
+5.
+
+Verify data.
+
+Open:
+
+npx prisma studio
+
+------------------------------------------
+
+6.
+
+Start Backend Development.
+
+Create:
+
+controllers/
+
+routes/
+
+middlewares/
+
+services/
+
+utils/
+
+------------------------------------------
+
+7.
+
+Build Project APIs.
+
+GET /projects
+
+GET /projects/:id
+
+POST /projects
+
+PUT /projects/:id
+
+DELETE /projects/:id
+
+------------------------------------------
+
+8.
+
+Connect Frontend with Database.
+
+Remove hardcoded project data.
+
+Fetch projects directly from PostgreSQL.
+
+------------------------------------------
+
+9.
+
+Continue building CODECOLLAB features one by one.
+
+Authentication
+
+Users
+
+Teams
+
+Project Applications
+
+Issues
+
+Chat
+
+AI
+
+Notifications
+
+GitHub Integration
+
+Realtime Collaboration
+
+==========================================
+END OF DATABASE SETUP
+==========================================

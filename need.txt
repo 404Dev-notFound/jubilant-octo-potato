@@ -1,0 +1,26 @@
+# CODECOLLAB - Backend Database Requirements
+
+To successfully run the PostgreSQL database locally using Docker and Prisma, your system needs to meet the following requirements:
+
+## 1. Docker Desktop
+- **Installation**: You must have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed on your machine.
+- **Running State**: The Docker engine MUST be actively running before executing the setup. If Docker Desktop is closed, the system cannot pull the PostgreSQL image or start the container.
+- **Docker API**: The Docker daemon/API must be accessible (this usually happens automatically when Docker Desktop is running).
+
+## 2. Node.js and npm
+- **Installation**: You need Node.js installed (you currently have v24.18.0, which is great).
+- **Execution Policies (Windows)**: Since you are on Windows using PowerShell, running `.ps1` scripts like `npm` might be blocked by default. You can bypass this by explicitly using `npm.cmd` or running `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` in a PowerShell window as Administrator.
+
+## 3. Network Ports
+- **Port 5432**: Ensure that port 5432 is free on your local machine. This is the default port for PostgreSQL and where the Docker container will be mapped. If you already have a local Postgres instance running directly on your OS, it might conflict with the Docker container.
+
+## 4. Prisma Setup (Already Handled in Code)
+- Prisma requires internet access to download the Prisma query engines the first time it runs `npx prisma generate` or `npx prisma db push`.
+- The `.env` file must contain a valid `DATABASE_URL` pointing to the Docker Postgres instance (I have already updated this for you).
+
+## Recommended Tools (Optional but Helpful)
+- **Database Client**: Consider installing [DBeaver](https://dbeaver.io/) or using Prisma Studio (`npx prisma studio`) to visually explore the data we insert into PostgreSQL.
+
+---
+
+Once Docker Desktop is open and running, we can proceed with starting the database, applying the Prisma schema, and seeding the projects data!

@@ -158,18 +158,23 @@
                     <span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full animate-pulse"></span>
                 </a>
                 
-                <!-- Profile Menu Dropdown Trigger -->
+                <!-- Authentication Buttons -->
+                <div class="hidden md:flex items-center gap-sm ml-sm">
+                    <button data-form="login_form" class="px-md py-sm text-sm font-bold text-on-surface hover:text-primary transition-colors">Log In</button>
+                    <button data-form="sign_up_form" class="px-md py-sm text-sm font-bold bg-primary text-on-primary rounded-lg hover:scale-105 transition-transform shadow-lg shadow-primary/20">Sign Up</button>
+                </div>
+
+                <!-- Profile Menu Dropdown Trigger (Hidden until logged in logically, but kept for demo) -->
                 <div class="relative group cursor-pointer ml-sm">
                     <div class="w-[32px] h-[32px] rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm hover:ring-2 hover:ring-primary/50 transition-all">
                         U
                     </div>
                     <!-- Dropdown -->
-                    <div class="absolute right-0 mt-2 w-48 bg-surface-container-high rounded-xl border border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
-                        <div class="p-xs flex flex-col">
-                            <a href="#user_profile" class="px-md py-sm text-sm text-on-surface hover:bg-surface-variant rounded-lg transition-colors">Profile</a>
-                            <a href="#settings" class="px-md py-sm text-sm text-on-surface hover:bg-surface-variant rounded-lg transition-colors">Settings</a>
-                            <div class="h-[1px] bg-outline-variant w-full my-xs"></div>
-                            <a href="#login" class="px-md py-sm text-sm text-error hover:bg-error/10 rounded-lg transition-colors">Sign out</a>
+                        <div class="absolute right-0 mt-2 w-48 py-sm bg-surface-container-high rounded-xl border border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                            <a href="#" data-form="edit_profile_form" class="px-md py-sm text-sm text-on-surface hover:bg-surface-variant rounded-lg transition-colors block">Edit Profile</a>
+                            <a href="#settings" class="px-md py-sm text-sm text-on-surface hover:bg-surface-variant rounded-lg transition-colors block">Settings</a>
+                            <div class="h-px bg-white/10 my-xs mx-md"></div>
+                            <a href="#" data-form="login_form" class="px-md py-sm text-sm text-error hover:bg-error/10 rounded-lg transition-colors block">Sign out</a>
                         </div>
                     </div>
                 </div>

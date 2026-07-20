@@ -1,0 +1,25 @@
+{
+  "name": "codecollab_v2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/404Dev-notFound/jubilant-octo-potato.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/404Dev-notFound/jubilant-octo-potato/issues"
+  },
+  "homepage": "https://github.com/404Dev-notFound/jubilant-octo-potato#readme",
+  "dependencies": {
+    "@prisma/client": "^6.16.3",
+    "prisma": "^6.16.3"
+  }
+}

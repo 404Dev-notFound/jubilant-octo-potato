@@ -12,10 +12,14 @@ docker-compose up -d
 To view the seeded project data in your browser, run:
 npx prisma studio
 
-### 3. Start the Frontend Website
-In a new terminal window inside the project folder, run a local python server:
+### 3. Start the API Server
+In a new terminal window inside the project folder, run the Node.js API server:
+node server.js
+
+### 4. Start the Frontend Website
+In another new terminal window inside the project folder, run a local python server:
 python -m http.server 8080
 
-### 4. View the App
+### 5. View the App
 Open your web browser and go to:
 http://localhost:8080/

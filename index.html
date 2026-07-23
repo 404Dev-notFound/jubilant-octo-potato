@@ -159,14 +159,14 @@
                 </a>
                 
                 <!-- Authentication Buttons -->
-                <div class="hidden md:flex items-center gap-sm ml-sm">
+                <div id="auth-buttons-container" class="hidden md:flex items-center gap-sm ml-sm">
                     <button data-form="login_form" class="px-md py-sm text-sm font-bold text-on-surface hover:text-primary transition-colors">Log In</button>
                     <button data-form="sign_up_form" class="px-md py-sm text-sm font-bold bg-primary text-on-primary rounded-lg hover:scale-105 transition-transform shadow-lg shadow-primary/20">Sign Up</button>
                 </div>
 
                 <!-- Profile Menu Dropdown Trigger (Hidden until logged in logically, but kept for demo) -->
-                <div class="relative group cursor-pointer ml-sm">
-                    <div class="w-[32px] h-[32px] rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm hover:ring-2 hover:ring-primary/50 transition-all">
+                <div id="profile-dropdown-container" class="relative group cursor-pointer ml-sm hidden">
+                    <div id="profile-avatar" class="w-[32px] h-[32px] rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm hover:ring-2 hover:ring-primary/50 transition-all uppercase">
                         U
                     </div>
                     <!-- Dropdown -->
@@ -174,7 +174,7 @@
                             <a href="#" data-form="edit_profile_form" class="px-md py-sm text-sm text-on-surface hover:bg-surface-variant rounded-lg transition-colors block">Edit Profile</a>
                             <a href="#settings" class="px-md py-sm text-sm text-on-surface hover:bg-surface-variant rounded-lg transition-colors block">Settings</a>
                             <div class="h-px bg-white/10 my-xs mx-md"></div>
-                            <a href="#" data-form="login_form" class="px-md py-sm text-sm text-error hover:bg-error/10 rounded-lg transition-colors block">Sign out</a>
+                            <a href="#" id="logout-btn" class="px-md py-sm text-sm text-error hover:bg-error/10 rounded-lg transition-colors block">Sign out</a>
                         </div>
                     </div>
                 </div>

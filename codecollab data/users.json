@@ -1,0 +1,21 @@
+[
+  {
+    "id": "1784846756266",
+    "createdAt": "2026-07-23T22:45:56.266Z",
+    "username": "test_user",
+    "email": "test@example.com"
+  },
+  {
+    "id": "1784847360354",
+    "createdAt": "2026-07-23T22:56:00.354Z",
+    "Alex Developer": "dev goel",
+    "email": "devgoel@gmail.com",
+    "password": "password"
+  },
+  {
+    "id": "1784847426484",
+    "createdAt": "2026-07-23T22:57:06.484Z",
+    "email": "devtestmail@gmail.com",
+    "password": "testpassword"
+  }
+]

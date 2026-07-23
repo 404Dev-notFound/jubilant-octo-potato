@@ -1,0 +1,67 @@
+export function render_add_project_form() {
+    return `<div class="glass-panel rounded-2xl border-t-4 border-t-secondary overflow-hidden shadow-2xl max-w-2xl w-full mx-auto animate-fade-in-up max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center p-md border-b border-white/5 bg-surface-container sticky top-0 z-10 backdrop-blur-md">
+        <h3 class="font-bold text-xl text-on-surface flex items-center gap-xs">
+            <span class="material-symbols-outlined text-secondary">add_box</span>
+            Add New Project
+        </h3>
+        <button data-close-modal class="text-on-surface-variant hover:text-error transition-colors p-1">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    
+    <div class="p-xl">
+        <form id="addProjectForm" class="space-y-lg" >
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                <div>
+                    <label class="block text-sm font-label-sm text-on-surface mb-xs">Project Title</label>
+                    <input type="text" required placeholder="e.g. NextGen API" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-label-sm text-on-surface mb-xs">Category</label>
+                    <select required class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors appearance-none">
+                        <option value="" disabled selected>Select category...</option>
+                        <option value="AI">Artificial Intelligence</option>
+                        <option value="Web">Web Development</option>
+                        <option value="Mobile">Mobile App</option>
+                        <option value="Developer Tools">Developer Tools</option>
+                        <option value="Open Source Platform">Open Source Platform</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-label-sm text-on-surface mb-xs">Tech Stack (comma separated)</label>
+                <input type="text" required placeholder="e.g. React, Node.js, MongoDB" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
+            </div>
+
+            <div>
+                <label class="block text-sm font-label-sm text-on-surface mb-xs">Image URL (Thumbnail)</label>
+                <input type="url" required placeholder="https://picsum.photos/600/400" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-label-sm text-on-surface mb-xs">Short Description</label>
+                <textarea required rows="3" placeholder="Briefly describe your project..." class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors resize-none"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-label-sm text-on-surface mb-xs">GitHub Repository URL</label>
+                <input type="url" required placeholder="https://github.com/username/repo" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
+            </div>
+            
+            <div class="flex justify-end gap-sm pt-md border-t border-white/5">
+                <button type="button" data-close-modal class="px-xl py-md bg-surface-variant text-on-surface rounded-xl font-bold hover:bg-outline-variant transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" class="px-xl py-md bg-secondary text-on-secondary rounded-xl font-bold shadow-lg shadow-secondary/20 hover:scale-[1.02] transition-transform flex items-center gap-xs">
+                    Submit Project <span class="material-symbols-outlined text-sm">cloud_upload</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+`;
+}

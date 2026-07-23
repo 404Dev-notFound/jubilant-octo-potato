@@ -1,0 +1,17 @@
+export function render_add_project() {
+    return `
+<main class="relative z-10 w-full p-xl flex flex-col min-h-screen">
+    <div class="glass-panel p-lg rounded-xl flex-1 flex flex-col mt-xl">
+        <h1 class="font-display text-headline-lg text-primary mb-md">Add Project</h1>
+        <div class="h-[1px] bg-outline-variant mb-lg"></div>
+        <div class="flex-1 text-on-surface-variant flex items-center justify-center border-2 border-dashed border-outline-variant rounded-lg">
+            <div class="text-center">
+                <span class="material-symbols-outlined text-[48px] mb-sm opacity-50" data-icon="construction">construction</span>
+                <h2 class="text-headline-md text-on-surface mb-xs">Module Under Construction</h2>
+                <p>The Add Project functionality is currently being assembled.</p>
+            </div>
+        </div>
+    </div>
+</main>
+`;
+}

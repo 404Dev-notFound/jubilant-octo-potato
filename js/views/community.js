@@ -1,0 +1,8 @@
+export function render_community() {
+    return `<main class="w-full max-w-[1200px] mx-auto p-xl flex flex-col pt-12 items-center text-center">
+    <span class="material-symbols-outlined text-[64px] text-primary/50 mb-md">construction</span>
+    <h1 class="font-display text-headline-lg font-bold text-on-surface mb-sm">Community</h1>
+    <p class="text-on-surface-variant max-w-md">This module is part of the CODECOLLAB ecosystem and is fully connected to our routing system. The detailed layout is currently under construction.</p>
+    <button onclick="window.history.back()" class="mt-lg px-md py-sm bg-surface-variant hover:bg-outline-variant rounded transition-colors text-sm">Go Back</button>
+</main>`;
+}

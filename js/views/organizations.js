@@ -1,0 +1,14 @@
+export function render_organizations() {
+    return `<main class="w-full max-w-[1200px] mx-auto p-xl flex flex-col pt-12 items-center text-center">
+    <span class="material-symbols-outlined text-[64px] text-primary/50 mb-md">construction</span>
+    <h1 class="font-display text-headline-lg font-bold text-on-surface mb-sm">Organizations</h1>
+    <p class="text-on-surface-variant max-w-md">This module is part of the CODECOLLAB ecosystem and is fully connected to our routing system. The detailed layout is currently under construction.</p>
+    
+    <div class="mt-lg flex gap-md">
+        <button onclick="window.history.back()" class="px-md py-sm bg-surface-variant hover:bg-outline-variant rounded transition-colors text-sm">Go Back</button>
+        <button data-form="create_org_form" class="px-xl py-sm bg-secondary text-on-secondary rounded-lg font-bold shadow-lg shadow-secondary/20 hover:scale-[1.02] transition-transform">
+            Create Organization
+        </button>
+    </div>
+</main>`;
+}

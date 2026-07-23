@@ -1,0 +1,1121 @@
+export function render_home_explore() {
+    return `
+ Top Navigation Bar 
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-outline-variant bg-background/80 backdrop-blur-md px-4 lg:px-40 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-on-background text-lg font-bold leading-tight tracking-[-0.015em]">CODECOLLAB</h2>
+</div>
+<label class="hidden md:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full overflow-hidden">
+<div class="text-outline flex border-none bg-surface-container-high items-center justify-center pl-4" data-icon="MagnifyingGlass">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-on-surface focus:outline-0 focus:ring-0 border-none bg-surface-container-high px-4 pl-2 text-base font-normal placeholder:text-outline" placeholder="Search" value=""/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="hidden lg:flex items-center gap-9">
+<a class="text-on-surface-variant hover:text-primary text-sm font-medium transition-colors" href="/dashboard">Dashboard</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary pb-1" href="/explore">Explore</a>
+<a class="text-on-surface-variant hover:text-primary text-sm font-medium transition-colors" href="/workspace">Workspace</a>
+<a class="text-on-surface-variant hover:text-primary text-sm font-medium transition-colors" href="/community">Community</a>
+<a class="text-on-surface-variant hover:text-primary text-sm font-medium transition-colors" href="/about">About</a>
+</nav>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary-container text-on-primary-container text-sm font-bold transition-opacity hover:opacity-90">
+<span class="truncate">Get Started</span>
+</button>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative min-h-[80vh] flex items-center justify-center pt-20">
+<!-- 3D Particle Scene Background Placeholder -->
+<div class="absolute inset-0 w-full h-full bg-[#0b0e14]"></div>
+<div class="hero-gradient-overlay absolute inset-0 z-10"></div>
+<div class="relative z-20 container mx-auto px-6 text-center max-w-4xl">
+<h1 class="text-on-background text-display lg:text-[72px] font-bold leading-tight tracking-tight mb-6">Looking someone who can <span class="text-primary italic">commit</span></h1>
+<p class="text-on-surface-variant text-body-lg lg:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
+                    CODECOLLAB connects developers, students, maintainers, and organizations through open-source collaboration, project discovery, and community building.
+                </p>
+<div class="flex flex-wrap items-center justify-center gap-4">
+<button data-form="add_project_form" class="px-8 h-14 rounded-full bg-primary-container text-on-primary-container font-bold text-lg hover:scale-105 transition-transform flex items-center gap-2">
+<span class="">Add Project</span>
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<button class="px-8 h-14 rounded-full bg-surface-container-high text-on-surface font-bold text-lg hover:bg-surface-variant transition-colors flex items-center gap-2">
+<span class="">Start Contributing</span>
+<span class="material-symbols-outlined">rocket_launch</span>
+</button>
+</div>
+<div class="mt-8">
+<button class="text-outline hover:text-primary transition-colors flex items-center gap-2 mx-auto font-medium">
+<span class="">Learn More</span>
+<span class="material-symbols-outlined">arrow_downward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Project Discovery Section (Merged from SCREEN_5) -->
+<section class="py-xl bg-background">
+<div class="container mx-auto px-6 max-w-[1440px]">
+<!-- Search Header -->
+<div class="relative group max-w-3xl mx-auto w-full mb-16">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary/20 via-tertiary/20 to-secondary/20 rounded-2xl blur-lg opacity-40 group-hover:opacity-70 transition-opacity"></div>
+<div class="relative bg-surface-container-low border border-white/10 rounded-2xl p-2 flex items-center shadow-2xl">
+<span class="material-symbols-outlined px-4 text-on-surface-variant text-[28px]">search</span>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-headline-md font-display placeholder:text-on-surface-variant/50 py-4 px-2" placeholder="Search across 15,402 open-source projects..." type="text"/>
+<div class="flex items-center gap-sm pr-4">
+<kbd class="bg-surface-container-highest px-2 py-1 rounded text-label-sm border border-white/10 font-label-md">⌘ K</kbd>
+<button class="bg-primary-container text-on-primary-container p-3 rounded-xl hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">auto_awesome</span>
+</button>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-md px-2">
+<span class="text-label-sm text-on-surface-variant">Recommended:</span>
+<button class="text-label-sm text-primary hover:underline">Neural Networks in Rust</button>
+<button class="text-label-sm text-primary hover:underline">Fullstack SaaS Kits</button>
+<button class="text-label-sm text-primary hover:underline">Web3 Gaming</button>
+</div>
+</div>
+<div class="flex gap-gutter">
+<!-- Filter Sidebar -->
+<aside class="hidden lg:flex flex-col w-64 flex-shrink-0 gap-lg h-fit sticky top-24">
+<div>
+<h3 class="font-label-md text-on-surface-variant mb-md uppercase tracking-wider text-xs">Language</h3>
+<div class="flex flex-col gap-xs">
+<label class="flex items-center gap-sm group cursor-pointer">
+<input checked="" class="form-checkbox bg-surface-container-low border-white/10 rounded text-primary focus:ring-offset-background" type="checkbox"/>
+<span class="text-body-sm text-on-surface group-hover:text-primary transition-colors">JavaScript</span>
+<span class="ml-auto text-label-sm text-on-surface-variant">1.2k</span>
+</label>
+<label class="flex items-center gap-sm group cursor-pointer">
+<input class="form-checkbox bg-surface-container-low border-white/10 rounded text-primary focus:ring-offset-background" type="checkbox"/>
+<span class="text-body-sm text-on-surface group-hover:text-primary transition-colors">Python</span>
+<span class="ml-auto text-label-sm text-on-surface-variant">842</span>
+</label>
+<label class="flex items-center gap-sm group cursor-pointer">
+<input class="form-checkbox bg-surface-container-low border-white/10 rounded text-primary focus:ring-offset-background" type="checkbox"/>
+<span class="text-body-sm text-on-surface group-hover:text-primary transition-colors">Rust</span>
+<span class="ml-auto text-label-sm text-on-surface-variant">321</span>
+</label>
+<label class="flex items-center gap-sm group cursor-pointer">
+<input class="form-checkbox bg-surface-container-low border-white/10 rounded text-primary focus:ring-offset-background" type="checkbox"/>
+<span class="text-body-sm text-on-surface group-hover:text-primary transition-colors">TypeScript</span>
+<span class="ml-auto text-label-sm text-on-surface-variant">1.1k</span>
+</label>
+</div>
+</div>
+<div class="h-px bg-white/5"></div>
+<div>
+<h3 class="font-label-md text-on-surface-variant mb-md uppercase tracking-wider text-xs">Difficulty</h3>
+<div class="grid grid-cols-1 gap-xs">
+<button class="text-left px-sm py-2 rounded-lg bg-primary/10 text-primary border border-primary/20 text-label-md font-medium">Beginner Friendly</button>
+<button class="text-left px-sm py-2 rounded-lg hover:bg-white/5 text-on-surface-variant border border-transparent text-label-md transition-all">Intermediate</button>
+<button class="text-left px-sm py-2 rounded-lg hover:bg-white/5 text-on-surface-variant border border-transparent text-label-md transition-all">Advanced</button>
+</div>
+</div>
+<div class="h-px bg-white/5"></div>
+<div>
+<h3 class="font-label-md text-on-surface-variant mb-md uppercase tracking-wider text-xs">Tech Stack</h3>
+<div class="flex flex-wrap gap-xs">
+<span class="px-3 py-1 bg-surface-container rounded-full text-label-sm text-on-surface-variant border border-white/5 hover:border-primary/50 cursor-pointer transition-colors">React</span>
+<span class="px-3 py-1 bg-surface-container rounded-full text-label-sm text-on-surface-variant border border-white/5 hover:border-primary/50 cursor-pointer transition-colors">Next.js</span>
+<span class="px-3 py-1 bg-surface-container rounded-full text-label-sm text-on-surface-variant border border-white/5 hover:border-primary/50 cursor-pointer transition-colors">Tailwind</span>
+<span class="px-3 py-1 bg-surface-container rounded-full text-label-sm text-on-surface-variant border border-white/5 hover:border-primary/50 cursor-pointer transition-colors">Node.js</span>
+<span class="px-3 py-1 bg-surface-container rounded-full text-label-sm text-on-surface-variant border border-white/5 hover:border-primary/50 cursor-pointer transition-colors">Prisma</span>
+</div>
+</div>
+<div class="mt-8">
+<button class="w-full py-3 bg-primary-container text-on-primary-container font-bold rounded-xl hover:shadow-[0_0_20px_rgba(0,112,243,0.3)] transition-all flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined">filter_list</span>
+                                Apply Filters
+                            </button>
+</div>
+</aside>
+<!-- Main Project Grid -->
+<div class="flex-1">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-md" id="project-grid">
+<!-- Skeleton Loader Items -->
+<div class="glass-card rounded-2xl p-md flex flex-col gap-md opacity-60">
+<div class="h-6 w-3/4 rounded-md shimmer bg-surface-container-highest"></div>
+<div class="space-y-2">
+<div class="h-4 w-full rounded-md shimmer bg-surface-container-highest"></div>
+<div class="h-4 w-5/6 rounded-md shimmer bg-surface-container-highest"></div>
+</div>
+<div class="flex gap-xs mt-auto">
+<div class="h-6 w-12 rounded-full shimmer bg-surface-container-highest"></div>
+<div class="h-6 w-16 rounded-full shimmer bg-surface-container-highest"></div>
+</div>
+<div class="h-10 w-full rounded-xl shimmer bg-surface-container-highest mt-md"></div>
+</div>
+<div class="glass-card rounded-2xl p-md flex flex-col gap-md opacity-60">
+<div class="h-6 w-1/2 rounded-md shimmer bg-surface-container-highest"></div>
+<div class="space-y-2">
+<div class="h-4 w-full rounded-md shimmer bg-surface-container-highest"></div>
+<div class="h-4 w-full rounded-md shimmer bg-surface-container-highest"></div>
+</div>
+<div class="flex gap-xs mt-auto">
+<div class="h-6 w-14 rounded-full shimmer bg-surface-container-highest"></div>
+<div class="h-6 w-12 rounded-full shimmer bg-surface-container-highest"></div>
+</div>
+<div class="h-10 w-full rounded-xl shimmer bg-surface-container-highest mt-md"></div>
+</div>
+<div class="glass-card rounded-2xl p-md flex flex-col gap-md opacity-60">
+<div class="h-6 w-2/3 rounded-md shimmer bg-surface-container-highest"></div>
+<div class="space-y-2">
+<div class="h-4 w-full rounded-md shimmer bg-surface-container-highest"></div>
+<div class="h-4 w-4/6 rounded-md shimmer bg-surface-container-highest"></div>
+</div>
+<div class="flex gap-xs mt-auto">
+<div class="h-6 w-12 rounded-full shimmer bg-surface-container-highest"></div>
+<div class="h-6 w-20 rounded-full shimmer bg-surface-container-highest"></div>
+</div>
+<div class="h-10 w-full rounded-xl shimmer bg-surface-container-highest mt-md"></div>
+</div>
+</div>
+<!-- Real Content -->
+<div class="hidden grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-md" id="real-content">
+
+<!-- Pinned Project Card (CODECOLLAB) -->
+<div class="col-span-1 md:col-span-2 xl:col-span-3 relative group">
+    <!-- Subtle animated glow -->
+    <div class="absolute -inset-1 bg-gradient-to-r from-primary via-tertiary to-secondary rounded-[24px] blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-500 animate-pulse"></div>
+    
+    <div class="relative bg-surface-container-low/40 backdrop-blur-md rounded-[24px] border border-white/10 p-1 flex flex-col xl:flex-row gap-6 overflow-hidden transition-all duration-300 hover:border-primary/50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1">
+        
+        <!-- Pinned Project Image -->
+        <div class="relative xl:w-[50%] h-[300px] xl:h-auto rounded-[20px] overflow-hidden bg-surface-container flex-shrink-0">
+            <div class="absolute top-4 left-4 z-10">
+                <span class="px-3 py-1 bg-black/60 backdrop-blur-md text-white border border-white/20 rounded-lg text-xs font-bold tracking-wider uppercase flex items-center gap-1 shadow-lg">
+                    📌 Featured Project
+                </span>
+            </div>
+            <div class="absolute top-4 right-4 z-10">
+                <span class="px-3 py-1 bg-error/10 text-error border-error/20 border rounded-lg text-xs font-bold shadow-lg backdrop-blur-md bg-opacity-80">
+                    Advanced
+                </span>
+            </div>
+            <!-- Mock Image for now, since it says /pic/screen shot -->
+            <img src="https://picsum.photos/1200/800?random=999" alt="CODECOLLAB Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy" />
+        </div>
+
+        <!-- Pinned Project Content -->
+        <div class="flex flex-col flex-1 p-6 xl:p-8 xl:pl-4 justify-between">
+            <div>
+                <span class="text-primary text-sm font-bold tracking-wider uppercase mb-2 block">Open Source Collaboration Platform</span>
+                <h3 class="text-display sm:text-[40px] font-bold text-on-surface mb-4 leading-tight group-hover:text-primary transition-colors">CODECOLLAB</h3>
+                <p class="text-on-surface-variant text-body-lg mb-6 leading-relaxed">
+                    CODECOLLAB is an AI-powered open-source collaboration platform where developers can discover impactful projects, collaborate in real time, manage teams, contribute to repositories, and accelerate development with integrated AI tools.
+                </p>
+                
+                <!-- Tech Stack Scrollable Area -->
+                <div class="flex flex-wrap gap-2 mb-8 max-h-[120px] overflow-y-auto custom-scrollbar pr-2 pb-2">
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">React.js</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Vite</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Tailwind CSS</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">JavaScript</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Node.js</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Express.js</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">MongoDB</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Mongoose</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Socket.IO</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">JWT Authentication</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">bcrypt</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Monaco Editor</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">CodeMirror</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">WebRTC</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">OpenAI API</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">GitHub API</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">GitHub OAuth</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Git</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">REST API</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Python</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">FastAPI</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Docker</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Cloudinary</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Multer</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Axios</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Markdown</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Mermaid.js</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Framer Motion</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">React Router</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Redux Toolkit</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Context API</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Nodemailer</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Redis</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Vercel</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Render</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">GitHub Actions</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">ESLint</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-on-surface-variant border border-white/5 hover:border-primary/50 transition-colors">Prettier</span>
+
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap items-center gap-4 mt-auto">
+                <a href="https://github.com/404Dev-notFound/jubilant-octo-potato" target="_blank" class="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-xl font-bold hover:bg-white/10 transition-colors">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                    <span>GitHub</span>
+                </a>
+                <a href="#" class="flex items-center gap-2 px-6 py-3 bg-surface-container-high border border-white/10 rounded-xl font-bold hover:bg-surface-variant transition-colors">
+                    View Project
+                </a>
+                <a href="#" class="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-xl font-bold shadow-lg hover:bg-primary-container hover:scale-105 hover:shadow-[0_0_20px_rgba(107,250,216,0.4)] transition-all">
+                    <span>Join Project</span>
+                    <span class="material-symbols-outlined text-[20px]">group_add</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 2 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Social Platform
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-tertiary/10 text-tertiary border-tertiary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Intermediate
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=1" alt="Campus Connect Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">Campus Connect</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            A campus networking platform where students can connect, create communities, share posts, and collaborate on projects.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">MERN</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">Socket.IO</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/campus-connect" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 3 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Developer Tools
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-secondary/10 text-secondary border-secondary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Beginner
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=2" alt="DevPortfolio AI Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">DevPortfolio AI</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            Build beautiful developer portfolios with AI-generated content and modern responsive templates.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">React</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">Tailwind CSS</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/devportfolio-ai" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 4 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                AI
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-error/10 text-error border-error/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Advanced
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=3" alt="Code Review Assistant Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">Code Review Assistant</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            AI-powered code review platform that suggests improvements, detects bugs, and explains best practices.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">React</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">Node.js</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">OpenAI API</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/code-review-assistant" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 5 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Finance
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-secondary/10 text-secondary border-secondary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Beginner
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=4" alt="Smart Expense Manager Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">Smart Expense Manager</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            Track income, expenses, budgets, savings, and monthly financial reports with insightful charts.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">React</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">Express.js</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">MongoDB</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/smart-expense-manager" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 6 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Communication
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-tertiary/10 text-tertiary border-tertiary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Intermediate
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=5" alt="Real-Time Chat Platform Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">Real-Time Chat Platform</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            A real-time messaging application with typing indicators, media sharing, and online presence.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">React</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">Node.js</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">Socket.IO</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/realtime-chat" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 7 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Healthcare
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-tertiary/10 text-tertiary border-tertiary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Intermediate
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=6" alt="Hospital Care System Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">Hospital Care System</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            Complete hospital management solution for doctors, patients, appointments, billing, and reports.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">MERN</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/hospital-care" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 8 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                E-Commerce
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-tertiary/10 text-tertiary border-tertiary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Intermediate
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=7" alt="ShopSphere Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">ShopSphere</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            Full-featured online shopping platform with secure payments, cart, orders, and admin dashboard.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">MERN</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">Stripe</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/shopsphere" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 9 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Education
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-secondary/10 text-secondary border-secondary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Beginner
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=8" alt="QuizVerse Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">QuizVerse</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            Create online quizzes, conduct exams, manage results, and generate leaderboards.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">React</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">Express.js</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/quizverse" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 10 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                AI
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-error/10 text-error border-error/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Advanced
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=9" alt="AI Interview Coach Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">AI Interview Coach</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            Practice technical interviews with AI-generated questions, live coding rounds, and detailed feedback.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">React</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">Node.js</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">OpenAI API</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/ai-interview-coach" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 11 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Productivity
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-secondary/10 text-secondary border-secondary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Beginner
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=10" alt="Team Task Manager Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">Team Task Manager</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            Organize tasks, manage projects, assign team members, and track deadlines efficiently.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">MERN</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/team-task-manager" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 12 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Food Delivery
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-error/10 text-error border-error/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Advanced
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=11" alt="FoodHub Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">FoodHub</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            Food ordering platform with restaurant listings, payments, live tracking, and order history.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">MERN</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/foodhub" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 13 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Utility
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-tertiary/10 text-tertiary border-tertiary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Intermediate
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=12" alt="Secure Share Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">Secure Share</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            Secure file sharing platform with authentication, cloud uploads, and encrypted downloads.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">Node.js</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">MongoDB</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/secure-share" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 14 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Weather
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-secondary/10 text-secondary border-secondary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Beginner
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=13" alt="Climate Dashboard Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">Climate Dashboard</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            Interactive weather dashboard with forecasts, air quality, and location-based weather updates.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">React</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">OpenWeather API</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/climate-dashboard" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 15 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Entertainment
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-tertiary/10 text-tertiary border-tertiary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Intermediate
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=14" alt="CineVerse Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">CineVerse</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            Discover trending movies, explore details, create watchlists, and get AI-powered recommendations.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">React</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">TMDB API</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/cineverse" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Project Card 16 -->
+<div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2">
+    <!-- Thumbnail Area 16:9 -->
+    <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
+        <!-- Badges -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                Health & Fitness
+            </span>
+        </div>
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 bg-tertiary/10 text-tertiary border-tertiary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
+                Intermediate
+            </span>
+        </div>
+        <!-- Image -->
+        <img src="https://picsum.photos/600/400?random=15" alt="FitTrack Pro Thumbnail" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
+        
+        <!-- Gradient Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6 flex flex-col flex-1">
+        <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">FitTrack Pro</h4>
+        
+        <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">
+            Track workouts, calories, sleep, water intake, and fitness progress with detailed analytics.
+        </p>
+
+        <!-- Tech Stack -->
+        <div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">React Native</span>
+<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5 hover:border-primary/40 transition-colors">Firebase</span>
+
+        </div>
+
+        <!-- Card Footer (Buttons) -->
+        <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+            <a href="https://github.com/demo/fittrack-pro" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
+                <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+                <span>Code</span>
+            </a>
+            <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                View Project
+            </a>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+</div>
+</section>
+<!-- Stats/Visual Section -->
+<section class="py-xl">
+<div class="container mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+<div>
+<h2 class="text-headline-lg text-on-background mb-6 leading-tight">Built by the community, <br/>for the community.</h2>
+<p class="text-body-lg text-on-surface-variant mb-8">
+                        We believe that open source is the engine of innovation. CODECOLLAB provides the infrastructure needed for sustainable development.
+                    </p>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="text-primary mt-1">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<div>
+<h4 class="font-bold text-on-background">Verified Organizations</h4>
+<p class="text-on-surface-variant">Work with trusted entities ranging from startups to tech giants.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="text-primary mt-1">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<div>
+<h4 class="font-bold text-on-background">Mentorship Programs</h4>
+<p class="text-on-surface-variant">Bridge the gap between student learning and industry-level contribution.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="relative h-[400px] rounded-2xl overflow-hidden border border-outline-variant shadow-2xl">
+<img alt="Developer Dashboard" class="object-cover w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAO-8501p-cOh2jH75pqCAF-x5oj7l1ubLphwWBm9MHncMYXGN9_numczikinVJDXjH9QIl3XK0aKnm6r8oFynuJRVsb-eV28ucEVd1eEgiWjoG_yPGfTNJA1pR18oTtsuuckMKt4La1Gv7qn1n2YPFd4B5Es8y81PahgXc1fUPIaKhrzyexm66i4qQA8bzbdCEivSkRHmNWPXoSpHIen2hYOdWvlQ7BAH49owyRZ5GPCo_1Z7eKvmU1g"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent"></div>
+</div>
+</div>
+</section>
+<!-- Final CTA Section -->
+<section class="py-xl bg-surface-container">
+<div class="container mx-auto px-6 text-center max-w-3xl">
+<h2 class="text-headline-lg text-on-background mb-4">Ready to build the future?</h2>
+<p class="text-on-surface-variant mb-10">Join thousands of developers contributing to impactful projects and making their mark on the digital world.</p>
+<button class="px-10 h-14 rounded-lg bg-primary-container text-on-primary-container font-bold text-lg hover:shadow-lg hover:shadow-primary/20 transition-all">
+                    Join the Community
+                </button>
+</div>
+</section>
+</main>
+ Footer 
+<footer class="py-lg border-t border-outline-variant px-6 lg:px-40">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="size-5 text-primary">
+<svg fill="currentColor" viewbox="0 0 48 48">
+<path d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z"></path>
+</svg>
+</div>
+<span class="font-bold text-on-background">CODECOLLAB</span>
+</div>
+<div class="flex gap-8 text-on-surface-variant text-sm">
+<a class="hover:text-primary" href="#">Privacy Policy</a>
+<a class="hover:text-primary" href="#">Terms of Service</a>
+<a class="hover:text-primary" href="#">Status</a>
+</div>
+<div class="flex gap-4">
+<a class="text-outline hover:text-primary" href="#"><span class="material-symbols-outlined">public</span></a>
+<a class="text-outline hover:text-primary" href="#"><span class="material-symbols-outlined">forum</span></a>
+</div>
+</div>
+<div class="text-center mt-8 text-outline text-xs">
+            © 2024 CODECOLLAB. Built with passion for Open Source.
+        </div>
+</footer>
+<script class="">
+        // Simulate Loading State for Skeleton Loader Demonstration
+        window.addEventListener('DOMContentLoaded', () => {
+            const skeletons = document.getElementById('project-grid');
+            const content = document.getElementById('real-content');
+
+            setTimeout(() => {
+                if(skeletons && content) {
+                    skeletons.classList.add('hidden');
+                    content.classList.remove('hidden');
+                }
+            }, 800);
+        });
+    </script>`;
+}

@@ -1,0 +1,69 @@
+export function render_ai_workspace() {
+    return `<main class="relative w-full max-w-[1400px] mx-auto p-xl flex flex-col h-[calc(100vh-70px)] pt-4">
+    <div class="flex items-center justify-between mb-lg flex-shrink-0">
+        <div>
+            <h1 class="font-display text-headline-lg text-tertiary mb-xs flex items-center gap-sm">
+                <span class="material-symbols-outlined text-[32px]">smart_toy</span> AI Workspace
+            </h1>
+            <p class="text-on-surface-variant font-label-sm tracking-widest uppercase">Intelligent Code Assistance</p>
+        </div>
+    </div>
+    
+    <div class="flex gap-lg flex-1 min-h-0">
+        <!-- Sidebar Tools List -->
+        <div class="w-64 flex-shrink-0 flex flex-col gap-sm overflow-y-auto no-scrollbar pb-lg pr-sm">
+            <button class="w-full text-left p-sm rounded-lg bg-surface-container border border-tertiary/50 text-tertiary flex items-center gap-sm">
+                <span class="material-symbols-outlined">plagiarism</span> Code Review
+            </button>
+            <button class="w-full text-left p-sm rounded-lg hover:bg-surface-variant border border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-sm transition-colors">
+                <span class="material-symbols-outlined">menu_book</span> Docs Generator
+            </button>
+            <button class="w-full text-left p-sm rounded-lg hover:bg-surface-variant border border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-sm transition-colors">
+                <span class="material-symbols-outlined">pest_control</span> Bug Detection
+            </button>
+            <button class="w-full text-left p-sm rounded-lg hover:bg-surface-variant border border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-sm transition-colors">
+                <span class="material-symbols-outlined">auto_fix_high</span> Refactoring
+            </button>
+            <button class="w-full text-left p-sm rounded-lg hover:bg-surface-variant border border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-sm transition-colors">
+                <span class="material-symbols-outlined">group_add</span> Match Contributor
+            </button>
+            <button class="w-full text-left p-sm rounded-lg hover:bg-surface-variant border border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-sm transition-colors">
+                <span class="material-symbols-outlined">forum</span> AI Chat
+            </button>
+        </div>
+        
+        <!-- Main Tool Area -->
+        <div class="flex-1 glass-panel rounded-xl flex flex-col overflow-hidden border border-tertiary/20">
+            <div class="p-md bg-surface-container border-b border-white/5 flex justify-between items-center">
+                <h3 class="font-bold flex items-center gap-xs text-tertiary"><span class="material-symbols-outlined">plagiarism</span> AI Code Review</h3>
+                <div class="flex gap-xs">
+                    <button class="px-sm py-1 bg-surface-variant rounded text-xs hover:bg-outline-variant transition-colors">Clear</button>
+                    <button class="px-sm py-1 bg-tertiary text-on-primary rounded text-xs font-bold shadow-lg shadow-tertiary/20">Analyze</button>
+                </div>
+            </div>
+            
+            <div class="flex-1 p-md flex flex-col md:flex-row gap-md overflow-hidden">
+                <!-- Editor -->
+                <div class="flex-1 flex flex-col">
+                    <div class="text-xs text-on-surface-variant mb-xs font-bold">PASTE CODE OR LINK GITHUB PR</div>
+                    <textarea class="flex-1 w-full bg-[#0d1117] border border-white/10 rounded-lg p-md font-mono text-sm text-on-surface outline-none focus:border-tertiary/50 resize-none transition-colors" spellcheck="false" placeholder="def memory_intensive_task(data):
+    result = []
+    for d in data:
+        result.append(d ** 2)
+    return result"></textarea>
+                </div>
+                
+                <!-- Results Panel -->
+                <div class="flex-1 bg-surface-container rounded-lg border border-white/5 p-md overflow-y-auto no-scrollbar relative flex flex-col">
+                    <div class="text-xs text-on-surface-variant mb-md font-bold border-b border-outline-variant pb-xs">ANALYSIS RESULTS</div>
+                    
+                    <div class="flex-1 flex flex-col items-center justify-center opacity-50" id="ai-empty-state">
+                        <span class="material-symbols-outlined text-[48px] mb-sm">manage_search</span>
+                        <p class="text-sm">Click Analyze to start AI code review</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>`;
+}

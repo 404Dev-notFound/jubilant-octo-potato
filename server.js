@@ -1,254 +1,132 @@
 const express = require('express');
 const cors = require('cors');
-const { PrismaClient } = require('@prisma/client');
-const { spawn } = require('child_process');
+const fs = require('fs/promises');
 const path = require('path');
 
-const prisma = new PrismaClient();
 const app = express();
+const PORT = 3000;
+const DATA_DIR = path.join(__dirname, 'codecollab data');
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// ==============================================
-// DSA CONCEPT 1: Least Recently Used (LRU) Cache
-// ==============================================
-class Node {
-    constructor(key, value) {
-        this.key = key;
-        this.value = value;
-        this.prev = null;
-        this.next = null;
-    }
-}
+// Helper function to get file path
+const getFilePath = (table) => path.join(DATA_DIR, `${table}.json`);
 
-class LRUCache {
-    constructor(capacity) {
-        this.capacity = capacity;
-        this.map = new Map();
-        
-        // Dummy head and tail
-        this.head = new Node(null, null);
-        this.tail = new Node(null, null);
-        this.head.next = this.tail;
-        this.tail.prev = this.head;
-    }
-    
-    _remove(node) {
-        const prev = node.prev;
-        const next = node.next;
-        prev.next = next;
-        next.prev = prev;
-    }
-    
-    _add(node) {
-        // Add right after head
-        const next = this.head.next;
-        this.head.next = node;
-        node.prev = this.head;
-        node.next = next;
-        next.prev = node;
-    }
-    
-    get(key) {
-        if (this.map.has(key)) {
-            const node = this.map.get(key);
-            this._remove(node);
-            this._add(node);
-            return node.value;
-        }
-        return null;
-    }
-    
-    put(key, value) {
-        if (this.map.has(key)) {
-            this._remove(this.map.get(key));
-        }
-        const node = new Node(key, value);
-        this._add(node);
-        this.map.set(key, node);
-        
-        if (this.map.size > this.capacity) {
-            const lru = this.tail.prev;
-            this._remove(lru);
-            this.map.delete(lru.key);
-        }
-    }
-}
-
-const projectCache = new LRUCache(10); // Cache size of 10
-
-// ==============================================
-// DSA CONCEPT 2: Trie (Prefix Tree) for Search
-// ==============================================
-class TrieNode {
-    constructor() {
-        this.children = {};
-        this.isEndOfWord = false;
-        this.projectIds = []; // Store references to matching projects
-    }
-}
-
-class Trie {
-    constructor() {
-        this.root = new TrieNode();
-    }
-    
-    insert(word, projectId) {
-        let node = this.root;
-        for (let char of word.toLowerCase()) {
-            if (!node.children[char]) {
-                node.children[char] = new TrieNode();
-            }
-            node = node.children[char];
-            // Add ID to all prefix nodes to allow partial searching
-            if (!node.projectIds.includes(projectId)) {
-                node.projectIds.push(projectId);
-            }
-        }
-        node.isEndOfWord = true;
-    }
-    
-    searchPrefix(prefix) {
-        let node = this.root;
-        for (let char of prefix.toLowerCase()) {
-            if (!node.children[char]) return [];
-            node = node.children[char];
-        }
-        return node.projectIds;
-    }
-}
-
-const searchTrie = new Trie();
-
-// Rebuild Trie on startup
-async function buildTrie() {
-    const projects = await prisma.project.findMany();
-    for (const p of projects) {
-        // Insert title words
-        const words = p.title.split(' ');
-        for (const w of words) {
-            searchTrie.insert(w, p.id);
-        }
-    }
-    console.log("Trie Search Engine initialized.");
-}
-
-// ==============================================
-// Python Integration
-// ==============================================
-function runPythonAnalytics(projects) {
-    return new Promise((resolve, reject) => {
-        const pythonProcess = spawn('python', ['analytics.py']);
-        let resultData = '';
-        
-        pythonProcess.stdout.on('data', (data) => {
-            resultData += data.toString();
-        });
-        
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`Python Error: ${data}`);
-        });
-        
-        pythonProcess.on('close', (code) => {
-            if (code !== 0) {
-                reject(new Error(`Python script exited with code ${code}`));
-            } else {
-                try {
-                    resolve(JSON.parse(resultData));
-                } catch (e) {
-                    reject(e);
-                }
-            }
-        });
-        
-        pythonProcess.stdin.write(JSON.stringify(projects));
-        pythonProcess.stdin.end();
-    });
-}
-
-// ==============================================
-// API Routes
-// ==============================================
-app.get('/api/projects', async (req, res) => {
-    const { query } = req.query;
-    const cacheKey = query ? `search_${query}` : 'all_projects';
-    
-    // Check Cache
-    const cachedData = projectCache.get(cacheKey);
-    if (cachedData) {
-        console.log(`[Cache Hit] Serving ${cacheKey} from LRU Cache`);
-        return res.json(cachedData);
-    }
-    
+// Read data
+app.post('/api/auth/signup', async (req, res) => {
     try {
-        console.log(`[Cache Miss] Fetching ${cacheKey} from Database`);
-        let dbProjects = [];
+        const filePath = getFilePath('users');
+        let users = [];
         
-        if (query) {
-            // Use Trie Search for fast lookup
-            const matchedIds = searchTrie.searchPrefix(query);
-            if (matchedIds.length > 0) {
-                dbProjects = await prisma.project.findMany({
-                    where: { id: { in: matchedIds } }
-                });
-            }
-        } else {
-            dbProjects = await prisma.project.findMany({
-                orderBy: { isPinned: 'desc' }
-            });
-        }
-        
-        // Enhance with Python Analytics
-        let finalProjects = dbProjects;
         try {
-            finalProjects = await runPythonAnalytics(dbProjects);
-        } catch (pyErr) {
-            console.error("Failed to run Python analytics, returning raw DB records:", pyErr);
+            const data = await fs.readFile(filePath, 'utf-8');
+            users = JSON.parse(data);
+        } catch {
+            // File doesn't exist yet
         }
         
-        // Cache the result
-        projectCache.put(cacheKey, finalProjects);
+        // Check if email already exists
+        const { email, password, name } = req.body;
+        if (users.find(u => u.email === email)) {
+            return res.status(400).json({ error: 'Mail existed already' });
+        }
         
-        res.json(finalProjects);
+        // Create new user
+        const newUser = {
+            id: Date.now().toString(),
+            createdAt: new Date().toISOString(),
+            name,
+            email,
+            password, // Plain text for local dev as requested/assumed
+            progress: 0,
+            potion: 0
+        };
+        
+        users.push(newUser);
+        await fs.writeFile(filePath, JSON.stringify(users, null, 2));
+        
+        // Remove password from response
+        const { password: _, ...userWithoutPassword } = newUser;
+        res.status(201).json(userWithoutPassword);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to fetch projects' });
+        console.error('Signup error:', error);
+        res.status(500).json({ error: 'Failed to sign up' });
     }
 });
 
-app.post('/api/projects', async (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
     try {
-        const data = req.body;
-        const project = await prisma.project.create({
-            data: {
-                title: data.title,
-                category: data.category,
-                techStack: data.techStack.split(',').map(s => s.trim()),
-                image: data.image,
-                description: data.description,
-                githubUrl: data.githubUrl,
-                difficulty: data.difficulty || 'Beginner'
-            }
-        });
+        const filePath = getFilePath('users');
+        const data = await fs.readFile(filePath, 'utf-8');
+        const users = JSON.parse(data);
         
-        // Invalidate 'all_projects' cache
-        projectCache.put('all_projects', null);
+        const { email, password } = req.body;
+        const user = users.find(u => u.email === email && u.password === password);
         
-        // Add to Trie
-        const words = project.title.split(' ');
-        for (const w of words) {
-            searchTrie.insert(w, project.id);
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
         
-        res.status(201).json(project);
+        const { password: _, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to create project' });
+        // If file doesn't exist, no users exist yet
+        res.status(401).json({ error: 'Invalid email or password' });
     }
 });
 
-const PORT = process.env.PORT || 3000;
+// Read data
+app.get('/api/:table', async (req, res) => {
+    try {
+        const filePath = getFilePath(req.params.table);
+        
+        try {
+            await fs.access(filePath);
+        } catch {
+            return res.json([]); // Return empty array if file doesn't exist
+        }
+        
+        const data = await fs.readFile(filePath, 'utf-8');
+        res.json(JSON.parse(data));
+    } catch (error) {
+        console.error(`Error reading ${req.params.table}:`, error);
+        res.status(500).json({ error: 'Failed to read data' });
+    }
+});
+
+// Write data
+app.post('/api/:table', async (req, res) => {
+    try {
+        const filePath = getFilePath(req.params.table);
+        let records = [];
+        
+        try {
+            const existingData = await fs.readFile(filePath, 'utf-8');
+            records = JSON.parse(existingData);
+        } catch {
+            // File doesn't exist yet, we'll start with empty array
+        }
+        
+        // Add ID and timestamp
+        const newRecord = {
+            id: Date.now().toString(),
+            createdAt: new Date().toISOString(),
+            ...req.body
+        };
+        
+        records.push(newRecord);
+        
+        await fs.writeFile(filePath, JSON.stringify(records, null, 2));
+        res.status(201).json(newRecord);
+    } catch (error) {
+        console.error(`Error writing ${req.params.table}:`, error);
+        res.status(500).json({ error: 'Failed to save data' });
+    }
+});
+
 app.listen(PORT, () => {
-    console.log(`API Server running on port ${PORT}`);
-    buildTrie(); // initialize search index
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Storing data in: ${DATA_DIR}`);
 });

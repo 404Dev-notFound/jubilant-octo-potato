@@ -1,0 +1,47 @@
+export function render_sign_up_form() {
+    return `<div class="glass-panel rounded-2xl border-t-4 border-t-tertiary overflow-hidden shadow-2xl max-w-md w-full mx-auto animate-fade-in-up">
+    <div class="flex justify-between items-center p-md border-b border-white/5 bg-surface-container relative">
+        <h3 class="font-bold text-xl text-on-surface flex items-center gap-xs">
+            <span class="material-symbols-outlined text-tertiary">person_add</span>
+            Create Account
+        </h3>
+        <button data-close-modal class="text-on-surface-variant hover:text-error transition-colors p-1 absolute right-4 top-4">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    
+    <div class="p-xl">
+        <form id="signUpForm" class="space-y-md" >
+            <div>
+                <label class="block text-sm font-label-sm text-on-surface mb-xs">Full Name</label>
+                <input type="text" name="name" required placeholder="Alex Developer" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-tertiary transition-colors">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-label-sm text-on-surface mb-xs">Email Address</label>
+                <input type="email" name="email" required placeholder="dev@example.com" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-tertiary transition-colors">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-label-sm text-on-surface mb-xs">Password</label>
+                <input type="password" name="password" required placeholder="••••••••" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-tertiary transition-colors">
+            </div>
+
+            <div>
+                <label class="block text-sm font-label-sm text-on-surface mb-xs">Confirm Password</label>
+                <input type="password" required placeholder="••••••••" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-tertiary transition-colors">
+            </div>
+            
+            <button type="submit" class="w-full py-md bg-tertiary text-on-tertiary rounded-xl font-bold shadow-lg shadow-tertiary/20 hover:scale-[1.02] transition-transform mt-sm flex justify-center items-center gap-xs">
+                Sign Up <span class="material-symbols-outlined text-sm">rocket_launch</span>
+            </button>
+        </form>
+        
+        <div class="mt-lg text-center text-sm text-on-surface-variant">
+            Already have an account? 
+            <a href="#" data-form="login_form" class="text-tertiary font-bold hover:underline">Log in</a>
+        </div>
+    </div>
+</div>
+`;
+}

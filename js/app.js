@@ -3,6 +3,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const nebulaBg = document.getElementById('nebula-bg');
     const viewCache = {};
 
+    window.updateAuthUI = function() {
+        const currentUserStr = localStorage.getItem('currentUser');
+        const authButtons = document.getElementById('auth-buttons-container');
+        const profileDropdown = document.getElementById('profile-dropdown-container');
+        const profileAvatar = document.getElementById('profile-avatar');
+        
+        if (currentUserStr) {
+            const user = JSON.parse(currentUserStr);
+            if (authButtons) authButtons.classList.add('hidden');
+            if (profileDropdown) profileDropdown.classList.remove('hidden');
+            if (profileAvatar) profileAvatar.textContent = (user.name ? user.name.charAt(0) : 'U').toUpperCase();
+        } else {
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (profileDropdown) profileDropdown.classList.add('hidden');
+            if (profileAvatar) profileAvatar.textContent = 'U';
+        }
+    };
+    
+    // Call it initially
+    window.updateAuthUI();
+
     async function navigate() {
         let hash = window.location.hash.substring(1) || 'home';
         const viewName = hash.split('?')[0].toLowerCase();
@@ -33,10 +54,15 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             let html = viewCache[viewName];
             if (!html) {
-                const response = await fetch(`views/${viewName}.html`);
-                if (!response.ok) throw new Error('View not found');
-                html = await response.text();
-                viewCache[viewName] = html;
+                // Dynamically import the JS view module
+                const module = await import(`./views/${viewName}.js`);
+                const funcName = `render_${viewName.replace(/-/g, '_')}`;
+                if (module[funcName]) {
+                    html = module[funcName]();
+                    viewCache[viewName] = html;
+                } else {
+                    throw new Error(`Export ${funcName} not found in views/${viewName}.js`);
+                }
             }
             // Small artificial delay to show skeleton and simulate real load
             setTimeout(async () => {
@@ -145,6 +171,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const link = e.target.closest('a');
         if (link) {
             const href = link.getAttribute('href');
+            
+            if (link.id === 'logout-btn') {
+                e.preventDefault();
+                localStorage.removeItem('currentUser');
+                window.updateAuthUI();
+                window.UI.showToast('Successfully logged out', 'success');
+                if (window.location.hash.includes('dashboard')) window.location.hash = 'home';
+                return;
+            }
+
             if (href && href.startsWith('/')) {
                 e.preventDefault();
                 window.location.hash = href.substring(1) || 'home';
@@ -157,14 +193,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (viewCache[formName]) {
                 window.UI.openModal(viewCache[formName]);
             } else {
-                fetch(`forms/${formName}.html`)
-                    .then(res => {
-                        if (!res.ok) throw new Error('Form not found');
-                        return res.text();
-                    })
-                    .then(html => {
-                        viewCache[formName] = html;
-                        window.UI.openModal(html);
+                import(`./forms/${formName}.js`)
+                    .then(module => {
+                        const funcName = `render_${formName.replace(/-/g, '_')}`;
+                        if (module[funcName]) {
+                            const html = module[funcName]();
+                            viewCache[formName] = html;
+                            window.UI.openModal(html);
+                        } else {
+                            throw new Error(`Export ${funcName} not found`);
+                        }
                     })
                     .catch(err => {
                         console.error(err);
@@ -209,4 +247,104 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('hashchange', navigate);
     navigate();
+
+    // Global Form Submit Interceptor
+    document.addEventListener('submit', async (e) => {
+        const form = e.target;
+        
+        // Handle auth forms specifically
+        if (form.id === 'signUpForm' || form.id === 'loginForm') {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Extract from un-named inputs just in case
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(input => {
+                if (input.name) data[input.name] = input.value;
+                else if (input.type === 'email') data['email'] = input.value;
+                else if (input.type === 'password') data['password'] = input.value;
+            });
+            
+            // Name field might be required for signup
+            if (form.id === 'signUpForm' && !data.name) {
+                const textInput = form.querySelector('input[type="text"]');
+                if (textInput) data.name = textInput.value;
+            }
+
+            const endpoint = form.id === 'signUpForm' ? '/api/auth/signup' : '/api/auth/login';
+            
+            try {
+                const response = await fetch(`http://localhost:3000${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('currentUser', JSON.stringify(result));
+                    window.updateAuthUI();
+                    window.UI.closeModal();
+                    window.UI.showToast(form.id === 'signUpForm' ? 'Account created!' : 'Welcome back!', 'success');
+                } else {
+                    window.UI.showToast(result.error || 'Authentication failed', 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                window.UI.showToast('Error connecting to backend.', 'error');
+            }
+            return;
+        }
+
+        const formIdToTable = {
+            'addProjectForm': 'projects',
+            'createOrgForm': 'organizations',
+            'editProfileForm': 'users'
+        };
+
+        const table = formIdToTable[form.id];
+        
+        if (table) {
+            e.preventDefault();
+            
+            // Gather form data
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.name) {
+                    data[input.name] = input.value;
+                } else if (input.type === 'email') {
+                    data['email'] = input.value;
+                } else if (input.type === 'password') {
+                    data['password'] = input.value;
+                } else if (input.type === 'text') {
+                    data[input.placeholder || 'text'] = input.value;
+                }
+            });
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/${table}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    window.UI.showToast('Data saved successfully!', 'success');
+                    window.UI.closeModal();
+                    if (table === 'projects') navigate();
+                } else {
+                    window.UI.showToast('Failed to save data.', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving data:', error);
+                window.UI.showToast('Error connecting to backend.', 'error');
+            }
+        }
+    });
 });

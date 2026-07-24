@@ -19,35 +19,33 @@ app.post('/api/auth/signup', async (req, res) => {
     try {
         const filePath = getFilePath('users');
         let users = [];
-        
+        // Load existing users if file exists
         try {
             const data = await fs.readFile(filePath, 'utf-8');
             users = JSON.parse(data);
-        } catch {
-            // File doesn't exist yet
-        }
-        
-        // Check if email already exists
+        } catch {}
+
         const { email, password, name } = req.body;
+        // Prevent duplicate email registrations
         if (users.find(u => u.email === email)) {
             return res.status(400).json({ error: 'Mail existed already' });
         }
-        
-        // Create new user
+
+        // Hash password using bcryptjs (async)
+        const bcrypt = require('bcryptjs');
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const newUser = {
             id: Date.now().toString(),
             createdAt: new Date().toISOString(),
             name,
             email,
-            password, // Plain text for local dev as requested/assumed
+            password: hashedPassword,
             progress: 0,
             potion: 0
         };
-        
         users.push(newUser);
         await fs.writeFile(filePath, JSON.stringify(users, null, 2));
-        
-        // Remove password from response
         const { password: _, ...userWithoutPassword } = newUser;
         res.status(201).json(userWithoutPassword);
     } catch (error) {
@@ -61,19 +59,24 @@ app.post('/api/auth/login', async (req, res) => {
         const filePath = getFilePath('users');
         const data = await fs.readFile(filePath, 'utf-8');
         const users = JSON.parse(data);
-        
         const { email, password } = req.body;
-        const user = users.find(u => u.email === email && u.password === password);
-        
+        const bcrypt = require('bcryptjs');
+        const jwt = require('jsonwebtoken');
+        const user = users.find(u => u.email === email);
         if (!user) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
-        
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }
+        // Generate JWT (expires in 7 days)
+        const token = jwt.sign({ id: user.id }, 'your-secret-key', { expiresIn: '7d' });
         const { password: _, ...userWithoutPassword } = user;
-        res.json(userWithoutPassword);
+        res.json({ ...userWithoutPassword, token });
     } catch (error) {
-        // If file doesn't exist, no users exist yet
-        res.status(401).json({ error: 'Invalid email or password' });
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Login failed' });
     }
 });
 
@@ -97,27 +100,41 @@ app.get('/api/:table', async (req, res) => {
 });
 
 // Write data
+// Middleware to verify JWT for protected routes
+function verifyToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return res.status(401).json({ error: 'No token provided' });
+    const token = authHeader.split(' ')[1]; // Expect format 'Bearer <token>'
+    const jwt = require('jsonwebtoken');
+    try {
+        const payload = jwt.verify(token, 'your-secret-key');
+        req.user = payload; // attach payload (e.g., { id }) to request
+        next();
+    } catch (err) {
+        return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+}
+
 app.post('/api/:table', async (req, res) => {
     try {
+        // Protect sensitive tables like 'projects'
+        const protectedTables = ['projects', 'organizations'];
+        if (protectedTables.includes(req.params.table)) {
+            // Run token verification manually
+            const authHeader = req.headers['authorization'];
+            if (!authHeader) return res.status(401).json({ error: 'No token provided' });
+            const token = authHeader.split(' ')[1];
+            const jwt = require('jsonwebtoken');
+            try { jwt.verify(token, 'your-secret-key'); } catch { return res.status(403).json({ error: 'Invalid token' }); }
+        }
         const filePath = getFilePath(req.params.table);
         let records = [];
-        
         try {
             const existingData = await fs.readFile(filePath, 'utf-8');
             records = JSON.parse(existingData);
-        } catch {
-            // File doesn't exist yet, we'll start with empty array
-        }
-        
-        // Add ID and timestamp
-        const newRecord = {
-            id: Date.now().toString(),
-            createdAt: new Date().toISOString(),
-            ...req.body
-        };
-        
+        } catch {}
+        const newRecord = { id: Date.now().toString(), createdAt: new Date().toISOString(), ...req.body };
         records.push(newRecord);
-        
         await fs.writeFile(filePath, JSON.stringify(records, null, 2));
         res.status(201).json(newRecord);
     } catch (error) {

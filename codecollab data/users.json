@@ -17,5 +17,14 @@
     "createdAt": "2026-07-23T22:57:06.484Z",
     "email": "devtestmail@gmail.com",
     "password": "testpassword"
+  },
+  {
+    "id": "1784851192493",
+    "createdAt": "2026-07-23T23:59:52.493Z",
+    "name": "dev",
+    "email": "emailtest@gmail.com",
+    "password": "$2b$10$L3TMytvmWUDjf1LAFBrh9uzEReHu/FRez551G6VUy7j2UWsvEQdaG",
+    "progress": 0,
+    "potion": 0
   }
 ]

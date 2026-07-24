@@ -21,8 +21,10 @@
   "homepage": "https://github.com/404Dev-notFound/jubilant-octo-potato#readme",
   "dependencies": {
     "@prisma/client": "^6.16.3",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "prisma": "^6.16.3"
   }
 }

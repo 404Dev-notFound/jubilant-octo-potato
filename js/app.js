@@ -326,20 +326,30 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             try {
+                // Prepare headers with optional JWT token
+                const authHeaders = { 'Content-Type': 'application/json' };
+                const currentUserStr = localStorage.getItem('currentUser');
+                if (currentUserStr) {
+                    try {
+                        const currentUser = JSON.parse(currentUserStr);
+                        if (currentUser.token) {
+                            authHeaders['Authorization'] = `Bearer ${currentUser.token}`;
+                        }
+                    } catch (e) { /* ignore malformed JSON */ }
+                }
                 const response = await fetch(`http://localhost:3000/api/${table}`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: authHeaders,
                     body: JSON.stringify(data)
                 });
-                
+
                 if (response.ok) {
                     window.UI.showToast('Data saved successfully!', 'success');
                     window.UI.closeModal();
                     if (table === 'projects') navigate();
                 } else {
-                    window.UI.showToast('Failed to save data.', 'error');
+                    const err = await response.json();
+                    window.UI.showToast(err.error || 'Failed to save data.', 'error');
                 }
             } catch (error) {
                 console.error('Error saving data:', error);

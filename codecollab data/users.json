@@ -1,21 +1,38 @@
 [
   {
-    "id": "1784846756266",
-    "createdAt": "2026-07-23T22:45:56.266Z",
-    "username": "test_user",
-    "email": "test@example.com"
+    "id": "1784902900927",
+    "createdAt": "2026-07-24T14:21:40.927Z",
+    "name": "hell",
+    "email": "hellno@gmail.com",
+    "password": "hellpassword",
+    "progress": 0,
+    "potion": 0
   },
   {
-    "id": "1784847360354",
-    "createdAt": "2026-07-23T22:56:00.354Z",
-    "Alex Developer": "dev goel",
-    "email": "devgoel@gmail.com",
-    "password": "password"
+    "id": "1784902994706",
+    "createdAt": "2026-07-24T14:23:14.706Z",
+    "name": "lgnosngs",
+    "email": "sdigon@gmail.com",
+    "password": "abcd",
+    "progress": 0,
+    "potion": 0
   },
   {
-    "id": "1784847426484",
-    "createdAt": "2026-07-23T22:57:06.484Z",
-    "email": "devtestmail@gmail.com",
-    "password": "testpassword"
+    "id": "1784903103220",
+    "createdAt": "2026-07-24T14:25:03.220Z",
+    "name": "ksfbunsusnvg",
+    "email": "ksfbunsusnvg@gmail.com",
+    "password": "abc",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1784903504228",
+    "createdAt": "2026-07-24T14:31:44.229Z",
+    "name": "sgufgnudbv",
+    "email": "sgufgnudbva@gmail.com",
+    "password": "$2b$10$fRy3PHopZ.sUNec4dO1QDe/zsg6RLZRjmeGpRDl6.4B.EgQprHi5C",
+    "progress": 0,
+    "potion": 0
   }
 ]

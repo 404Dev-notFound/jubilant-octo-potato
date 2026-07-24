@@ -32,6 +32,10 @@ app.post('/api/auth/signup', async (req, res) => {
         if (users.find(u => u.email === email)) {
             return res.status(400).json({ error: 'Mail existed already' });
         }
+
+        // Hash password
+        const bcrypt = require('bcryptjs');
+        const hashedPassword = await bcrypt.hash(password, 10);
         
         // Create new user
         const newUser = {
@@ -39,7 +43,7 @@ app.post('/api/auth/signup', async (req, res) => {
             createdAt: new Date().toISOString(),
             name,
             email,
-            password, // Plain text for local dev as requested/assumed
+            password: hashedPassword, // Hashed password
             progress: 0,
             potion: 0
         };

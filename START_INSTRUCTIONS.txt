@@ -1,25 +1,36 @@
-How to Start CodeCollab Locally
 
 Follow these steps to run the frontend and backend locally:
 
 ### 1. Start the Backend Database
 Make sure Docker Desktop is running, then open your terminal in the project folder:
+```bash
 cd "c:\Users\Dell\Downloads\overall\dev\obsidian\projects and it's code\codecollab_v2"
+```
 Run this command to start the PostgreSQL database:
+```bash
 docker-compose up -d
+```
 
 ### 2. View the Database (Optional)
 To view the seeded project data in your browser, run:
+```bash
 npx prisma studio
+```
 
 ### 3. Start the API Server
 In a new terminal window inside the project folder, run the Node.js API server:
+```bash
 node server.js
+```
 
 ### 4. Start the Frontend Website
-In another new terminal window inside the project folder, run a local python server:
+In another new terminal window inside the project folder, run a local Python server:
+```bash
 python -m http.server 8080
+```
 
 ### 5. View the App
 Open your web browser and go to:
+```
 http://localhost:8080/
+```

@@ -34,5 +34,14 @@
     "password": "$2b$10$fRy3PHopZ.sUNec4dO1QDe/zsg6RLZRjmeGpRDl6.4B.EgQprHi5C",
     "progress": 0,
     "potion": 0
+  },
+  {
+    "id": "1785007805649",
+    "createdAt": "2026-07-25T19:30:05.649Z",
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "$2b$10$wytKEtWX/sWc9wOBE6Z00.eoUbQY5zLrmAmWpu.lPZApBBNbnKC9u",
+    "progress": 0,
+    "potion": 0
   }
 ]

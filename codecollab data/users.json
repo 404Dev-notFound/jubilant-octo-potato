@@ -43,5 +43,25 @@
     "password": "$2b$10$wytKEtWX/sWc9wOBE6Z00.eoUbQY5zLrmAmWpu.lPZApBBNbnKC9u",
     "progress": 0,
     "potion": 0
+  },
+  {
+    "id": "1785191830616",
+    "createdAt": "2026-07-27T22:37:10.616Z",
+    "name": "faisbfhabfhabh",
+    "email": "faisbfhabfhabh@gmail.com",
+    "password": "$2b$10$ezghJN9qIbEbQaAOOPcZ6eSM02t26dRk7ryEWndRwcFtaRVzouAPC",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1785192064906",
+    "createdAt": "2026-07-27T22:41:04.906Z",
+    "name": "helliii",
+    "email": "helliii@gmail.con",
+    "password": "$2b$10$bIPTzW5AV2rNxKT9Qw5LE.DUR30XMFDXbVo8tEPZbkxg.pCBa0V.u",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
   }
 ]

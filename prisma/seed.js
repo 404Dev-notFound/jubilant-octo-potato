@@ -1,3 +1,6 @@
+const { loadEnv } = require('../load-env.js');
+loadEnv({ required: ['DATABASE_URL'] });
+
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 

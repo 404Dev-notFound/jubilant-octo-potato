@@ -1,7 +1,9 @@
+const { loadEnv } = require('./load-env.js');
+loadEnv();
+
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 const { OAuth2Client } = require('google-auth-library'); // Google OAuth
 const { v4: uuidv4 } = require('uuid'); // Refresh token generator
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';

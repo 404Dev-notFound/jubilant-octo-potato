@@ -1,0 +1,12 @@
+[
+  {
+    "projectId": "proj_001",
+    "totalTasks": 42,
+    "completedTasks": 27,
+    "openIssues": 5,
+    "activeUsers": 8,
+    "lastActivityAt": "2026-08-02T18:30:00.000Z",
+    "createdAt": "2026-08-01T00:00:00.000Z",
+    "updatedAt": "2026-08-02T18:30:00.000Z"
+  }
+]

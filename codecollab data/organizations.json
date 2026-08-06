@@ -1,0 +1,21 @@
+[
+  {
+    "id": "org_001",
+    "ownerId": "1785007805649",
+    "name": "Demo Organization",
+    "logo": "https://picsum.photos/200/200?random=org",
+    "banner": "https://picsum.photos/800/200?random=orgbanner",
+    "description": "A sample organization for demonstration purposes.",
+    "website": "https://demo.org",
+    "members": ["1785007805649"],
+    "administrators": ["1785007805649"],
+    "teams": ["team_001"],
+    "projects": ["proj_001", "proj_002"],
+    "invitations": [],
+    "settings": {"allowPublicProjects": true},
+    "socialLinks": {"twitter": "@demoorg", "linkedin": "demo-org"},
+    "visibility": "Public",
+    "createdAt": "2026-08-01T10:00:00.000Z",
+    "updatedAt": "2026-08-02T12:00:00.000Z"
+  }
+]

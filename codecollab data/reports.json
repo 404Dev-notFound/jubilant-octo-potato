@@ -1,0 +1,9 @@
+[
+  {
+    "id": "report_001",
+    "type": "project_summary",
+    "title": "Weekly Project Summary",
+    "content": "Summary of project progress for the week.",
+    "createdAt": "2026-08-02T00:00:00.000Z"
+  }
+]

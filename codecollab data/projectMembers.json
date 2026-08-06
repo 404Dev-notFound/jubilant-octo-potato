@@ -1,0 +1,14 @@
+[
+  {
+    "projectId": "proj_001",
+    "userId": "1785007805649",
+    "projectRole": "owner",
+    "joinedAt": "2026-08-01T10:00:00.000Z"
+  },
+  {
+    "projectId": "proj_001",
+    "userId": "1784903103220",
+    "projectRole": "editor",
+    "joinedAt": "2026-08-01T11:00:00.000Z"
+  }
+]

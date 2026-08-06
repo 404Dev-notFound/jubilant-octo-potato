@@ -1,0 +1,92 @@
+/* Global Design Tokens */
+:root {
+  --color-primary: hsl(220, 90%, 55%);
+  --color-primary-light: hsl(220, 90%, 70%);
+  --color-primary-dark: hsl(220, 90%, 40%);
+  --color-bg: hsl(0, 0%, 100%);
+  --color-bg-dark: hsl(0, 0%, 10%);
+  --color-text: hsl(0, 0%, 10%);
+  --color-text-dark: hsl(0, 0%, 90%);
+  --radius: 0.5rem;
+  --spacing: 1rem;
+  --font-family: 'Inter', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: var(--color-bg-dark);
+    --color-text: var(--color-text-dark);
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+  padding: var(--spacing);
+}
+
+h1, h2, h3 {
+  margin-bottom: calc(var(--spacing) / 2);
+}
+
+form {
+  max-width: 480px;
+  margin: auto;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius);
+  padding: var(--spacing);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+  font-size: 1rem;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+}
+
+button {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: var(--color-primary-dark);
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.875rem;
+  margin-top: -0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.success {
+  color: #388e3c;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}

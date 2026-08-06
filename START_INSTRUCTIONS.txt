@@ -17,6 +17,72 @@ To view the seeded project data in your browser, run:
 npx prisma studio
 ```
 
+
+
+
+
+
+
+
+
+Next steps for you
+Check / update the .env file as described in step 1.
+Start the PostgreSQL container (docker-compose up -d).
+Run the migration command (node scripts/run-prisma.js migrate dev --name init).
+Seed if you want sample projects (node prisma/seed.js).
+Restart your backend (npm start or node server.js).
+If any of these commands fail, copy the exact error message and share it with me so I can help you troubleshoot further.
+
+TL;DR: Ensure DATABASE_URL points to the container’s password, bring the container up, run Prisma migrations, optionally seed, then restart the server. This will resolve the “Can’t reach database server” error.
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 3. Start the API Server
 In a new terminal window inside the project folder, run the Node.js API server:
 ```bash

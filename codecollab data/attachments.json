@@ -1,0 +1,14 @@
+[
+  {
+    "id": "attach_001",
+    "taskId": "task_001",
+    "commentId": null,
+    "projectId": "proj_001",
+    "filename": "ci-config.yml",
+    "url": "https://cdn.example.com/attachments/attach_001.yml",
+    "mimeType": "application/x-yaml",
+    "sizeBytes": 842,
+    "uploadedBy": "1785007805649",
+    "createdAt": "2026-08-01T09:05:00.000Z"
+  }
+]

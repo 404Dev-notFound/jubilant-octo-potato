@@ -52,7 +52,7 @@ The diagram above illustrates the data flow:
 ## UI Animation
 Below is a short GIF that shows the skeleton loader fading into a fully populated project card, demonstrating the micro‑animation experience offered by the app.
 
-![UI Loading Animation](file:///C:/Users/Dell/.gemini/antigravity/brain/3e6eade9-6abe-4753-9cbc-5f01af650241/ui_animation_1784738817860.jpg)
+![UI Loading Animation](pic\Screenshot (17).png)
 
 ## Development Notes
 - **DSA Modules** are located in `js/app.js` (Trie) and `server.js` (LRU Cache). Feel free to extend them.

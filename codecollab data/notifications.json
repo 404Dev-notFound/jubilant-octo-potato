@@ -1,0 +1,11 @@
+[
+  // Add notification objects here
+  {
+    "id": "notif_001",
+    "userId": "1785007805649",
+    "type": "message",
+    "content": "You have a new message from user 1784903103220.",
+    "read": false,
+    "createdAt": "2026-08-02T12:00:00.000Z"
+  }
+]

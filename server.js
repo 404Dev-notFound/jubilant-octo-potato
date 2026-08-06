@@ -1,3 +1,7 @@
+/*
+ * Server entry point for the CodeCollab application.
+ * Handles authentication, CRUD operations, and token refresh.
+ */
 const { loadEnv } = require('./load-env.js');
 loadEnv();
 
@@ -23,6 +27,11 @@ app.use(cors());
 app.use(express.json());
 
 // JWT verification middleware for protected routes
+/*
+ * JWT verification middleware for protected routes.
+ * Extracts the token from the Authorization header, verifies it,
+ * and attaches the decoded user payload to the request object.
+ */
 function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'];
   if (!authHeader) return res.status(401).json({ error: 'No token provided' });
@@ -35,9 +44,15 @@ function authMiddleware(req, res, next) {
 }
 
 // Helper function to get file path
+/* Helper to construct absolute paths for JSON data tables */
 const getFilePath = (table) => path.join(DATA_DIR, `${table}.json`);
 
 // Read data
+/*
+ * User signup endpoint.
+ * Creates a new user, hashes the password, stores the record,
+ * and returns JWT + refresh token for immediate login.
+ */
 app.post('/api/auth/signup', async (req, res) => {
       try {
         const filePath = getFilePath('users');
@@ -83,7 +98,11 @@ app.post('/api/auth/signup', async (req, res) => {
       }
     });
 
-    app.post('/api/auth/login', async (req, res) => {
+    /*
+ * User login endpoint.
+ * Validates credentials, issues JWT and refresh token.
+ */
+app.post('/api/auth/login', async (req, res) => {
         try {
             const filePath = getFilePath('users');
             const data = await fs.readFile(filePath, 'utf-8');
@@ -157,6 +176,10 @@ app.post('/api/:table', authMiddleware, async (req, res) => {
 });
 
 // Refresh token endpoint
+/*
+ * Refresh token endpoint.
+ * Exchanges a valid refresh token for a new access token and refresh token.
+ */
 app.post('/api/auth/refresh', async (req, res) => {
     const { refreshToken } = req.body;
     if (!refreshToken || !refreshTokenStore.has(refreshToken)) {
@@ -175,6 +198,10 @@ app.post('/api/auth/refresh', async (req, res) => {
 });
 
 // Logout endpoint – invalidate refresh token
+/*
+ * Logout endpoint.
+ * Invalidates the provided refresh token.
+ */
 app.post('/api/auth/logout', async (req, res) => {
     const { refreshToken } = req.body;
     if (refreshToken && refreshTokenStore.has(refreshToken)) {
@@ -185,6 +212,11 @@ app.post('/api/auth/logout', async (req, res) => {
 });
 
 // Google Sign‑In / Sign‑Up
+/*
+ * Google OAuth endpoint.
+ * Verifies Google ID token, finds or creates a user,
+ * and returns JWT + refresh token.
+ */
 app.post('/api/auth/google', async (req, res) => {
     const { idToken } = req.body;
     if (!idToken) return res.status(400).json({ error: 'Missing idToken' });

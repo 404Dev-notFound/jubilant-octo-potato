@@ -1,0 +1,42 @@
+[
+  {
+    "id": "conv_001",
+    "conversationType": "Direct",
+    "title": null,
+    "participants": ["1785007805649", "1784903103220"],
+    "participantDetails": [],
+    "messages": [
+      {
+        "messageId": "msg_001",
+        "senderId": "1785007805649",
+        "timestamp": "2026-08-02T10:00:00.000Z",
+        "content": "Hey, let's collaborate on the new project!",
+        "attachments": [],
+        "edited": false,
+        "deleted": false,
+        "reactions": [],
+        "readBy": ["1785007805649"]
+      }
+    ],
+    "pinnedMessages": [],
+    "attachments": [],
+    "lastMessage": {
+      "messageId": "msg_001",
+      "senderId": "1785007805649",
+      "content": "Hey, let's collaborate on the new project!",
+      "timestamp": "2026-08-02T10:00:00.000Z"
+    },
+    "unreadCounts": {},
+    "typingUsers": [],
+    "mutedUsers": [],
+    "archivedUsers": [],
+    "deletedForUsers": [],
+    "groupAdmin": null,
+    "groupAvatar": null,
+    "groupDescription": "",
+    "encryption": true,
+    "createdAt": "2026-08-02T09:55:00.000Z",
+    "updatedAt": "2026-08-02T10:00:00.000Z",
+    "lastActivityAt": "2026-08-02T10:00:00.000Z"
+  }
+]

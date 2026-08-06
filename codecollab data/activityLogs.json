@@ -1,0 +1,10 @@
+[
+  // Sample activity log entries
+  {
+    "id": "log_001",
+    "userId": "1785007805649",
+    "action": "created_project",
+    "details": "Created project proj_001",
+    "timestamp": "2026-08-02T10:30:00.000Z"
+  }
+]

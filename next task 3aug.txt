@@ -1,0 +1,40 @@
+For CODECOLLAB, these are the forms you'll need and which collection(s) they populate.
+
+Form	Stores Data In	User Inputs
+Sign Up	users.json	Name, Username, Email, Password, Confirm Password
+Login	sessions.json, activityLogs.json	Email/Username, Password
+Complete Profile	users.json	Profile Image, Bio, GitHub, LinkedIn, Website, Skills, Experience, Education, Location
+Edit Profile	users.json	Any editable profile information
+Create Organization	organizations.json	Organization Name, Logo, Description, Website, Visibility
+Edit Organization	organizations.json	Name, Logo, Description, Website, Settings
+Create Team	teams.json	Team Name, Description, Members, Team Lead
+Create Project	projects.json	Project Name, Description, Tech Stack, Tags, Visibility, License, Repository URL, Demo URL, Screenshots
+Edit Project	projects.json	All editable project information
+Invite Member	projectInvitations.json	User Email/Username, Role
+Join Project	projects.json	Accept/Reject Invitation
+Create Issue	projects.json	Title, Description, Priority, Labels, Assignee, Due Date, Attachments
+Edit Issue	projects.json	Status, Priority, Description, Assignee
+Comment on Issue	projects.json	Comment, Attachments
+Create Pull Request	projects.json	Title, Description, Source Branch, Target Branch
+Review Pull Request	projects.json	Review Comment, Approval Status
+Project Wiki	projects.json	Page Title, Content
+Create Release	projects.json	Version, Release Notes, Assets
+Upload Attachment	attachments.json	File, File Name, Type, Related Entity
+Direct Chat	conversations.json	Message, Attachment, Emoji
+Group Chat	conversations.json	Group Name, Members, Messages
+Notification Preferences	settings.json	Email Notifications, Push Notifications, Sound, Theme
+Account Settings	settings.json	Privacy, Language, Timezone, 2FA
+Report User/Project	reports.json	Report Type, Reason, Description, Evidence
+AI Chat	aiChats.json	Prompt, Context, Uploaded Files
+Search	searchHistory.json	Search Query, Filters
+Project Analytics	projectAnalytics.json	Mostly system-generated (no user form)
+User Analytics	userAnalytics.json	Mostly system-generated
+Password Reset	passwordResetTokens.json	Email
+Email Verification	verificationTokens.json	Verification Code
+API Key Management	apiKeys.json	Key Name, Permissions
+Project Template	projectTemplates.json	Template Name, Description, Default Tech Stack
+System Settings (Admin)	systemSettings.json	Feature Flags, Maintenance Mode, Limits
+Bookmark Project	users.json	No form (Button Click)
+Star Project	projects.json, users.json	No form (Button Click)
+Fork Project	projects.json	No form (Button Click)
+Follow User (Optional)	users.json	No form (Button Click)

@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewCache = {};
 
     window.updateAuthUI = function() {
-        const currentUserStr = localStorage.getItem('currentUser');
+        // Update UI based on authentication status (show/hide login, profile, etc.)
+const currentUserStr = localStorage.getItem('currentUser');
         const authButtons = document.getElementById('auth-buttons-container');
         const profileDropdown = document.getElementById('profile-dropdown-container');
         const profileAvatar = document.getElementById('profile-avatar');
@@ -25,7 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.updateAuthUI();
 
     async function navigate() {
-        let hash = window.location.hash.substring(1) || 'home';
+        // SPA navigation: parse hash, load appropriate view, display skeleton loader, and fetch dynamic data
+let hash = window.location.hash.substring(1) || 'home';
         const viewName = hash.split('?')[0].toLowerCase();
         
         // Nebula Background Logic
@@ -161,13 +163,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Scroll Progress for Nebula Background (Camera animation driven in index.html)
-    window.addEventListener('scroll', () => {
+    // Scroll listener: adjust nebula background opacity/blur based on current view
+window.addEventListener('scroll', () => {
         // No longer translating the nebulaBg directly, it remains fixed.
         // The ThreeJS script in index.html will read window.scrollY.
     });
 
     // Global Link Interceptor & Action Handler
-    document.body.addEventListener('click', (e) => {
+    // Global click interceptor: handle internal navigation, logout, modals, and action buttons
+document.body.addEventListener('click', (e) => {
         const link = e.target.closest('a');
         if (link) {
             const href = link.getAttribute('href');
@@ -249,7 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
     navigate();
 
     // Global Form Submit Interceptor
-    document.addEventListener('submit', async (e) => {
+    // Global form submit handler: process auth forms and generic data forms, POST to backend APIs
+document.addEventListener('submit', async (e) => {
         const form = e.target;
         
         // Handle auth forms specifically

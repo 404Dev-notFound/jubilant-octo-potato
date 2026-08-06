@@ -1,0 +1,14 @@
+[
+  {
+    "id": "team_001",
+    "organizationId": "org_001",
+    "teamName": "Core Developers",
+    "description": "Team responsible for core development of the platform.",
+    "leadId": "1785007805649",
+    "members": ["1785007805649", "1784903103220"],
+    "assignedProjects": ["proj_001", "proj_002"],
+    "permissions": {"createProject": true, "deleteProject": false},
+    "createdAt": "2026-08-01T11:00:00.000Z",
+    "updatedAt": "2026-08-02T13:00:00.000Z"
+  }
+]

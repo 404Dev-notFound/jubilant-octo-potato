@@ -1,3 +1,8 @@
+/*
+ * Script to run Prisma commands via npx.
+ * This script ensures all required environment variables, specifically
+ * the DATABASE_URL, are loaded before invoking Prisma commands.
+ */
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { loadEnv } = require('../load-env.js');

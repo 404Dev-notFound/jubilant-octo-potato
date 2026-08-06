@@ -1,0 +1,177 @@
+# Backend Integration & Full Feature Implementation
+
+**Goal**: Turn the static frontend forms into a production‑ready full‑stack application by implementing a robust Express.js REST API backed by Prisma ORM and PostgreSQL, adding authentication, file storage, real‑time features, AI integration, analytics, security, testing, CI/CD, and documentation.
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> Approve this implementation plan before any code is generated. The plan defines the file layout, major dependencies, and high‑level architecture decisions. If any part does not match your expectations, let me know and we will adjust the plan.
+
+---
+
+## Open Questions
+
+> [!WARNING]
+> - **File storage provider** – Do you prefer AWS S3, Cloudinary, Supabase Storage, or local filesystem for uploaded assets?
+> - **Email service** – Which provider should be used for verification/password‑reset emails (SendGrid, SES, Mailgun, etc.)?
+> - **AI model** – Do you have a specific LLM endpoint (OpenAI, Anthropic, self‑hosted) for the AI assistant?
+> - **Realtime transport** – Should we use pure WebSocket, Socket.IO, or a managed service like Pusher?
+> - **Rate limiting strategy** – Redis‑based token bucket, in‑memory, or third‑party service?
+> - **Deployment target** – Docker/Kubernetes on a cloud provider, Vercel, Render, or self‑hosted VM?
+> - **Analytics stack** – Prefer self‑hosted PostHog, Plausible, or external (Mixpanel, Amplitude)?
+
+---
+
+## Proposed Changes
+
+### 1️⃣ Project Structure & Core Server
+
+#### [NEW] [backend](file:///c:/Users/Dell/Downloads/overall/dev/obsidian/projects%20and%20it's%20code/codecollab_v2/backend)
+- **backend/package.json** – project metadata, scripts, dependencies.
+- **backend/server.js** – entry point, Express app, middleware registration, HTTP & HTTPS server.
+- **backend/.env.example** – environment variable template (DB URL, JWT secret, S3 creds, etc.).
+
+#### [NEW] [backend/prisma](file:///c:/Users/Dell/Downloads/overall/dev/obsidian/projects%20and%20it's%20code/codecollab_v2/backend/prisma)
+- `schema.prisma` – data model mirroring all tables listed in the specification.
+- `migrations/` – generated migration files.
+- `seed.ts` – optional seed script.
+
+#### [NEW] [backend/src](file:///c:/Users/Dell/Downloads/overall/dev/obsidian/projects%20and%20it's%20code/codecollab_v2/backend/src)
+- **src/app.js** – Express app configuration (body parsers, CORS, helmet, rate limiter).
+- **src/routes/** – folder containing route files per domain (auth.js, users.js, projects.js, issues.js, pull_requests.js, wiki.js, releases.js, attachments.js, chats.js, notifications.js, ai.js, search.js, admin.js).
+- **src/controllers/** – controller functions for each route.
+- **src/middlewares/** – auth middleware (JWT verification), RBAC checker, error handler, validation middleware (using `express-validator`).
+- **src/services/** – business logic (userService, projectService, fileService, aiService, analyticsService).
+- **src/utils/** – helper utilities (hashPassword, generateToken, paginate, logger).
+- **src/config/** – configuration loader (dotenv, config schemas).
+
+### 2️⃣ Authentication & Authorization
+
+- **src/routes/auth.js** – `/api/auth/register`, `/api/auth/login`, `/api/auth/refresh`, `/api/auth/logout`, `/api/auth/verify-email`, `/api/auth/password-reset`.
+- Use **bcrypt** for password hashing, **jsonwebtoken** for Access & Refresh tokens.
+- Store refresh tokens hashed in `refresh_tokens` table (create new table if not present).
+- Email verification tokens stored in `verification_tokens`.
+- RBAC middleware reads user role from JWT payload and checks required roles per route.
+
+### 3️⃣ File Storage Integration
+
+- Add **src/services/fileService.js**.
+- Abstract storage provider behind an interface (`upload`, `delete`, `getUrl`).
+- Implement adapters for **AWS S3**, **Cloudinary**, **Supabase Storage**, and **local disk** (selected via env var `FILE_STORAGE_PROVIDER`).
+- Endpoint **POST /api/attachments/upload** will accept `multipart/form-data` (using `multer`), call the service, store metadata in `attachments` table, and return the public URL.
+
+### 4️⃣ Real‑Time Features (Socket.IO)
+
+- Install **socket.io** on the server, expose on same HTTP server.
+- Create **src/socket/index.js** to handle events:
+  - `chat:message`, `chat:typing`, `presence:update` for direct & group chats.
+  - `project:activity` for issue/Pull Request updates.
+  - `notification:new` for in‑app notifications.
+- Use **Redis adapter** for horizontal scaling (optional).
+
+### 5️⃣ Git & Repository Integration
+
+- Add **src/services/gitService.js** – thin wrapper around **simple‑git** library.
+- Routes:
+  - `POST /api/repositories` (create remote clone, store in `repositories`).
+  - `GET /api/repositories/:id/commits`, `POST /api/repositories/:id/branches`, `POST /api/pull_requests` (create PR entry, trigger CI webhook). 
+- Store minimal repo metadata in `repositories` table, link to `projects` via foreign key.
+
+### 6️⃣ Rich Text & Markdown Support
+
+- Frontend will switch textarea to **SimpleMDE** (or **ToastUI Editor**) – already scoped in UI.
+- Backend stores content as plain markdown in `wiki_pages.content`, `issues.description`, `pull_requests.description`, etc.
+- Add **src/middlewares/markdownSanitizer.js** using **DOMPurify** to strip unsafe HTML after markdown is rendered server‑side (if needed).
+
+### 7️⃣ Search & Filtering
+
+- Build a **searchService.js** that composes PostgreSQL full‑text search (`tsvector` columns) with filters.
+- Create indexes on searchable fields (`title`, `description`, `tags`).
+- Endpoint **GET /api/search** with query params `q`, `type`, `page`, `size`, `sort`.
+- Optional: integrate **Typesense** or **MeiliSearch** as a separate micro‑service (out of scope for initial MVP).
+
+### 8️⃣ Notification System
+
+- New table `notifications` already exists.
+- Service **notificationService.js** creates rows and emits `notification:new` via Socket.IO.
+- Email notifications optional – configurable per user in `settings.notification_preferences`.
+
+### 9️⃣ AI Integration
+
+- Service **aiService.js** abstracts calls to the chosen LLM (OpenAI, Anthropic, etc.).
+- Routes:
+  - `POST /api/ai/chat` – store conversation in `ai_chats` and `ai_chat_messages`.
+  - `POST /api/ai/summarize-issue` – generate summary for a given issue ID.
+- Rate‑limit AI endpoints heavily.
+
+### 🔟 Analytics & Dashboard
+
+- Create **src/controllers/analyticsController.js** with endpoints like `/api/analytics/project/:id` returning aggregated metrics.
+- Use Prisma’s `$queryRaw` for performant aggregation queries.
+- Frontend dashboard pages (e.g., `src/pages/dashboard.html`) will fetch JSON and render charts via **Chart.js**.
+
+### 1️⃣1️⃣ Security Hardenings
+
+- **helmet** for secure headers.
+- **csurf** for CSRF protection on state‑changing POST/PUT/DELETE routes (except API token auth).
+- **express-rate-limit** with Redis store for distributed rate limiting.
+- Input validation via **express-validator** (mirrors JSON schemas on frontend).
+- All Prisma queries use parameterised statements – no raw string concatenation.
+- Log audit events to `audit_logs` table (already present).
+
+### 1️⃣2️⃣ Performance Optimizations
+
+- Add **response caching** for GET endpoints using **apicache** + Redis.
+- Pagination on list endpoints (`/api/issues`, `/api/projects`, `/api/search`).
+- Use **DataLoader** pattern for batch loading of related entities.
+- Optimize DB indexes per Prisma schema (add `@index`, `@unique`).
+- Background jobs (e.g., email sending, AI processing) via **BullMQ** with Redis.
+
+### 1️⃣3️⃣ Testing Strategy
+
+- **Unit tests** – Jest for utilities, services, middlewares.
+- **Integration tests** – Supertest against an in‑memory SQLite Prisma datasource (or Dockerised PostgreSQL in CI).
+- **E2E tests** – Playwright scripts covering UI flows (signup, create project, chat, AI assistant).
+- Coverage goal ≥ 85 %.
+
+### 1️⃣4️⃣ CI/CD & Deployment
+
+- Add **Dockerfile** and **docker-compose.yml** (services: api, postgres, redis, minio (local S3), mock‑smtp).
+- GitHub Actions workflow:
+  - Lint (`eslint`, `prettier`).
+  - Run unit/integration tests.
+  - Build Docker image, push to registry.
+  - Deploy to staging via `docker compose up -d` on a remote VM.
+  - On tag `v*`, promote to production.
+- Use **Prisma migrate deploy** in CI to apply DB migrations.
+- Health‑check endpoint `/healthz`.
+
+### 1️⃣5️⃣ Documentation
+
+- Generate OpenAPI (Swagger) spec from route definitions using **express-oas-generator**.
+- Add **README.md**, **CONTRIBUTING.md**, **SETUP.md** with local dev instructions (Docker, env vars).
+- Architecture diagram (C4) stored in `docs/architecture.c4model.png`.
+- API docs hosted via **Swagger UI** at `/api-docs`.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+- `npm run test` will execute Jest unit tests and Supertest integration tests. All must pass.
+- Playwright CI job will run a subset of critical UI flows.
+
+### Manual Verification
+- Run `docker compose up` locally.
+- Open the frontend, register a new user, verify email (check mock email inbox).
+- Create an organization, project, issue, PR; ensure data appears in PostgreSQL.
+- Upload a file, confirm URL stored and accessible via S3 (or local bucket).
+- Open two browser windows, log in as different users, test real‑time chat and presence.
+- Trigger an AI chat, verify response stored.
+- Visit `/api-docs` and confirm endpoints match implementation.
+
+---
+
+**Please review this plan and answer the open questions** so we can proceed to generate the backend scaffolding and implement the first batch of endpoints.

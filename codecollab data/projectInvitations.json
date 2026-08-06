@@ -1,0 +1,13 @@
+[
+  {
+    "id": "proj_inv_001",
+    "projectId": "proj_001",
+    "inviterId": "1785007805649",
+    "inviteeId": "1784903103220",
+    "role": "editor",
+    "status": "pending",
+    "expiresAt": "2026-08-10T00:00:00.000Z",
+    "createdAt": "2026-08-02T09:00:00.000Z",
+    "updatedAt": "2026-08-02T09:00:00.000Z"
+  }
+]

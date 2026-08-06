@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  passwordHash    String
+  name            String?
+  role            Role     @default(USER)
+  isEmailVerified Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  projects             Project[]
+  organizations        Organization[] // owned organizations
+  refreshTokens        RefreshToken[]
+  notifications        Notification[]
+  // Inverse relations
+  organizationMembers  OrganizationMember[] @relation("UserOrganizationMembers")
+  authoredPullRequests PullRequest[]        @relation("UserPullRequestsAuthored")
+  reviewedPullRequests PullRequest[]        @relation("PRReviewers")
+  wikiPages            WikiPage[]           @relation("UserWikiPages")
+  attachments          Attachment[]         @relation("UserAttachments")
+  comments             Comment[]            @relation("UserComments")
+  assigneeIssues       Issue[]              @relation("Assignee")
+  reportedIssues       Issue[]              @relation("Reporter")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  tokenHash String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  revoked   Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Organization {
+  id          Int                  @id @default(autoincrement())
+  name        String
+  description String?
+  logoUrl     String?
+  website     String?
+  visibility  Visibility           @default(PUBLIC)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  ownerId     Int
+  owner       User                 @relation(fields: [ownerId], references: [id])
+  members     OrganizationMember[]
+  projects    Project[]
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+model OrganizationMember {
+  id             Int          @id @default(autoincrement())
+  organizationId Int
+  userId         Int
+  role           MemberRole   @default(MEMBER)
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  user           User         @relation("UserOrganizationMembers", fields: [userId], references: [id])
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model Project {
+  id             Int           @id @default(autoincrement())
+  title          String
+  shortDesc      String?
+  techStack      String[]
+  tags           String[]
+  repositoryUrl  String?
+  demoUrl        String?
+  visibility     Visibility    @default(PUBLIC)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  organizationId Int?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  ownerId        Int
+  owner          User          @relation(fields: [ownerId], references: [id])
+  // Relations
+  issues         Issue[]
+  pullRequests   PullRequest[]
+  wikiPages      WikiPage[]
+  releases       Release[]
+}
+
+model Issue {
+  id          Int           @id @default(autoincrement())
+  title       String
+  description String?
+  status      IssueStatus   @default(OPEN)
+  priority    IssuePriority @default(MEDIUM)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  projectId   Int
+  project     Project       @relation(fields: [projectId], references: [id])
+  assigneeId  Int?
+  assignee    User?         @relation(name: "Assignee", fields: [assigneeId], references: [id])
+  reporterId  Int
+  reporter    User          @relation(name: "Reporter", fields: [reporterId], references: [id])
+  comments    Comment[]
+}
+
+enum IssueStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+enum IssuePriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model PullRequest {
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String?
+  sourceBranch String
+  targetBranch String
+  status       PRStatus  @default(OPEN)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  projectId    Int
+  project      Project   @relation(fields: [projectId], references: [id])
+  authorId     Int
+  author       User      @relation("UserPullRequestsAuthored", fields: [authorId], references: [id])
+  reviewers    User[]    @relation("PRReviewers")
+  comments     Comment[] @relation("CommentPullRequest")
+}
+
+enum PRStatus {
+  OPEN
+  MERGED
+  CLOSED
+}
+
+model WikiPage {
+  id        Int      @id @default(autoincrement())
+  title     String
+  slug      String   @unique
+  content   String   @default("")
+  projectId Int
+  project   Project  @relation(fields: [projectId], references: [id])
+  authorId  Int
+  author    User     @relation("UserWikiPages", fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Release {
+  id        Int      @id @default(autoincrement())
+  version   String
+  notes     String?
+  createdAt DateTime @default(now())
+  projectId Int
+  project   Project  @relation(fields: [projectId], references: [id])
+}
+
+model Attachment {
+  id           Int      @id @default(autoincrement())
+  url          String
+  filename     String
+  mimeType     String?
+  size         Int?
+  uploadedAt   DateTime @default(now())
+  uploadedById Int
+  uploadedBy   User     @relation("UserAttachments", fields: [uploadedById], references: [id])
+  // Polymorphic relation fields (entity type & id) can be added as needed
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  type      String
+  payload   Json
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Comment {
+  id            Int          @id @default(autoincrement())
+  content       String
+  createdAt     DateTime     @default(now())
+  authorId      Int
+  author        User         @relation("UserComments", fields: [authorId], references: [id])
+  issueId       Int?
+  issue         Issue?       @relation(fields: [issueId], references: [id])
+  pullRequestId Int?
+  pullRequest   PullRequest? @relation("CommentPullRequest", fields: [pullRequestId], references: [id])
+}

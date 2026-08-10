@@ -34,10 +34,14 @@ app.use(express.json());
  */
 function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'];
+  console.log('authMiddleware hit:', req.path, 'header:', authHeader);
   if (!authHeader) return res.status(401).json({ error: 'No token provided' });
   const token = authHeader.split(' ')[1];
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(401).json({ error: 'Invalid or expired token' });
+    if (err) {
+      console.log('jwt verify error:', err.message);
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
     req.user = decoded; // { id, email }
     next();
   });
@@ -143,6 +147,42 @@ app.get('/api/:table', async (req, res) => {
     } catch (error) {
         console.error(`Error reading ${req.params.table}:`, error);
         res.status(500).json({ error: 'Failed to read data' });
+    }
+});
+
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+// Write project data to Prisma PostgreSQL (protected)
+app.post('/api/projects', authMiddleware, async (req, res) => {
+    try {
+        const { title, category, difficulty, techStack, image, description, githubUrl, isPinned, isDemo } = req.body;
+        
+        let techStackArray = techStack;
+        if (typeof techStack === 'string') {
+            techStackArray = techStack.split(',').map(s => s.trim());
+        }
+
+        const project = await prisma.project.create({
+            data: {
+                title: title || 'Untitled Project',
+                category: category || 'Other',
+                difficulty: difficulty || 'Beginner',
+                techStack: techStackArray || [],
+                image: image || '',
+                description: description || '',
+                githubUrl: githubUrl || '',
+                isPinned: isPinned === 'on' || isPinned === true,
+                isDemo: isDemo === 'on' || isDemo === true,
+                // ownerId left null — users currently live in JSON files, not the Prisma User table
+                ownerId: null
+            }
+        });
+        
+        res.status(201).json(project);
+    } catch (error) {
+        console.error('Error writing project to Prisma:', error);
+        res.status(500).json({ error: 'Failed to save data' });
     }
 });
 

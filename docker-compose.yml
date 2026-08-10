@@ -6,7 +6,7 @@ services:
     container_name: codecollab_db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgrespassword}
+      POSTGRES_PASSWORD: postgrespassword9555
       POSTGRES_DB: codecollab
     ports:
       - "5432:5432"

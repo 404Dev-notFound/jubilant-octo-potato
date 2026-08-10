@@ -16,12 +16,12 @@ export function render_add_project_form() {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
                 <div>
                     <label class="block text-sm font-label-sm text-on-surface mb-xs">Project Title</label>
-                    <input type="text" required placeholder="e.g. NextGen API" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
+                    <input type="text" name="title" required placeholder="e.g. NextGen API" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
                 </div>
                 
                 <div>
                     <label class="block text-sm font-label-sm text-on-surface mb-xs">Category</label>
-                    <select required class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors appearance-none">
+                    <select name="category" required class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors appearance-none">
                         <option value="" disabled selected>Select category...</option>
                         <option value="AI">Artificial Intelligence</option>
                         <option value="Web">Web Development</option>
@@ -34,22 +34,22 @@ export function render_add_project_form() {
 
             <div>
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">Tech Stack (comma separated)</label>
-                <input type="text" required placeholder="e.g. React, Node.js, MongoDB" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
+                <input type="text" name="techStack" required placeholder="e.g. React, Node.js, MongoDB" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
             </div>
 
             <div>
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">Image URL (Thumbnail)</label>
-                <input type="url" required placeholder="https://picsum.photos/600/400" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
+                <input type="url" name="image" required placeholder="https://picsum.photos/600/400" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
             </div>
             
             <div>
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">Short Description</label>
-                <textarea required rows="3" placeholder="Briefly describe your project..." class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors resize-none"></textarea>
+                <textarea name="description" required rows="3" placeholder="Briefly describe your project..." class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors resize-none"></textarea>
             </div>
 
             <div>
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">GitHub Repository URL</label>
-                <input type="url" required placeholder="https://github.com/username/repo" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
+                <input type="url" name="githubUrl" required placeholder="https://github.com/username/repo" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
             </div>
             
             <div class="flex justify-end gap-sm pt-md border-t border-white/5">

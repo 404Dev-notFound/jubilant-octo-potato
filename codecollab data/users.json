@@ -40,5 +40,45 @@
     "role": "user",
     "progress": 0,
     "potion": 0
+  },
+  {
+    "id": "1786377283959",
+    "createdAt": "2026-08-10T15:54:43.959Z",
+    "name": "Test",
+    "email": "test1786377283729@example.com",
+    "password": "$2b$10$Hz7GX9rQCuRVp2XwbbZSfenN5SvpGVaBpqEodj.XCmZbCo/Fzao4i",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786378111584",
+    "createdAt": "2026-08-10T16:08:31.584Z",
+    "name": "Test",
+    "email": "test1786378111432@example.com",
+    "password": "$2b$10$/4Mt.cDJVceNeUwEZi9Aku/zszZDt1Unoj0HGbnsCSa/Oo7jAEDGK",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786378564210",
+    "createdAt": "2026-08-10T16:16:04.210Z",
+    "name": "Test",
+    "email": "test1786378564071@example.com",
+    "password": "$2b$10$./vjrG9AQgg3hYjThHoQaufsk0Eu8g42TLBaK6t8Vm8HPUozz6Ini",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786378587089",
+    "createdAt": "2026-08-10T16:16:27.089Z",
+    "name": "Test",
+    "email": "test1786378586931@example.com",
+    "password": "$2b$10$4YPmdWVNWPqrPlqZfpZ7ieINhuQmjmhdSLuNRQ3Bn3vT2yzS/biUq",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
   }
 ]

@@ -6,6 +6,7 @@ export function render_explore() {
             <h1 class="font-display text-headline-lg text-primary mb-xs">Explore Projects</h1>
             <p class="text-on-surface-variant font-label-sm tracking-widest uppercase">Discover & Contribute</p>
         </div>
+        <button data-form="add_project_form" class="px-md py-sm bg-secondary text-on-secondary rounded-xl font-bold hover:bg-secondary/80 transition-colors flex items-center gap-xs"><span class="material-symbols-outlined">add</span> Add Project</button>
     </div>
     <div class="flex flex-col md:flex-row gap-lg">
         <!-- Sidebar Filters -->

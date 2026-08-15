@@ -141,27 +141,24 @@ const currentUserStr = localStorage.getItem('currentUser');
         `;
 
         try {
+            let html = viewCache[viewName];
             let module;
             try {
-                module = await import(`./views/${viewName}.js?t=${Date.now()}`);
+                module = await import(`./views/${viewName}.js`);
             } catch(e) {
-                try {
-                    module = await import(`./views/${viewName}.js`);
-                } catch(e2) {
-                    console.error(`Module import error for ${viewName}`, e2);
-                }
+                console.error(`Module import error for ${viewName}`, e);
             }
 
-            let html = '';
-            if (module) {
-                const funcName = `render_${viewName.replace(/-/g, '_')}`;
-                if (module[funcName]) {
-                    html = module[funcName]();
-                } else {
-                    throw new Error(`Export ${funcName} not found in views/${viewName}.js`);
+            if (!html) {
+                if (module) {
+                    const funcName = `render_${viewName.replace(/-/g, '_')}`;
+                    if (module[funcName]) {
+                        html = module[funcName]();
+                        viewCache[viewName] = html;
+                    } else {
+                        throw new Error(`Export ${funcName} not found in views/${viewName}.js`);
+                    }
                 }
-            } else if (viewCache[viewName]) {
-                html = viewCache[viewName];
             }
             // Small artificial delay to show skeleton and simulate real load
             setTimeout(async () => {
@@ -171,15 +168,6 @@ const currentUserStr = localStorage.getItem('currentUser');
                 // Initialize Issues view
                 if (viewName === 'issues' && module && module.initIssues) {
                     module.initIssues(projectId);
-                }
-
-                // Initialize Dashboard view
-                if (viewName === 'dashboard') {
-                    if (module && module.initDashboard) {
-                        module.initDashboard();
-                    } else if (window.initDashboard) {
-                        window.initDashboard();
-                    }
                 }
 
                 // Fetch projects if on the explore page

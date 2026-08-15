@@ -16,12 +16,12 @@ export function render_project_details() {
                 <button data-action="toast" data-message="Watching project" class="px-md py-sm bg-surface-container rounded-lg border border-white/5 hover:bg-surface-variant transition-colors flex items-center gap-xs">
                     <span class="material-symbols-outlined text-[18px]">visibility</span> Watch <span class="ml-1 bg-surface-variant px-1 rounded text-xs">142</span>
                 </button>
-                <button data-action="toast" data-message="Project starred!" class="px-md py-sm bg-surface-container rounded-lg border border-white/5 hover:bg-surface-variant transition-colors flex items-center gap-xs">
-                    <span class="material-symbols-outlined text-[18px]">star</span> Star <span class="ml-1 bg-surface-variant px-1 rounded text-xs">1.2k</span>
-                </button>
-                <button data-action="toast" data-message="Forking repository..." class="px-md py-sm bg-primary text-on-primary shadow-lg shadow-primary/20 rounded-lg hover:scale-105 transition-transform flex items-center gap-xs">
-                    <span class="material-symbols-outlined text-[18px]">fork_right</span> Fork <span class="ml-1 bg-primary-container text-primary px-1 rounded text-xs">320</span>
-                </button>
+                <button disabled class="px-md py-sm bg-surface-container rounded-lg border border-white/5 flex items-center gap-xs opacity-50 cursor-not-allowed">
+    <!-- <span class="material-symbols-outlined text-[18px]">star</span> Star <span class="ml-1 bg-surface-variant px-1 rounded text-xs">1.2k</span> -->
+</button>
+                <!-- Fork button disabled: <button disabled class="px-md py-sm bg-primary text-on-primary shadow-lg shadow-primary/20 rounded-lg opacity-50 cursor-not-allowed flex items-center gap-xs">
+    <span class="material-symbols-outlined text-[18px]">fork_right</span> Fork <span class="ml-1 bg-primary-container text-primary px-1 rounded text-xs">320</span>
+</button> -->
             </div>
         </div>
         

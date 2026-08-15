@@ -80,5 +80,45 @@
     "role": "user",
     "progress": 0,
     "potion": 0
+  },
+  {
+    "id": "1786575657867",
+    "createdAt": "2026-08-12T23:00:57.867Z",
+    "name": "Test User",
+    "email": "testuser_1786575657588@example.com",
+    "password": "$2b$10$QZ0UcUq1rs0XYnrtlQdKleU78v0yQfzjEbiUSXFFLMvGmUIUH.dQq",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786578107519",
+    "createdAt": "2026-08-12T23:41:47.519Z",
+    "name": "Test User",
+    "email": "testuser_1786578107201@example.com",
+    "password": "$2b$10$gz6Y65WWiVOlEVIzFaBr3.m55FAZYxg/1u6a/EZYmpyG6LXyXSm6S",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786746884946",
+    "createdAt": "2026-08-14T22:34:44.946Z",
+    "name": "Alice Wonder",
+    "email": "alice_1786746884843@example.com",
+    "password": "$2b$10$Sj2AT5QyHOvcliHrCL9NU..r9GMvLc.TgfavQN1UdqzVdwT0VnMTG",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786747907456",
+    "createdAt": "2026-08-14T22:51:47.456Z",
+    "name": "Bob Smith",
+    "email": "bob_1786747907286@example.com",
+    "password": "$2b$10$/kbO/zNKt2J.RJp7413tEOK3fT8g2IiEIF7m7NmrpG1ERQPXvZx9u",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
   }
 ]

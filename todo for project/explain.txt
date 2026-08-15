@@ -1,0 +1,260 @@
+================================================================================
+  CODECOLLAB - ADD ISSUE + POSTGRESQL + PRISMA + JWT + KANBAN INTEGRATION
+================================================================================
+Folder Purpose: Documentation & Independent Feature Reference Only.
+Ye folder feature ko samajhne aur future me alag se reuse karne ke liye reference copy hai.
+
+--------------------------------------------------------------------------------
+1. KAUNSI FILE KA KYA KAAM HAI (FILE RESPONSIBILITIES)
+--------------------------------------------------------------------------------
+1. `todo for project/js/forms/add_issue_form.js`:
+   - Ye file "Create New Issue" ka popup/modal UI render karti hai (`render_add_issue_form`).
+   - Iske andar project ke users ko `/api/users` se dynamically fetch karke Assignee dropdown me populate kiya jata hai.
+   - Title, Status, Priority, Assignee, Tags, aur Description ke input fields hote hain.
+   - Quick tag suggestion pills provide karti hai (+bug, +frontend, etc.).
+   - Form submission handler (`window.handleAddIssue`) ko execute karti hai jo API request bhejta hai aur modal close karke Kanban board ko refresh trigger karta hai.
+
+2. `todo for project/js/views/issues.js`:
+   - Ye Kanban Board ka main view render karta hai (`render_issues`).
+   - 3 Columns manage karta hai: "TO DO", "IN PROGRESS", "DONE".
+   - Current project ke mutabiq database se `/api/projects/:projectId/issues` call karke issues fetch karta hai (`loadIssues`).
+   - HTML5 Drag-and-Drop system implement karta hai (dragstart, dragover, drop) jisse cards ek column se doosre column me drag kiye ja sakte hain.
+   - Status change ke direct 3-dots context menu actions provide karta hai.
+   - Issue Delete action provide karta hai.
+   - `window.addIssueToBoard` hook provide karta hai taaki naya issue bante hi board instantly refresh ho sake.
+
+3. `todo for project/js/app.js`:
+   - Client-side application core controller and router.
+   - `window.apiFetch` provide karta hai jo automatically `localStorage.getItem('currentUser')` se JWT token nikal kar `Authorization: Bearer <token>` header me attach karta hai.
+   - Global click listener me `[data-form="add_issue_form"]` ko capture karta hai, user ke logged-in status ko check karta hai, aur dynamic import ke zariye `add_issue_form.js` ko load karke `window.UI.openModal()` me kholta hai.
+   - SPA hash router (`#issues?projectId=...`) ko handle karta hai aur view load hone par `initIssues(projectId)` run karta hai.
+
+4. `todo for project/js/components.js`:
+   - Global UI helper object `window.UI` provide karta hai.
+   - `openModal(html)`: Modal container ko display karta hai scale animation ke sath.
+   - `closeModal()`: Modal ko hide karta hai aur contents clear karta hai.
+   - `showToast(msg, type)`: Animated notifications/toasts display karta hai (success/error/info).
+   - `createSkeleton()`: Loading skeleton placeholder generate karta hai.
+
+5. `todo for project/server.js`:
+   - Express backend server jo API routes ko host karta hai.
+   - `authMiddleware`: Headers se JWT token verify karta hai aur `req.user = decoded` set karta hai.
+   - `POST /api/projects/:projectId/issues`: Naya issue Prisma ke zariye PostgreSQL me insert karta hai.
+   - `GET /api/projects/:projectId/issues`: Project ke saare issues database se fetch karta hai.
+   - `PATCH /api/projects/:projectId/issues/:issueId`: Drag-and-drop ya status move hone par database me status/priority update karta hai.
+   - `DELETE /api/projects/:projectId/issues/:issueId`: Issue ko delete karta hai.
+
+6. `todo for project/prisma/schema.prisma`:
+   - PostgreSQL database schema definition.
+   - `model Issue` define karta hai (id, title, description, status, priority, tags, creatorId, assigneeId, projectId, timestamps).
+   - `enum IssueStatus` (TODO, IN_PROGRESS, DONE) aur `enum IssuePriority` (LOW, MEDIUM, HIGH, URGENT) define karta hai.
+   - `model Project` aur `model User` ke sath relations configure karta hai (e.g. `onDelete: Cascade`).
+
+--------------------------------------------------------------------------------
+2. ADD ISSUE POPUP KAISE OPEN HOTA HAI (MODAL TRIGGER FLOW)
+--------------------------------------------------------------------------------
+1. User Kanban Board (`#issues`) par "NEW ISSUE" button ya kisi column ke niche "+ Add Issue" button par click karta hai.
+2. Un buttons par attribute set hota hai:
+   `data-form="add_issue_form"` aur `data-status="TODO"` (ya column ka status).
+3. `js/app.js` me laga global event listener `document.body.addEventListener('click', ...)` is click ko intercept karta hai.
+4. Pehle authentication check hoti hai:
+   `localStorage.getItem('currentUser')` check kiya jata hai. Agar user logged in nahi hai to error toast "Please log in to access this feature" show ho jata hai aur modal nahi khulta.
+5. Agar user logged in hai, to `import('./forms/add_issue_form.js')` dynamic import execute hota hai.
+6. `render_add_issue_form(status, currentProjectId, currentProjectTitle)` call hota hai jo HTML string return karta hai.
+7. `window.UI.openModal(html)` execute hota hai, jo `#modal-container` aur `#modal-content` me HTML daal kar smooth scale-in transition ke sath popup open kar deta hai.
+8. Asynchronously, form ke andar ka `setTimeout` trigger hota hai jo `/api/users` se users ki list laakar Assignee dropdown (`#issue-assignee-select`) me options inject kar deta hai.
+
+--------------------------------------------------------------------------------
+3. FORM ISSUE DATA KAISE COLLECT KARTA HAI
+--------------------------------------------------------------------------------
+1. Form me user fields fill karta hai:
+   - Title: Required text input (`name="title"`).
+   - Status: Select dropdown (`name="status"`) -> 'TODO', 'IN_PROGRESS', 'DONE'.
+   - Priority: Select dropdown (`name="priority"`) -> 'LOW', 'MEDIUM', 'HIGH', 'URGENT'.
+   - Assignee: Select dropdown (`name="assigneeId"`).
+   - Tags: Text input (`name="tags"`) + quick suggestion buttons (+bug, +frontend, etc.). Quick buttons par click karne se `window.appendTag(tag)` chalakar comma-separated string banayi jati hai.
+   - Description: Textarea (`name="description"`).
+2. User "Create Issue" submit button click karta hai.
+3. Form ka event handler `onsubmit="return window.handleAddIssue(event)"` call hota hai.
+4. `window.handleAddIssue` me:
+   - `event.preventDefault()` se default browser page reload ko roka jata hai.
+   - `const formData = new FormData(form)` se saare fields extract kiye jaate hain.
+   - Comma-separated tags ko array me split kiya jata hai: `rawTags.split(',').map(t => t.trim()).filter(Boolean)`.
+   - Submit button ko loading state me convert kiya jata hai (spinner + "Saving...").
+
+--------------------------------------------------------------------------------
+4. AUTHENTICATION & JWT SE CURRENT USER KAISE IDENTIFY HOTA HAI
+--------------------------------------------------------------------------------
+1. Jab user login/signup karta hai, backend Express server JWT token generate karke client ko bhejta hai.
+2. Client is token ko user object ke sath `localStorage.setItem('currentUser', JSON.stringify(user))` me store kar leta hai.
+3. Jab bhi frontend se `window.apiFetch(endpoint, options)` call hota hai:
+   - `apiFetch` check karta hai agar `localStorage.getItem('currentUser')` exist karta hai.
+   - Wo user object parse karta hai aur `currentUser.token` nikalta hai.
+   - Request headers me inject kar deta hai:
+     `headers['Authorization'] = 'Bearer ' + currentUser.token;`
+4. Jab request Express server par aati hai, to route se pehle `authMiddleware` run hota hai:
+   - `req.headers['authorization']` se Bearer token extract karta hai.
+   - `jwt.verify(token, JWT_SECRET, (err, decoded) => ...)` se token ko verify karta hai.
+   - Decoded payload me user ki details hoti hain: `{ id: "...", email: "...", role: "..." }`.
+   - Middleware is decoded data ko `req.user = decoded;` par attach kar deta hai aur `next()` call karta hai.
+
+--------------------------------------------------------------------------------
+5. `creatorId` AUTHENTICATED USER KE SATH KAISE SECURELY BIND HOTI HAI
+--------------------------------------------------------------------------------
+- Frontend se client koi bhi `creatorId` nahi bhejta (security risk se bachne ke liye).
+- Backend Express handler `app.post('/api/projects/:projectId/issues')` ke andar:
+  `const creatorId = req.user.id;`
+- Ye `req.user.id` direct verified JWT token se aati hai jo spoof nahi ho sakti.
+- Is tarah issue create karne wale user ki sahi ID hamesha record ke sath associate hoti hai.
+
+--------------------------------------------------------------------------------
+6. REQUEST EXPRESS TAK KAISE PAHUNCHTI HAI
+--------------------------------------------------------------------------------
+1. `window.handleAddIssue` function me:
+   ```javascript
+   const res = await window.apiFetch(`/api/projects/${projectId}/issues`, {
+       method: 'POST',
+       body: JSON.stringify(payload)
+   });
+   ```
+2. Browser HTTP POST request bhejta hai `http://localhost:3000/api/projects/:projectId/issues` par.
+3. Express server me pehle global middlewares (`cors()`, `express.json()`) parse karte hain.
+4. Route middleware `authMiddleware` JWT authenticate karta hai.
+5. Fir request route handler ke andar aati hai jahan `req.params.projectId` aur `req.body` ka data milta hai.
+
+--------------------------------------------------------------------------------
+7. PRISMA ISSUE RECORD KAISE BANATA HAI
+--------------------------------------------------------------------------------
+1. Server check karta hai ki kya project exist karta hai:
+   `const project = await prisma.project.findUnique({ where: { id: projectId } });`
+2. Enums aur input sanitize karne ke baad Prisma ORM ka `create` method execute hota hai:
+   ```javascript
+   const issue = await prisma.issue.create({
+       data: {
+           title: title.trim(),
+           description: description ? description.trim() : '',
+           status: issueStatus,     // 'TODO' | 'IN_PROGRESS' | 'DONE'
+           priority: issuePriority, // 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
+           tags: tagsArray,         // ['bug', 'frontend']
+           assigneeId: assigneeId ? String(assigneeId).trim() : null,
+           creatorId: req.user.id,
+           projectId: projectId
+       }
+   });
+   ```
+
+--------------------------------------------------------------------------------
+8. POSTGRESQL ME DATA KAISE STORE HOTA HAI
+--------------------------------------------------------------------------------
+1. Prisma internally SQL query generate karta hai:
+   `INSERT INTO "Issue" ("id", "title", "description", "status", "priority", "tags", "creatorId", "assigneeId", "projectId", "createdAt", "updatedAt") VALUES (gen_random_uuid(), ...);`
+2. PostgreSQL database me:
+   - `id`: Unique UUID primary key banti hai.
+   - `status`: Enum type `IssueStatus` ke mutabiq validate hoti hai.
+   - `priority`: Enum type `IssuePriority` ke mutabiq validate hoti hai.
+   - `tags`: PostgreSQL TEXT[] array column me store hoti hai.
+   - `projectId`: Foreign key relation se link hoti hai. Agar project delete ho to cascade delete rule se issue bhi delete ho jayega.
+   - `createdAt` & `updatedAt`: Current timestamp par set hote hain.
+
+--------------------------------------------------------------------------------
+9. CREATED ISSUE RESPONSE ME FRONTEND TAK WAPAS KAISE AATA HAI
+--------------------------------------------------------------------------------
+1. Express server database se bane hue issue object ko response me return karta hai:
+   `res.status(201).json(issue);`
+2. Frontend me `const newIssue = await res.json();` par full saved issue object receive hota hai (with its generated `id`, `createdAt`, etc.).
+
+--------------------------------------------------------------------------------
+10. KANBAN BOARD IMMEDIATELY REFRESH / UPDATE KAISE HOTA HAI
+--------------------------------------------------------------------------------
+1. `window.handleAddIssue` check karta hai:
+   ```javascript
+   if (typeof window.addIssueToBoard === 'function') {
+       await window.addIssueToBoard(newIssue);
+   }
+   ```
+2. `window.addIssueToBoard` hook `js/views/issues.js` ke `loadIssues()` function ko execute karta hai.
+3. Modal instantly close ho jata hai (`window.UI.closeModal()`).
+4. Success toast display hota hai: "Issue created and saved to database!".
+5. Kanban board ke corresponding column me naya card render ho jata hai aur column issue counters (0 -> 1) update ho jaate hain.
+
+--------------------------------------------------------------------------------
+11. PAGE RELOAD HONE KE BAAD DATA DATABASE SE KAISE FETCH HOTA HAI
+--------------------------------------------------------------------------------
+1. Jab page reload hota hai (e.g. URL `#issues?projectId=abc-123`), `js/app.js` ka router initialize hota hai.
+2. Router `initIssues(projectId)` call karta hai `js/views/issues.js` me.
+3. `initIssues()` function backend par authenticated GET request bhejta hai:
+   `const res = await window.apiFetch('/api/projects/' + currentProjectId + '/issues');`
+4. Express route `app.get('/api/projects/:projectId/issues')` Prisma query chalata hai:
+   ```javascript
+   const issues = await prisma.issue.findMany({
+       where: { projectId: projectId },
+       orderBy: { createdAt: 'asc' }
+   });
+   res.json(issues);
+   ```
+5. PostgreSQL se live rows fetch hokar array ke roop me aati hain.
+6. Frontend ka `renderBoard(issues)` function issues ko loop karta hai aur cards bana kar unke respective columns (TODO, IN_PROGRESS, DONE) me append kar deta hai.
+
+--------------------------------------------------------------------------------
+12. INVOLVED API ENDPOINTS LIST
+--------------------------------------------------------------------------------
+1. `POST /api/auth/login` & `POST /api/auth/signup`
+   - Purpose: User authentication aur JWT access token issue karna.
+2. `GET /api/users`
+   - Purpose: Assignee dropdown ke liye sanitized users list lana.
+3. `GET /api/projects`
+   - Purpose: Project switcher dropdown populate karna.
+4. `GET /api/projects/:projectId/issues`
+   - Method: GET (Protected - requires Bearer JWT)
+   - Purpose: Ek specific project ke saare issues database se fetch karna.
+5. `POST /api/projects/:projectId/issues`
+   - Method: POST (Protected - requires Bearer JWT)
+   - Body: `{ title, description, status, priority, tags, assigneeId }`
+   - Purpose: Project ke andar naya issue create karna.
+6. `PATCH /api/projects/:projectId/issues/:issueId`
+   - Method: PATCH (Protected - requires Bearer JWT)
+   - Body: `{ status, priority, description, assigneeId, tags, title }`
+   - Purpose: Drag & drop ya manual move se status/priority update karna.
+7. `DELETE /api/projects/:projectId/issues/:issueId`
+   - Method: DELETE (Protected - requires Bearer JWT)
+   - Purpose: Issue ko database se delete karna.
+
+--------------------------------------------------------------------------------
+13. FRONTEND FILES KA AAPAS ME CONNECTION
+--------------------------------------------------------------------------------
+- `index.html` loads:
+  - Tailwind CSS / Material Symbols / Geist font
+  - `#modal-container` & `#toast-container` (base containers)
+  - `js/components.js` (Initializes `window.UI`)
+  - `js/app.js` (Initializes `window.apiFetch`, routing, event listeners)
+- `js/app.js` connects with:
+  - `js/views/issues.js` (via dynamic `import('./views/issues.js')` jab `#issues` open hota hai)
+  - `js/forms/add_issue_form.js` (via dynamic `import('./forms/add_issue_form.js')` jab `[data-form="add_issue_form"]` click hota hai)
+- `js/forms/add_issue_form.js` connects with:
+  - `window.apiFetch` (for `/api/users` and `/api/projects/:id/issues`)
+  - `window.UI.closeModal()` & `window.UI.showToast()`
+  - `window.addIssueToBoard()` hook (defined in `js/views/issues.js`)
+
+--------------------------------------------------------------------------------
+14. IMPORTANT DEPENDENCIES & GLOBAL FUNCTIONS
+--------------------------------------------------------------------------------
+Feature ko chalane ke liye ye global functions aur packages zaroori hain:
+
+Client-Side Globals:
+- `window.apiFetch(endpoint, options)`: Wrapper around `fetch()` jo JWT token headers attach karta hai aur 401 handle karta hai.
+- `window.UI.openModal(html)`: Modal open karta hai.
+- `window.UI.closeModal()`: Modal close karta hai.
+- `window.UI.showToast(message, type)`: Toast notification trigger karta hai.
+- `window.currentActiveProjectId`: Active project ID track karta hai.
+- `window.addIssueToBoard(newIssue)`: Naya issue bante hi board refresh karta hai.
+
+Backend Dependencies:
+- `express`: REST API web framework.
+- `@prisma/client`: PostgreSQL database query builder & ORM.
+- `jsonwebtoken`: JWT creation aur verification ke liye.
+- `cors`: Cross-Origin requests enable karne ke liye.
+- `dotenv` / `load-env.js`: Environment variables (`DATABASE_URL`, `JWT_SECRET`) load karne ke liye.
+
+Database:
+- PostgreSQL database running with active Prisma migrations matching `schema.prisma`.
+================================================================================

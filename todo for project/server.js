@@ -186,38 +186,6 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-
-// Issue endpoints - Protected with JWT Authentication
-app.get('/api/issues', authMiddleware, async (req, res) => {
-    try {
-        const issues = await prisma.issue.findMany({
-            orderBy: { createdAt: 'asc' }
-        });
-        res.json(issues);
-    } catch (error) {
-        console.error('Error fetching all issues:', error);
-        res.status(500).json({ error: 'Failed to fetch issues' });
-    }
-});
-
-app.get('/api/projects/:projectId/issues', authMiddleware, async (req, res) => {
-    try {
-        const projectId = req.params.projectId;
-        const issues = await prisma.issue.findMany({
-            where: {
-                projectId: projectId
-            },
-            orderBy: { createdAt: 'asc' }
-        });
-        res.json(issues);
-    } catch (error) {
-        console.error('Error fetching issues:', error);
-        res.status(500).json({ error: 'Failed to fetch issues' });
-    }
-});
-
 app.get('/api/:table', async (req, res) => {
     try {
         const filePath = getFilePath(req.params.table);
@@ -229,6 +197,9 @@ app.get('/api/:table', async (req, res) => {
         res.status(500).json({ error: 'Failed to read data' });
     }
 });
+
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 // Write project data to Prisma PostgreSQL (protected)
 app.post('/api/projects', authMiddleware, async (req, res) => {
@@ -260,6 +231,23 @@ app.post('/api/projects', authMiddleware, async (req, res) => {
     } catch (error) {
         console.error('Error writing project to Prisma:', error);
         res.status(500).json({ error: 'Failed to save data' });
+    }
+});
+
+// Issue endpoints - Protected with JWT Authentication
+app.get('/api/projects/:projectId/issues', authMiddleware, async (req, res) => {
+    try {
+        const projectId = req.params.projectId;
+        const issues = await prisma.issue.findMany({
+            where: {
+                projectId: projectId
+            },
+            orderBy: { createdAt: 'asc' }
+        });
+        res.json(issues);
+    } catch (error) {
+        console.error('Error fetching issues:', error);
+        res.status(500).json({ error: 'Failed to fetch issues' });
     }
 });
 

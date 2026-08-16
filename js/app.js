@@ -70,6 +70,7 @@ const currentUserStr = localStorage.getItem('currentUser');
             `<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5">${tech}</span>`
         ).join('');
         const demoBadge = p.isDemo ? `<span class="ml-2 px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">Demo</span>` : '';
+        const ownerDisplay = p.owner?.name ? `<div class="flex items-center gap-1.5 text-xs text-on-surface-variant mb-3"><span class="w-4 h-4 rounded-full bg-secondary/30 text-secondary text-[10px] font-bold flex items-center justify-center">${p.owner.name.charAt(0).toUpperCase()}</span><span class="truncate">By ${p.owner.name}</span></div>` : '';
         
         return `
         <div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2" data-project-id="${p.id || ''}">
@@ -94,6 +95,7 @@ const currentUserStr = localStorage.getItem('currentUser');
             </div>
             <div class="p-6 flex flex-col flex-1">
                 <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">${p.title || 'Untitled'}${demoBadge}</h4>
+                ${ownerDisplay}
                 <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">${p.description || ''}</p>
                 <div class="flex flex-wrap gap-2 mb-6">${techBadges}</div>
                 <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
@@ -104,7 +106,7 @@ const currentUserStr = localStorage.getItem('currentUser');
                     <a href="#issues?projectId=${p.id}" class="flex-1 flex justify-center items-center gap-1 px-3 py-2.5 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-xs font-bold hover:bg-secondary hover:text-on-secondary transition-all active:scale-95">
                         <span class="material-symbols-outlined text-[14px]">view_kanban</span> Issues
                     </a>
-                    <a href="#" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">View Project</a>
+                    <a href="#project_details?projectId=${p.id}" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">View Project</a>
                 </div>
             </div>
         </div>`;
@@ -168,9 +170,19 @@ const currentUserStr = localStorage.getItem('currentUser');
                 appContent.innerHTML = html;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 
+                // Initialize Home view
+                if (viewName === 'home' && module && module.initHome) {
+                    module.initHome();
+                }
+
                 // Initialize Issues view
                 if (viewName === 'issues' && module && module.initIssues) {
                     module.initIssues(projectId);
+                }
+
+                // Initialize Project Details view
+                if ((viewName === 'project_details' || viewName === 'project-details') && module && module.initProjectDetails) {
+                    module.initProjectDetails(projectId);
                 }
 
                 // Initialize Dashboard view
@@ -403,6 +415,12 @@ document.addEventListener('submit', async (e) => {
             // Gather form data
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
+
+            // For projects, collect all checked memberIds into an array
+            if (form.id === 'addProjectForm') {
+                const memberIds = formData.getAll('memberIds');
+                data.memberIds = memberIds;
+            }
             
             const inputs = form.querySelectorAll('input, select, textarea');
             inputs.forEach(input => {

@@ -7,15 +7,34 @@
     "banner": "https://picsum.photos/800/200?random=orgbanner",
     "description": "A sample organization for demonstration purposes.",
     "website": "https://demo.org",
-    "members": ["1785007805649"],
-    "administrators": ["1785007805649"],
-    "teams": ["team_001"],
-    "projects": ["proj_001", "proj_002"],
+    "members": [
+      "1785007805649"
+    ],
+    "administrators": [
+      "1785007805649"
+    ],
+    "teams": [
+      "team_001"
+    ],
+    "projects": [
+      "proj_001",
+      "proj_002"
+    ],
     "invitations": [],
-    "settings": {"allowPublicProjects": true},
-    "socialLinks": {"twitter": "@demoorg", "linkedin": "demo-org"},
+    "settings": {
+      "allowPublicProjects": true
+    },
+    "socialLinks": {
+      "twitter": "@demoorg",
+      "linkedin": "demo-org"
+    },
     "visibility": "Public",
     "createdAt": "2026-08-01T10:00:00.000Z",
     "updatedAt": "2026-08-02T12:00:00.000Z"
+  },
+  {
+    "id": "1786919391753",
+    "createdAt": "2026-08-16T22:29:51.753Z",
+    "e.g. OpenSource Heroes": "organization test"
   }
 ]

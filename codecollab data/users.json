@@ -120,5 +120,45 @@
     "role": "user",
     "progress": 0,
     "potion": 0
+  },
+  {
+    "id": "1786828340958",
+    "createdAt": "2026-08-15T21:12:20.958Z",
+    "name": "Dev Engineer",
+    "email": "devuser_1786828340661@example.com",
+    "password": "$2b$10$JSIa1bS1o2icHUooaInAMOci17CrdqOV3HRdAQps5X5gUd.LwO4B2",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786828370836",
+    "createdAt": "2026-08-15T21:12:50.836Z",
+    "name": "Dev Engineer",
+    "email": "devuser_1786828370561@example.com",
+    "password": "$2b$10$A5zn/e4BvryTnfEkXOKC4uhMuxUa3vXCRG5w0CZUkM0jfvidDswx.",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786911448811",
+    "createdAt": "2026-08-16T20:17:28.811Z",
+    "name": "Test Engineer 1786911448453",
+    "email": "tester_1786911448453@example.com",
+    "password": "$2b$10$Dj87PzGKw0964tFXl08R5OKtzbxiZgfMrYPdY9sZjMSLyS0MPaU6C",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786912119881",
+    "createdAt": "2026-08-16T20:28:39.881Z",
+    "name": "Test Engineer 1786912119749",
+    "email": "tester_1786912119749@example.com",
+    "password": "$2b$10$EH2WOwg8hsPfFGuWvt2ShOWUo0cspFbbUNQINVIy4lNH06wiUL4SW",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
   }
 ]

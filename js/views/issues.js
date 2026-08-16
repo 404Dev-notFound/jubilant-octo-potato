@@ -252,8 +252,8 @@ export async function initIssues(initialProjectId) {
         // Assignee details
         let assigneeHtml = '';
         if (issue.assigneeId) {
-            const assignee = cachedUsers[issue.assigneeId];
-            const name = assignee ? (assignee.name || assignee.email) : `User #${issue.assigneeId}`;
+            const assignee = cachedUsers[issue.assigneeId] || issue.assignee;
+            const name = assignee ? (assignee.name || `User #${issue.assigneeId}`) : `User #${issue.assigneeId}`;
             const initial = name.charAt(0).toUpperCase();
             assigneeHtml = `
                 <div class="flex items-center gap-1.5 px-2 py-0.5 bg-white/5 border border-white/5 rounded-md text-[11px] text-on-surface-variant" title="Assigned to ${name}">

@@ -26,11 +26,34 @@ export function render_home() {
     </div>
     
     <!-- Hero Stats -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-lg mt-24 w-full max-w-4xl border-t border-white/5 pt-xl">
-        <div><div class="text-headline-lg font-display text-primary font-bold">150k+</div><div class="text-sm text-on-surface-variant">Developers</div></div>
-        <div><div class="text-headline-lg font-display text-secondary font-bold">42k+</div><div class="text-sm text-on-surface-variant">Projects</div></div>
-        <div><div class="text-headline-lg font-display text-tertiary font-bold">1.2M+</div><div class="text-sm text-on-surface-variant">PRs Merged</div></div>
-        <div><div class="text-headline-lg font-display text-error font-bold">100%</div><div class="text-sm text-on-surface-variant">Open Source</div></div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-lg mt-24 w-full max-w-5xl border-t border-white/5 pt-xl">
+        <div><div id="stat-developers" class="text-headline-lg font-display text-primary font-bold">0</div><div class="text-sm text-on-surface-variant">Developers</div></div>
+        <div><div id="stat-projects" class="text-headline-lg font-display text-secondary font-bold">0</div><div class="text-sm text-on-surface-variant">Projects</div></div>
+        <div><div id="stat-prs" class="text-headline-lg font-display text-tertiary font-bold">0K+</div><div class="text-sm text-on-surface-variant">PRs Merged</div></div>
+        <div><div id="stat-opensource" class="text-headline-lg font-display text-error font-bold">100%</div><div class="text-sm text-on-surface-variant">Open Source</div></div>
+        <div><div id="stat-issues" class="text-headline-lg font-display text-primary font-bold">0</div><div class="text-sm text-on-surface-variant">Issues</div></div>
     </div>
 </div>`;
+}
+
+export async function initHome() {
+    try {
+        const res = await (window.apiFetch ? window.apiFetch('/api/stats') : fetch('http://localhost:3000/api/stats'));
+        if (res.ok) {
+            const data = await res.json();
+            const devEl = document.getElementById('stat-developers');
+            const projEl = document.getElementById('stat-projects');
+            const prsEl = document.getElementById('stat-prs');
+            const osEl = document.getElementById('stat-opensource');
+            const issuesEl = document.getElementById('stat-issues');
+
+            if (devEl && data.developers !== undefined) devEl.textContent = data.developers;
+            if (projEl && data.projects !== undefined) projEl.textContent = data.projects;
+            if (prsEl && (data.prsMerged !== undefined || data.loc !== undefined)) prsEl.textContent = data.prsMerged || data.loc;
+            if (osEl && data.openSource !== undefined) osEl.textContent = data.openSource;
+            if (issuesEl && data.issues !== undefined) issuesEl.textContent = data.issues;
+        }
+    } catch (e) {
+        console.error('Failed to load stats:', e);
+    }
 }

@@ -1,7 +1,7 @@
 export function render_dashboard() {
     const currentUserStr = localStorage.getItem('currentUser');
     const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
-    const userName = currentUser ? (currentUser.name || currentUser.email.split('@')[0]) : 'Developer';
+    const userName = currentUser ? (currentUser.name || 'Developer') : 'Developer';
 
     return `<main class="relative w-full max-w-[1400px] mx-auto p-xl flex flex-col pt-4">
     <!-- Header Section -->
@@ -140,7 +140,7 @@ export async function initDashboard() {
     // Update Header Greeting
     const welcomeHeading = document.getElementById('dashboard-welcome-heading');
     if (welcomeHeading) {
-        const userName = currentUser ? (currentUser.name || currentUser.email.split('@')[0]) : 'Developer';
+        const userName = currentUser ? (currentUser.name || 'Developer') : 'Developer';
         welcomeHeading.textContent = `Welcome back, ${userName}!`;
     }
 
@@ -176,8 +176,9 @@ export async function initDashboard() {
 
         // 1. Projects where user is owner / creator / member
         allProjects.forEach(p => {
-            const isOwner = p.ownerId && p.ownerId === currentUser.id;
-            const isMember = Array.isArray(allMembers) && allMembers.some(m => m.projectId === p.id && m.userId === currentUser.id);
+            const isOwner = p.ownerId && String(p.ownerId) === String(currentUser.id);
+            const isMember = (Array.isArray(allMembers) && allMembers.some(m => m.projectId === p.id && String(m.userId) === String(currentUser.id))) ||
+                             (Array.isArray(p.members) && p.members.some(m => String(m.userId) === String(currentUser.id)));
             if (isOwner || isMember) {
                 userProjectMap.set(p.id, p);
                 userProjectIds.add(p.id);
@@ -186,7 +187,7 @@ export async function initDashboard() {
 
         // 2. Projects where user has created or has been assigned issues
         allIssues.forEach(i => {
-            if (i.creatorId === currentUser.id || i.assigneeId === currentUser.id) {
+            if (String(i.creatorId) === String(currentUser.id) || String(i.assigneeId) === String(currentUser.id)) {
                 userProjectIds.add(i.projectId);
                 const proj = allProjects.find(p => p.id === i.projectId);
                 if (proj && !userProjectMap.has(proj.id)) {

@@ -26,6 +26,8 @@ model User {
 
   ownedProjects  Project[]       @relation("ProjectOwner")
   projectMembers ProjectMember[]
+  createdIssues  Issue[]         @relation("IssueCreator")
+  assignedIssues Issue[]         @relation("IssueAssignee")
 }
 
 model UserProfile {
@@ -201,5 +203,8 @@ model Issue {
   project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   creatorId   String
+  creator     User          @relation("IssueCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+
   assigneeId  String?
+  assignee    User?         @relation("IssueAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
 }

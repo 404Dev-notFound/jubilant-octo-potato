@@ -40,5 +40,25 @@
     "id": "1786377283978",
     "createdAt": "2026-08-10T15:54:43.978Z",
     "title": "Test Project"
+  },
+  {
+    "id": "1786828341033",
+    "createdAt": "2026-08-15T21:12:21.033Z",
+    "title": "Distributed Neural Engine",
+    "category": "AI",
+    "difficulty": "Advanced",
+    "techStack": [
+      "Rust",
+      "PyTorch",
+      "gRPC"
+    ],
+    "description": "High-speed distributed neural network trainer across multi-node clusters",
+    "githubUrl": "https://github.com/codecollab/neural-engine",
+    "isPinned": true,
+    "isDemo": false,
+    "memberIds": [
+      "user_001",
+      "1785998502411"
+    ]
   }
 ]

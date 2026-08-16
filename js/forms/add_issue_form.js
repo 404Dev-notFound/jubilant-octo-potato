@@ -10,7 +10,7 @@ export function render_add_issue_form(defaultStatus = 'TODO', projectId = '', pr
                 users.forEach(u => {
                     const option = document.createElement('option');
                     option.value = u.id;
-                    const displayName = u.name ? `${u.name} (${u.email})` : (u.email || `User #${u.id}`);
+                    const displayName = u.name || `User #${u.id}`;
                     option.textContent = displayName;
                     select.appendChild(option);
                 });

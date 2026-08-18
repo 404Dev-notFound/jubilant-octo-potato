@@ -15,7 +15,12 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const oauthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 const fs = require('fs/promises');
 const path = require('path');
-const { PrismaClient } = require('@prisma/client');
+let PrismaClient;
+try {
+    PrismaClient = require('./prisma/generated/client').PrismaClient;
+} catch {
+    PrismaClient = require('@prisma/client').PrismaClient;
+}
 const prisma = new PrismaClient();
 
 // In‑memory store for valid refresh tokens
@@ -628,8 +633,20 @@ app.get('/api/users', async (req, res) => {
             userMap.set(String(u.id), {
                 id: String(u.id),
                 name: u.name || `User #${u.id}`,
+                title: u.title || u.role || 'Developer',
                 avatarUrl: u.avatarUrl || '',
-                role: u.role || 'user'
+                role: u.role || 'user',
+                bio: u.bio || '',
+                verifiedSkills: u.verifiedSkills || [],
+                skills: u.skills || [],
+                rating: u.rating || 4.8,
+                upvotes: u.upvotes || 0,
+                upvoters: u.upvoters || [],
+                followers: u.followers || [],
+                availability: u.availability || 'Available · Part-time',
+                lookingFor: u.lookingFor || 'Open for collaboration',
+                socialLinks: u.socialLinks || {},
+                projects: u.projects || []
             });
         });
 
@@ -651,6 +668,439 @@ app.get('/api/users', async (req, res) => {
     } catch (error) {
         console.error('Error fetching users:', error);
         res.status(500).json({ error: 'Failed to fetch users' });
+    }
+});
+
+// Community Developers List (Enriched, Zero Email Exposure)
+app.get('/api/community/developers', async (req, res) => {
+    try {
+        const filePath = getFilePath('users');
+        let fileUsers = [];
+        try {
+            const data = await fs.readFile(filePath, 'utf-8');
+            fileUsers = JSON.parse(data);
+        } catch { }
+
+        const developers = fileUsers
+            .filter(u => u.name && u.name.trim().length > 0)
+            .map(u => ({
+                id: String(u.id),
+                name: u.name,
+                title: u.title || 'Fullstack Developer',
+                role: u.role || 'Developer',
+                bio: u.bio || 'Passionate open-source developer building web applications and collaborating on modern tools.',
+                avatarUrl: u.avatarUrl || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80`,
+                verifiedSkills: Array.isArray(u.verifiedSkills) ? u.verifiedSkills : [],
+                skills: Array.isArray(u.skills) ? u.skills : (u.verifiedSkills || ['React', 'JavaScript']),
+                rating: u.rating || 4.8,
+                upvotes: typeof u.upvotes === 'number' ? u.upvotes : (Array.isArray(u.upvoters) ? u.upvoters.length : 12),
+                upvoters: Array.isArray(u.upvoters) ? u.upvoters : [],
+                followers: Array.isArray(u.followers) ? u.followers : [],
+                availability: u.availability || 'Available · Open for Collab',
+                lookingFor: u.lookingFor || 'Looking for: Open-source project collaboration',
+                socialLinks: u.socialLinks || { github: 'https://github.com' },
+                projects: Array.isArray(u.projects) ? u.projects : ['CodeCollab']
+            }));
+
+        res.json(developers);
+    } catch (error) {
+        console.error('Error fetching community developers:', error);
+        res.status(500).json({ error: 'Failed to fetch community developers' });
+    }
+});
+
+// Developer Upvote Toggle
+app.post('/api/users/:id/upvote', authMiddleware, async (req, res) => {
+    try {
+        const targetUserId = String(req.params.id);
+        const currentUserId = String(req.user.id);
+        const filePath = getFilePath('users');
+        
+        let users = JSON.parse(await fs.readFile(filePath, 'utf-8'));
+        const userIndex = users.findIndex(u => String(u.id) === targetUserId);
+        
+        if (userIndex === -1) {
+            return res.status(404).json({ error: 'Developer not found' });
+        }
+
+        const user = users[userIndex];
+        user.upvoters = Array.isArray(user.upvoters) ? user.upvoters : [];
+        user.upvotes = typeof user.upvotes === 'number' ? user.upvotes : user.upvoters.length;
+
+        const hasUpvoted = user.upvoters.includes(currentUserId);
+        if (hasUpvoted) {
+            user.upvoters = user.upvoters.filter(id => id !== currentUserId);
+            user.upvotes = Math.max(0, user.upvotes - 1);
+        } else {
+            user.upvoters.push(currentUserId);
+            user.upvotes += 1;
+        }
+
+        await fs.writeFile(filePath, JSON.stringify(users, null, 2));
+
+        res.json({
+            id: targetUserId,
+            upvotes: user.upvotes,
+            upvoters: user.upvoters,
+            hasUpvoted: !hasUpvoted
+        });
+    } catch (error) {
+        console.error('Error upvoting developer:', error);
+        res.status(500).json({ error: 'Failed to upvote developer' });
+    }
+});
+
+// Developer Follow Toggle
+app.post('/api/users/:id/follow', authMiddleware, async (req, res) => {
+    try {
+        const targetUserId = String(req.params.id);
+        const currentUserId = String(req.user.id);
+        const filePath = getFilePath('users');
+        
+        let users = JSON.parse(await fs.readFile(filePath, 'utf-8'));
+        const userIndex = users.findIndex(u => String(u.id) === targetUserId);
+        
+        if (userIndex === -1) {
+            return res.status(404).json({ error: 'Developer not found' });
+        }
+
+        const user = users[userIndex];
+        user.followers = Array.isArray(user.followers) ? user.followers : [];
+
+        const hasFollowed = user.followers.includes(currentUserId);
+        if (hasFollowed) {
+            user.followers = user.followers.filter(id => id !== currentUserId);
+        } else {
+            user.followers.push(currentUserId);
+        }
+
+        await fs.writeFile(filePath, JSON.stringify(users, null, 2));
+
+        res.json({
+            id: targetUserId,
+            followersCount: user.followers.length,
+            followers: user.followers,
+            hasFollowed: !hasFollowed
+        });
+    } catch (error) {
+        console.error('Error following developer:', error);
+        res.status(500).json({ error: 'Failed to follow developer' });
+    }
+});
+
+// Community Teams List (Enriched with Member and Project relations)
+app.get('/api/teams', async (req, res) => {
+    try {
+        const teamsPath = getFilePath('teams');
+        const usersPath = getFilePath('users');
+        
+        let teams = [];
+        let users = [];
+        try {
+            teams = JSON.parse(await fs.readFile(teamsPath, 'utf-8'));
+        } catch { teams = []; }
+        try {
+            users = JSON.parse(await fs.readFile(usersPath, 'utf-8'));
+        } catch { users = []; }
+
+        const userMap = new Map();
+        users.forEach(u => userMap.set(String(u.id), {
+            id: String(u.id),
+            name: u.name || `User #${u.id}`,
+            title: u.title || u.role || 'Developer',
+            avatarUrl: u.avatarUrl || '',
+            verifiedSkills: u.verifiedSkills || []
+        }));
+
+        const enrichedTeams = teams.map(t => {
+            const lead = userMap.get(String(t.leadId)) || { id: String(t.leadId), name: 'Team Lead', avatarUrl: '' };
+            const memberDetails = (Array.isArray(t.members) ? t.members : []).map(mId => {
+                return userMap.get(String(mId)) || { id: String(mId), name: `Member`, avatarUrl: '' };
+            });
+
+            return {
+                id: t.id,
+                teamName: t.teamName || 'Untitled Team',
+                description: t.description || '',
+                leadId: t.leadId,
+                lead: lead,
+                members: t.members || [],
+                memberDetails: memberDetails,
+                assignedProjects: t.assignedProjects || [],
+                skills: t.skills || [],
+                upvotes: typeof t.upvotes === 'number' ? t.upvotes : (Array.isArray(t.upvoters) ? t.upvoters.length : 10),
+                upvoters: Array.isArray(t.upvoters) ? t.upvoters : [],
+                lookingFor: t.lookingFor || 'Looking for passionate developers',
+                openPositions: t.openPositions || [],
+                availability: t.availability || 'Active · Recruiting',
+                rating: t.rating || 4.9,
+                createdAt: t.createdAt || new Date().toISOString(),
+                updatedAt: t.updatedAt || new Date().toISOString()
+            };
+        });
+
+        res.json(enrichedTeams);
+    } catch (error) {
+        console.error('Error fetching teams:', error);
+        res.status(500).json({ error: 'Failed to fetch teams' });
+    }
+});
+
+// Team Upvote Toggle
+app.post('/api/teams/:id/upvote', authMiddleware, async (req, res) => {
+    try {
+        const teamId = req.params.id;
+        const currentUserId = String(req.user.id);
+        const teamsPath = getFilePath('teams');
+
+        let teams = JSON.parse(await fs.readFile(teamsPath, 'utf-8'));
+        const teamIndex = teams.findIndex(t => t.id === teamId);
+        
+        if (teamIndex === -1) {
+            return res.status(404).json({ error: 'Team not found' });
+        }
+
+        const team = teams[teamIndex];
+        team.upvoters = Array.isArray(team.upvoters) ? team.upvoters : [];
+        team.upvotes = typeof team.upvotes === 'number' ? team.upvotes : team.upvoters.length;
+
+        const hasUpvoted = team.upvoters.includes(currentUserId);
+        if (hasUpvoted) {
+            team.upvoters = team.upvoters.filter(id => id !== currentUserId);
+            team.upvotes = Math.max(0, team.upvotes - 1);
+        } else {
+            team.upvoters.push(currentUserId);
+            team.upvotes += 1;
+        }
+
+        await fs.writeFile(teamsPath, JSON.stringify(teams, null, 2));
+
+        res.json({
+            id: teamId,
+            upvotes: team.upvotes,
+            upvoters: team.upvoters,
+            hasUpvoted: !hasUpvoted
+        });
+    } catch (error) {
+        console.error('Error upvoting team:', error);
+        res.status(500).json({ error: 'Failed to upvote team' });
+    }
+});
+
+// Team Join Request Handler (Dispatches Notification to Team Lead)
+app.post('/api/teams/:id/join', authMiddleware, async (req, res) => {
+    try {
+        const teamId = req.params.id;
+        const currentUserId = String(req.user.id);
+        const { message, position } = req.body;
+        const teamsPath = getFilePath('teams');
+        const usersPath = getFilePath('users');
+
+        let teams = JSON.parse(await fs.readFile(teamsPath, 'utf-8'));
+        const team = teams.find(t => t.id === teamId);
+        if (!team) {
+            return res.status(404).json({ error: 'Team not found' });
+        }
+
+        if (String(team.leadId) === currentUserId) {
+            return res.status(400).json({ error: 'You are already the leader of this team' });
+        }
+
+        if (Array.isArray(team.members) && team.members.includes(currentUserId)) {
+            return res.status(400).json({ error: 'You are already a member of this team' });
+        }
+
+        let users = [];
+        try { users = JSON.parse(await fs.readFile(usersPath, 'utf-8')); } catch {}
+        const requester = users.find(u => String(u.id) === currentUserId);
+        const requesterName = requester?.name || 'A developer';
+
+        // Dispatch notification to team leader via Prisma
+        try {
+            const leadExists = await prisma.user.findUnique({ where: { id: String(team.leadId) } });
+            if (!leadExists) {
+                const leadFileUser = users.find(u => String(u.id) === String(team.leadId));
+                if (leadFileUser) {
+                    await prisma.user.create({
+                        data: {
+                            id: String(team.leadId),
+                            email: leadFileUser.email || `lead_${team.leadId}@example.com`,
+                            isVerified: true,
+                            status: 'active',
+                            profile: {
+                                create: {
+                                    firstName: leadFileUser.name || 'Team Lead',
+                                    lastName: '',
+                                    avatarUrl: leadFileUser.avatarUrl || ''
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Also ensure requester exists in Prisma
+            const reqExists = await prisma.user.findUnique({ where: { id: currentUserId } });
+            if (!reqExists) {
+                await prisma.user.create({
+                    data: {
+                        id: currentUserId,
+                        email: requester?.email || req.user.email || `user_${currentUserId}@example.com`,
+                        isVerified: true,
+                        status: 'active',
+                        profile: {
+                            create: {
+                                firstName: requesterName,
+                                lastName: '',
+                                avatarUrl: requester?.avatarUrl || ''
+                            }
+                        }
+                    }
+                });
+            }
+
+            await prisma.notification.create({
+                data: {
+                    userId: String(team.leadId),
+                    actorId: currentUserId,
+                    type: 'TEAM_JOIN_REQUEST',
+                    title: 'Team Join Request',
+                    message: `${requesterName} requested to join "${team.teamName}"${position ? ` for position: ${position}` : ''}`,
+                    data: {
+                        teamId: team.id,
+                        teamName: team.teamName,
+                        requesterId: currentUserId,
+                        requesterName,
+                        position: position || 'Developer',
+                        message: (message || '').trim()
+                    }
+                }
+            });
+        } catch (notifErr) {
+            console.error('Error saving team notification to Prisma:', notifErr);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `Join request sent to ${team.teamName} team lead!`
+        });
+    } catch (error) {
+        console.error('Error submitting team join request:', error);
+        res.status(500).json({ error: 'Failed to submit team join request' });
+    }
+});
+
+// Team Lead Responds to Join Request (Accept / Reject)
+app.post('/api/teams/:id/respond', authMiddleware, async (req, res) => {
+    try {
+        const teamId = req.params.id;
+        const currentUserId = String(req.user.id);
+        const { requesterId, action } = req.body; // action: 'ACCEPT' or 'REJECT'
+        const teamsPath = getFilePath('teams');
+        const usersPath = getFilePath('users');
+
+        if (!['ACCEPT', 'REJECT'].includes(action)) {
+            return res.status(400).json({ error: 'Invalid action. Must be ACCEPT or REJECT.' });
+        }
+
+        let teams = JSON.parse(await fs.readFile(teamsPath, 'utf-8'));
+        const teamIndex = teams.findIndex(t => t.id === teamId);
+        if (teamIndex === -1) {
+            return res.status(404).json({ error: 'Team not found' });
+        }
+
+        const team = teams[teamIndex];
+        if (String(team.leadId) !== currentUserId) {
+            return res.status(403).json({ error: 'Only the team leader can manage join requests' });
+        }
+
+        let users = [];
+        try { users = JSON.parse(await fs.readFile(usersPath, 'utf-8')); } catch {}
+        const requester = users.find(u => String(u.id) === String(requesterId));
+
+        if (action === 'ACCEPT') {
+            team.members = Array.isArray(team.members) ? team.members : [];
+            if (!team.members.includes(String(requesterId))) {
+                team.members.push(String(requesterId));
+                team.updatedAt = new Date().toISOString();
+                await fs.writeFile(teamsPath, JSON.stringify(teams, null, 2));
+            }
+
+            // Notify requester
+            try {
+                await prisma.notification.create({
+                    data: {
+                        userId: String(requesterId),
+                        actorId: currentUserId,
+                        type: 'TEAM_JOIN_ACCEPTED',
+                        title: 'Team Request Accepted! 🎉',
+                        message: `You were accepted into team "${team.teamName}"!`,
+                        data: {
+                            teamId: team.id,
+                            teamName: team.teamName
+                        }
+                    }
+                });
+            } catch (e) {}
+        } else {
+            // Notify requester of decline
+            try {
+                await prisma.notification.create({
+                    data: {
+                        userId: String(requesterId),
+                        actorId: currentUserId,
+                        type: 'TEAM_JOIN_REJECTED',
+                        title: 'Team Request Update',
+                        message: `Your request to join "${team.teamName}" was declined.`,
+                        data: {
+                            teamId: team.id,
+                            teamName: team.teamName
+                        }
+                    }
+                });
+            } catch (e) {}
+        }
+
+        res.json({ success: true, action, team });
+    } catch (error) {
+        console.error('Error responding to team join request:', error);
+        res.status(500).json({ error: 'Failed to process team join request response' });
+    }
+});
+
+// Community Looking-For Matchmaking Posts
+app.get('/api/community/looking-for', async (req, res) => {
+    try {
+        const lookingForPath = getFilePath('lookingFor');
+        const usersPath = getFilePath('users');
+        
+        let posts = [];
+        let users = [];
+        try { posts = JSON.parse(await fs.readFile(lookingForPath, 'utf-8')); } catch {}
+        try { users = JSON.parse(await fs.readFile(usersPath, 'utf-8')); } catch {}
+
+        const userMap = new Map();
+        users.forEach(u => userMap.set(String(u.id), {
+            id: String(u.id),
+            name: u.name,
+            title: u.title || 'Developer',
+            avatarUrl: u.avatarUrl || '',
+            verifiedSkills: u.verifiedSkills || [],
+            socialLinks: u.socialLinks || {}
+        }));
+
+        const enrichedPosts = posts.map(p => {
+            const author = userMap.get(String(p.userId)) || { id: String(p.userId), name: 'Developer', avatarUrl: '' };
+            return {
+                ...p,
+                author
+            };
+        });
+
+        res.json(enrichedPosts);
+    } catch (error) {
+        console.error('Error fetching lookingFor posts:', error);
+        res.status(500).json({ error: 'Failed to fetch lookingFor posts' });
     }
 });
 
@@ -685,17 +1135,6 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-app.get('/api/:table', async (req, res) => {
-    try {
-        const filePath = getFilePath(req.params.table);
-        try { await fs.access(filePath); } catch { return res.json([]); }
-        const data = await fs.readFile(filePath, 'utf-8');
-        res.json(JSON.parse(data));
-    } catch (error) {
-        console.error(`Error reading ${req.params.table}:`, error);
-        res.status(500).json({ error: 'Failed to read data' });
-    }
-});
 
 // Issue endpoints - Protected with JWT Authentication
 app.get('/api/issues', authMiddleware, async (req, res) => {
@@ -988,6 +1427,725 @@ async function handleDeleteIssue(req, res) {
 app.delete('/api/projects/:projectId/issues/:issueId', authMiddleware, handleDeleteIssue);
 app.delete('/api/issues/:issueId', authMiddleware, handleDeleteIssue);
 
+// ----------------------------------------------------------------------------
+// Join Request, Meeting Request, and Notification Helpers (Zero-Email, Clean Relations)
+// ----------------------------------------------------------------------------
+
+function sanitizeUserObj(u, fallbackName = 'Developer') {
+    if (!u) return null;
+    const name = u.profile?.firstName 
+        ? `${u.profile.firstName} ${u.profile.lastName || ''}`.trim()
+        : (u.name || fallbackName);
+    return {
+        id: u.id,
+        name: name || fallbackName,
+        avatarUrl: u.profile?.avatarUrl || u.avatarUrl || ''
+    };
+}
+
+function sanitizeJoinRequest(r, fileUsersMap = new Map()) {
+    if (!r) return null;
+    const userFallback = r.userId ? fileUsersMap.get(String(r.userId)) : null;
+    const userObj = r.user ? sanitizeUserObj(r.user, userFallback?.name) : (userFallback ? { id: String(r.userId), name: userFallback.name, avatarUrl: userFallback.avatarUrl || '' } : { id: String(r.userId), name: `Developer` });
+    
+    const ownerFallback = r.ownerId ? fileUsersMap.get(String(r.ownerId)) : null;
+    const ownerObj = r.owner ? sanitizeUserObj(r.owner, ownerFallback?.name) : (ownerFallback ? { id: String(r.ownerId), name: ownerFallback.name, avatarUrl: ownerFallback.avatarUrl || '' } : { id: String(r.ownerId), name: `Project Owner` });
+
+    return {
+        id: r.id,
+        status: r.status,
+        message: r.message || '',
+        createdAt: r.createdAt,
+        updatedAt: r.updatedAt,
+        projectId: r.projectId,
+        project: r.project ? { id: r.project.id, title: r.project.title } : undefined,
+        userId: r.userId,
+        user: userObj,
+        ownerId: r.ownerId,
+        owner: ownerObj
+    };
+}
+
+function sanitizeMeetingRequest(m, fileUsersMap = new Map()) {
+    if (!m) return null;
+    const userFallback = m.userId ? fileUsersMap.get(String(m.userId)) : null;
+    const userObj = m.user ? sanitizeUserObj(m.user, userFallback?.name) : (userFallback ? { id: String(m.userId), name: userFallback.name, avatarUrl: userFallback.avatarUrl || '' } : { id: String(m.userId), name: `Developer` });
+    
+    const ownerFallback = m.ownerId ? fileUsersMap.get(String(m.ownerId)) : null;
+    const ownerObj = m.owner ? sanitizeUserObj(m.owner, ownerFallback?.name) : (ownerFallback ? { id: String(m.ownerId), name: ownerFallback.name, avatarUrl: ownerFallback.avatarUrl || '' } : { id: String(m.ownerId), name: `Project Owner` });
+
+    return {
+        id: m.id,
+        status: m.status,
+        preferredDate: m.preferredDate,
+        message: m.message || '',
+        responseNotes: m.responseNotes || '',
+        meetingLink: m.meetingLink || '',
+        createdAt: m.createdAt,
+        updatedAt: m.updatedAt,
+        projectId: m.projectId,
+        project: m.project ? { id: m.project.id, title: m.project.title } : undefined,
+        userId: m.userId,
+        user: userObj,
+        ownerId: m.ownerId,
+        owner: ownerObj
+    };
+}
+
+function sanitizeNotification(n) {
+    if (!n) return null;
+    const actorObj = n.actor ? sanitizeUserObj(n.actor) : null;
+    return {
+        id: n.id,
+        type: n.type,
+        title: n.title,
+        message: n.message,
+        data: n.data || {},
+        read: n.read,
+        createdAt: n.createdAt,
+        projectId: n.projectId,
+        actor: actorObj
+    };
+}
+
+// ----------------------------------------------------------------------------
+// Join Request Endpoints
+// ----------------------------------------------------------------------------
+
+// Create join request for a project
+app.post('/api/projects/:projectId/join-requests', authMiddleware, async (req, res) => {
+    try {
+        const projectId = req.params.projectId;
+        const userId = String(req.user.id);
+        const { message } = req.body;
+
+        const project = await prisma.project.findUnique({
+            where: { id: projectId },
+            include: { owner: { include: { profile: true } } }
+        });
+        if (!project) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        if (project.ownerId && String(project.ownerId) === userId) {
+            return res.status(400).json({ error: 'You are the owner of this project' });
+        }
+
+        // Check if already a project member
+        const existingMember = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: { projectId, userId }
+            }
+        });
+        if (existingMember) {
+            return res.status(400).json({ error: 'You are already a member of this project' });
+        }
+
+        // Check for active (pending) join request
+        const existingPending = await prisma.joinRequest.findFirst({
+            where: {
+                projectId,
+                userId,
+                status: 'PENDING'
+            }
+        });
+        if (existingPending) {
+            return res.status(400).json({ error: 'You already have an active pending join request for this project' });
+        }
+
+        // Ensure user exists in Postgres User table
+        try {
+            const userExists = await prisma.user.findUnique({ where: { id: userId } });
+            if (!userExists) {
+                let fileUsers = [];
+                try { fileUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8')); } catch {}
+                const u = fileUsers.find(x => String(x.id) === userId);
+                await prisma.user.create({
+                    data: {
+                        id: userId,
+                        email: u?.email || req.user.email || `user_${userId}@example.com`,
+                        passwordHash: u?.password || null,
+                        isVerified: true,
+                        status: 'active',
+                        profile: {
+                            create: {
+                                firstName: u?.name || 'Developer',
+                                lastName: '',
+                                avatarUrl: u?.avatarUrl || ''
+                            }
+                        }
+                    }
+                });
+            }
+        } catch (uErr) {}
+
+        const joinRequest = await prisma.joinRequest.create({
+            data: {
+                userId,
+                projectId,
+                ownerId: project.ownerId || userId,
+                status: 'PENDING',
+                message: message ? String(message).trim() : null
+            },
+            include: {
+                user: { include: { profile: true } },
+                project: { select: { id: true, title: true } }
+            }
+        });
+
+        // Notify project owner
+        if (project.ownerId && String(project.ownerId) !== userId) {
+            const requesterName = joinRequest.user?.profile?.firstName 
+                ? `${joinRequest.user.profile.firstName} ${joinRequest.user.profile.lastName || ''}`.trim()
+                : 'A developer';
+            await prisma.notification.create({
+                data: {
+                    userId: project.ownerId,
+                    actorId: userId,
+                    projectId: projectId,
+                    type: 'JOIN_REQUEST_RECEIVED',
+                    title: 'New Join Request',
+                    message: `${requesterName} requested to join "${project.title}"`,
+                    data: {
+                        requestId: joinRequest.id,
+                        projectId: projectId,
+                        projectTitle: project.title,
+                        requesterName
+                    }
+                }
+            });
+        }
+
+        let fileUsersMap = new Map();
+        try {
+            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
+            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+        } catch {}
+
+        res.status(201).json(sanitizeJoinRequest(joinRequest, fileUsersMap));
+    } catch (error) {
+        console.error('Error creating join request:', error);
+        res.status(500).json({ error: 'Failed to submit join request' });
+    }
+});
+
+// Get current user's join request for a project
+app.get('/api/projects/:projectId/join-requests/my', authMiddleware, async (req, res) => {
+    try {
+        const projectId = req.params.projectId;
+        const userId = String(req.user.id);
+
+        const request = await prisma.joinRequest.findFirst({
+            where: { projectId, userId },
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: { include: { profile: true } },
+                project: { select: { id: true, title: true } }
+            }
+        });
+
+        let fileUsersMap = new Map();
+        try {
+            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
+            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+        } catch {}
+
+        res.json(request ? sanitizeJoinRequest(request, fileUsersMap) : null);
+    } catch (error) {
+        console.error('Error fetching user join request for project:', error);
+        res.status(500).json({ error: 'Failed to fetch join request status' });
+    }
+});
+
+// Get received join requests (for project owner)
+app.get('/api/join-requests/received', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        const requests = await prisma.joinRequest.findMany({
+            where: { ownerId: userId },
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: { include: { profile: true } },
+                project: { select: { id: true, title: true } }
+            }
+        });
+
+        let fileUsersMap = new Map();
+        try {
+            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
+            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+        } catch {}
+
+        res.json(requests.map(r => sanitizeJoinRequest(r, fileUsersMap)));
+    } catch (error) {
+        console.error('Error fetching received join requests:', error);
+        res.status(500).json({ error: 'Failed to fetch received join requests' });
+    }
+});
+
+// Get sent join requests (for requester)
+app.get('/api/join-requests/sent', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        const requests = await prisma.joinRequest.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: { include: { profile: true } },
+                owner: { include: { profile: true } },
+                project: { select: { id: true, title: true } }
+            }
+        });
+
+        let fileUsersMap = new Map();
+        try {
+            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
+            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+        } catch {}
+
+        res.json(requests.map(r => sanitizeJoinRequest(r, fileUsersMap)));
+    } catch (error) {
+        console.error('Error fetching sent join requests:', error);
+        res.status(500).json({ error: 'Failed to fetch sent join requests' });
+    }
+});
+
+// Respond to join request (ACCEPT or REJECT)
+app.patch('/api/join-requests/:id', authMiddleware, async (req, res) => {
+    try {
+        const requestId = req.params.id;
+        const currentUserId = String(req.user.id);
+        const { status, action } = req.body;
+        const targetStatus = status || action;
+
+        if (!['ACCEPTED', 'REJECTED'].includes(targetStatus)) {
+            return res.status(400).json({ error: 'Invalid status. Must be ACCEPTED or REJECTED.' });
+        }
+
+        const joinRequest = await prisma.joinRequest.findUnique({
+            where: { id: requestId },
+            include: {
+                project: true,
+                user: { include: { profile: true } },
+                owner: { include: { profile: true } }
+            }
+        });
+
+        if (!joinRequest) {
+            return res.status(404).json({ error: 'Join request not found' });
+        }
+
+        // Authorization check: Only project owner can respond
+        if (String(joinRequest.ownerId) !== currentUserId && String(joinRequest.project?.ownerId) !== currentUserId) {
+            return res.status(403).json({ error: 'You are not authorized to manage this join request' });
+        }
+
+        const updated = await prisma.joinRequest.update({
+            where: { id: requestId },
+            data: { status: targetStatus },
+            include: {
+                user: { include: { profile: true } },
+                owner: { include: { profile: true } },
+                project: { select: { id: true, title: true } }
+            }
+        });
+
+        if (targetStatus === 'ACCEPTED') {
+            // Add user to project members if not already there
+            const existingMember = await prisma.projectMember.findUnique({
+                where: {
+                    projectId_userId: {
+                        projectId: joinRequest.projectId,
+                        userId: joinRequest.userId
+                    }
+                }
+            });
+            if (!existingMember) {
+                await prisma.projectMember.create({
+                    data: {
+                        projectId: joinRequest.projectId,
+                        userId: joinRequest.userId,
+                        projectRole: 'editor'
+                    }
+                });
+            }
+
+            // Send notification to the requester
+            await prisma.notification.create({
+                data: {
+                    userId: joinRequest.userId,
+                    actorId: currentUserId,
+                    projectId: joinRequest.projectId,
+                    type: 'JOIN_REQUEST_ACCEPTED',
+                    title: 'Join Request Accepted',
+                    message: `Your request to join "${joinRequest.project?.title || 'the project'}" was accepted!`,
+                    data: {
+                        requestId: joinRequest.id,
+                        projectId: joinRequest.projectId,
+                        projectTitle: joinRequest.project?.title
+                    }
+                }
+            });
+        } else if (targetStatus === 'REJECTED') {
+            // Send notification to the requester
+            await prisma.notification.create({
+                data: {
+                    userId: joinRequest.userId,
+                    actorId: currentUserId,
+                    projectId: joinRequest.projectId,
+                    type: 'JOIN_REQUEST_REJECTED',
+                    title: 'Join Request Declined',
+                    message: `Your request to join "${joinRequest.project?.title || 'the project'}" was declined.`,
+                    data: {
+                        requestId: joinRequest.id,
+                        projectId: joinRequest.projectId,
+                        projectTitle: joinRequest.project?.title
+                    }
+                }
+            });
+        }
+
+        let fileUsersMap = new Map();
+        try {
+            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
+            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+        } catch {}
+
+        res.json(sanitizeJoinRequest(updated, fileUsersMap));
+    } catch (error) {
+        console.error('Error updating join request:', error);
+        res.status(500).json({ error: 'Failed to update join request' });
+    }
+});
+
+// ----------------------------------------------------------------------------
+// Meeting Request Endpoints
+// ----------------------------------------------------------------------------
+
+// Create meeting request for a project
+app.post('/api/projects/:projectId/meetings', authMiddleware, async (req, res) => {
+    try {
+        const projectId = req.params.projectId;
+        const userId = String(req.user.id);
+        const { preferredDate, message, topic } = req.body;
+
+        const project = await prisma.project.findUnique({
+            where: { id: projectId },
+            include: { owner: { include: { profile: true } } }
+        });
+        if (!project) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        if (project.ownerId && String(project.ownerId) === userId) {
+            return res.status(400).json({ error: 'You cannot schedule a meeting with yourself' });
+        }
+
+        // Ensure user exists in Postgres User table
+        try {
+            const userExists = await prisma.user.findUnique({ where: { id: userId } });
+            if (!userExists) {
+                let fileUsers = [];
+                try { fileUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8')); } catch {}
+                const u = fileUsers.find(x => String(x.id) === userId);
+                await prisma.user.create({
+                    data: {
+                        id: userId,
+                        email: u?.email || req.user.email || `user_${userId}@example.com`,
+                        passwordHash: u?.password || null,
+                        isVerified: true,
+                        status: 'active',
+                        profile: {
+                            create: {
+                                firstName: u?.name || 'Developer',
+                                lastName: '',
+                                avatarUrl: u?.avatarUrl || ''
+                            }
+                        }
+                    }
+                });
+            }
+        } catch (uErr) {}
+
+        const meeting = await prisma.meetingRequest.create({
+            data: {
+                userId,
+                projectId,
+                ownerId: project.ownerId || userId,
+                preferredDate: preferredDate ? new Date(preferredDate) : null,
+                message: (message || topic || '').trim(),
+                status: 'PENDING'
+            },
+            include: {
+                user: { include: { profile: true } },
+                project: { select: { id: true, title: true } }
+            }
+        });
+
+        // Notify project owner
+        if (project.ownerId && String(project.ownerId) !== userId) {
+            const requesterName = meeting.user?.profile?.firstName 
+                ? `${meeting.user.profile.firstName} ${meeting.user.profile.lastName || ''}`.trim()
+                : 'A developer';
+            await prisma.notification.create({
+                data: {
+                    userId: project.ownerId,
+                    actorId: userId,
+                    projectId: projectId,
+                    type: 'MEETING_REQUEST_RECEIVED',
+                    title: 'New Meeting Request',
+                    message: `${requesterName} requested a meeting regarding "${project.title}"`,
+                    data: {
+                        meetingId: meeting.id,
+                        projectId: projectId,
+                        projectTitle: project.title,
+                        requesterName,
+                        preferredDate: meeting.preferredDate
+                    }
+                }
+            });
+        }
+
+        let fileUsersMap = new Map();
+        try {
+            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
+            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+        } catch {}
+
+        res.status(201).json(sanitizeMeetingRequest(meeting, fileUsersMap));
+    } catch (error) {
+        console.error('Error creating meeting request:', error);
+        res.status(500).json({ error: 'Failed to schedule meeting' });
+    }
+});
+
+// Get user's meeting requests for a project
+app.get('/api/projects/:projectId/meetings/my', authMiddleware, async (req, res) => {
+    try {
+        const projectId = req.params.projectId;
+        const userId = String(req.user.id);
+
+        const meetings = await prisma.meetingRequest.findMany({
+            where: {
+                projectId,
+                OR: [
+                    { userId },
+                    { ownerId: userId }
+                ]
+            },
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: { include: { profile: true } },
+                owner: { include: { profile: true } },
+                project: { select: { id: true, title: true } }
+            }
+        });
+
+        let fileUsersMap = new Map();
+        try {
+            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
+            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+        } catch {}
+
+        res.json(meetings.map(m => sanitizeMeetingRequest(m, fileUsersMap)));
+    } catch (error) {
+        console.error('Error fetching project meetings:', error);
+        res.status(500).json({ error: 'Failed to fetch meeting requests' });
+    }
+});
+
+// Get received meeting requests (for project owner)
+app.get('/api/meetings/received', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        const meetings = await prisma.meetingRequest.findMany({
+            where: { ownerId: userId },
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: { include: { profile: true } },
+                project: { select: { id: true, title: true } }
+            }
+        });
+
+        let fileUsersMap = new Map();
+        try {
+            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
+            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+        } catch {}
+
+        res.json(meetings.map(m => sanitizeMeetingRequest(m, fileUsersMap)));
+    } catch (error) {
+        console.error('Error fetching received meetings:', error);
+        res.status(500).json({ error: 'Failed to fetch received meeting requests' });
+    }
+});
+
+// Get sent meeting requests (for requester)
+app.get('/api/meetings/sent', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        const meetings = await prisma.meetingRequest.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: { include: { profile: true } },
+                owner: { include: { profile: true } },
+                project: { select: { id: true, title: true } }
+            }
+        });
+
+        let fileUsersMap = new Map();
+        try {
+            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
+            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+        } catch {}
+
+        res.json(meetings.map(m => sanitizeMeetingRequest(m, fileUsersMap)));
+    } catch (error) {
+        console.error('Error fetching sent meetings:', error);
+        res.status(500).json({ error: 'Failed to fetch sent meeting requests' });
+    }
+});
+
+// Respond to / update meeting request
+app.patch('/api/meetings/:id', authMiddleware, async (req, res) => {
+    try {
+        const meetingId = req.params.id;
+        const currentUserId = String(req.user.id);
+        const { status, responseNotes, meetingLink } = req.body;
+
+        const meeting = await prisma.meetingRequest.findUnique({
+            where: { id: meetingId },
+            include: {
+                project: true,
+                user: { include: { profile: true } },
+                owner: { include: { profile: true } }
+            }
+        });
+
+        if (!meeting) {
+            return res.status(404).json({ error: 'Meeting request not found' });
+        }
+
+        const isOwner = String(meeting.ownerId) === currentUserId || String(meeting.project?.ownerId) === currentUserId;
+        const isRequester = String(meeting.userId) === currentUserId;
+
+        if (!isOwner && !isRequester) {
+            return res.status(403).json({ error: 'You are not authorized to update this meeting request' });
+        }
+
+        const updateData = {};
+        if (status && ['ACCEPTED', 'REJECTED', 'PENDING'].includes(status)) {
+            updateData.status = status;
+        }
+        if (responseNotes !== undefined) updateData.responseNotes = String(responseNotes).trim();
+        if (meetingLink !== undefined) updateData.meetingLink = String(meetingLink).trim();
+
+        const updated = await prisma.meetingRequest.update({
+            where: { id: meetingId },
+            data: updateData,
+            include: {
+                user: { include: { profile: true } },
+                owner: { include: { profile: true } },
+                project: { select: { id: true, title: true } }
+            }
+        });
+
+        // If owner responded, notify the requester
+        if (isOwner && status && status !== 'PENDING') {
+            await prisma.notification.create({
+                data: {
+                    userId: meeting.userId,
+                    actorId: currentUserId,
+                    projectId: meeting.projectId,
+                    type: status === 'ACCEPTED' ? 'MEETING_REQUEST_ACCEPTED' : 'MEETING_REQUEST_REJECTED',
+                    title: status === 'ACCEPTED' ? 'Meeting Request Accepted' : 'Meeting Request Declined',
+                    message: status === 'ACCEPTED'
+                        ? `Your meeting request for "${meeting.project?.title || 'the project'}" was accepted!`
+                        : `Your meeting request for "${meeting.project?.title || 'the project'}" was declined.`,
+                    data: {
+                        meetingId: meeting.id,
+                        projectId: meeting.projectId,
+                        projectTitle: meeting.project?.title,
+                        responseNotes: updated.responseNotes,
+                        meetingLink: updated.meetingLink
+                    }
+                }
+            });
+        }
+
+        let fileUsersMap = new Map();
+        try {
+            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
+            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+        } catch {}
+
+        res.json(sanitizeMeetingRequest(updated, fileUsersMap));
+    } catch (error) {
+        console.error('Error updating meeting request:', error);
+        res.status(500).json({ error: 'Failed to update meeting request' });
+    }
+});
+
+// ----------------------------------------------------------------------------
+// Notification Endpoints
+// ----------------------------------------------------------------------------
+
+// Get notifications for authenticated user
+app.get('/api/notifications', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        const notifications = await prisma.notification.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            take: 50,
+            include: {
+                actor: { include: { profile: true } }
+            }
+        });
+        res.json(notifications.map(sanitizeNotification));
+    } catch (error) {
+        console.error('Error fetching notifications:', error);
+        res.status(500).json({ error: 'Failed to fetch notifications' });
+    }
+});
+
+// Mark single notification as read
+app.patch('/api/notifications/:id/read', authMiddleware, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const userId = String(req.user.id);
+        const existing = await prisma.notification.findUnique({ where: { id } });
+        if (!existing || existing.userId !== userId) {
+            return res.status(404).json({ error: 'Notification not found' });
+        }
+        const updated = await prisma.notification.update({
+            where: { id },
+            data: { read: true },
+            include: { actor: { include: { profile: true } } }
+        });
+        res.json(sanitizeNotification(updated));
+    } catch (error) {
+        console.error('Error marking notification as read:', error);
+        res.status(500).json({ error: 'Failed to update notification' });
+    }
+});
+
+// Mark all notifications as read
+app.post('/api/notifications/read-all', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        await prisma.notification.updateMany({
+            where: { userId, read: false },
+            data: { read: true }
+        });
+        res.json({ success: true, message: 'All notifications marked as read' });
+    } catch (error) {
+        console.error('Error marking all notifications as read:', error);
+        res.status(500).json({ error: 'Failed to update notifications' });
+    }
+});
+
 // Write project data to Prisma PostgreSQL with ownerId and member linkage (protected)
 app.post('/api/projects', authMiddleware, async (req, res) => {
     try {
@@ -1261,7 +2419,24 @@ app.post('/api/auth/google', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`Storing data in: ${DATA_DIR}`);
+// Fallback generic data table route
+app.get('/api/:table', async (req, res) => {
+    try {
+        const filePath = getFilePath(req.params.table);
+        try { await fs.access(filePath); } catch { return res.json([]); }
+        const data = await fs.readFile(filePath, 'utf-8');
+        res.json(JSON.parse(data));
+    } catch (error) {
+        console.error(`Error reading ${req.params.table}:`, error);
+        res.status(500).json({ error: 'Failed to read data' });
+    }
 });
+
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+        console.log(`Storing data in: ${DATA_DIR}`);
+    });
+}
+
+module.exports = app;

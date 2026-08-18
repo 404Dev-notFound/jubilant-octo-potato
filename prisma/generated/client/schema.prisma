@@ -1,0 +1,274 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String? // Nullable for OAuth-only
+  isVerified   Boolean  @default(false)
+  status       String   @default("active") // active, suspended, deleted
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile         UserProfile?
+  roles           UserRole[]
+  oauthIdentities OAuthIdentity[]
+  sessions        UserSession[]
+  securityLogs    SecurityLog[]
+  tokens          VerificationToken[]
+  apiKeys         ApiKey[]
+
+  ownedProjects  Project[]       @relation("ProjectOwner")
+  projectMembers ProjectMember[]
+  createdIssues  Issue[]         @relation("IssueCreator")
+  assignedIssues Issue[]         @relation("IssueAssignee")
+
+  joinRequestsSent     JoinRequest[]    @relation("UserJoinRequests")
+  joinRequestsReceived JoinRequest[]    @relation("OwnerJoinRequests")
+  meetingsRequested    MeetingRequest[] @relation("UserMeetingRequests")
+  meetingsReceived     MeetingRequest[] @relation("OwnerMeetingRequests")
+  notifications        Notification[]   @relation("UserNotifications")
+  actorNotifications   Notification[]   @relation("ActorNotifications")
+}
+
+model UserProfile {
+  userId      String  @id
+  firstName   String?
+  lastName    String?
+  avatarUrl   String?
+  phoneNumber String?
+  preferences Json?   @default("{}")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OAuthIdentity {
+  id         String   @id @default(uuid())
+  userId     String
+  provider   String // google, github, apple
+  providerId String   @unique
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  users       UserRole[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  roles RolePermission[]
+}
+
+model UserRole {
+  userId String
+  roleId Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String
+  refreshToken String   @unique
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  type      String // email_verify, password_reset
+  isUsed    Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ApiKey {
+  id         String    @id @default(uuid())
+  userId     String
+  keyHash    String    @unique
+  name       String
+  projectId  String?
+  expiresAt  DateTime?
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model SecurityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  eventType String // login_success, failed_login, password_change
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ----------------------------------------------------------------------------
+// Existing Models (Updated with relations)
+// ----------------------------------------------------------------------------
+
+model Project {
+  id          String   @id @default(uuid())
+  title       String
+  category    String
+  difficulty  String
+  techStack   String[]
+  image       String
+  description String
+  githubUrl   String
+  isPinned    Boolean  @default(false)
+  isDemo      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ownerId String?
+  owner   User?   @relation("ProjectOwner", fields: [ownerId], references: [id])
+
+  members         ProjectMember[]
+  apiKeys         ApiKey[]
+  issues          Issue[]
+  joinRequests    JoinRequest[]
+  meetingRequests MeetingRequest[]
+  notifications   Notification[]
+}
+
+model ProjectMember {
+  projectId   String
+  userId      String
+  projectRole String   @default("viewer") // admin, editor, viewer
+  joinedAt    DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, userId])
+}
+
+enum IssueStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum IssuePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Issue {
+  id          String        @id @default(uuid())
+  title       String
+  description String?
+  status      IssueStatus   @default(TODO)
+  priority    IssuePriority @default(MEDIUM)
+  tags        String[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  creatorId String
+  creator   User   @relation("IssueCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+
+  assigneeId String?
+  assignee   User?   @relation("IssueAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model JoinRequest {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation("UserJoinRequests", fields: [userId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  ownerId   String
+  owner     User          @relation("OwnerJoinRequests", fields: [ownerId], references: [id], onDelete: Cascade)
+  status    RequestStatus @default(PENDING)
+  message   String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model MeetingRequest {
+  id            String        @id @default(uuid())
+  userId        String
+  user          User          @relation("UserMeetingRequests", fields: [userId], references: [id], onDelete: Cascade)
+  projectId     String
+  project       Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  ownerId       String
+  owner         User          @relation("OwnerMeetingRequests", fields: [ownerId], references: [id], onDelete: Cascade)
+  preferredDate DateTime?
+  message       String?
+  status        RequestStatus @default(PENDING)
+  responseNotes String?
+  meetingLink   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  actorId   String?
+  actor     User?    @relation("ActorNotifications", fields: [actorId], references: [id], onDelete: SetNull)
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type      String // JOIN_REQUEST_RECEIVED, JOIN_REQUEST_ACCEPTED, JOIN_REQUEST_REJECTED, MEETING_REQUEST_RECEIVED, MEETING_REQUEST_ACCEPTED, MEETING_REQUEST_REJECTED
+  title     String
+  message   String
+  data      Json?    @default("{}")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

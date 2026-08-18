@@ -9,8 +9,8 @@ export function render_home() {
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-tertiary">can commit</span>
     </h1>
     
-    <p class="text-on-surface-variant text-lg md:text-xl max-w-3xl mb-xl">
-        Connect with developers, students, and open-source maintainers. Discover beginner-friendly issues, track your contributions, leverage intelligent AI code review, and build your digital legacy.
+    <p class="font-['Oleo_Script'] font-bold text-transparent text-lg md:text-xl max-w-3xl mb-xl tracking-wide" style="-webkit-text-stroke: 1px #ffffff; text-stroke: 1px #ffffff; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));">
+        Find your next project, meet developers who share your passion, and build something that matters. Join teams, solve real-world issues, contribute your skills, and grow from every collaboration — from your first contribution to your next big open-source project.
     </p>
     
     <div class="flex flex-col sm:flex-row gap-md justify-center w-full max-w-2xl">

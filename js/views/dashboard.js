@@ -96,6 +96,75 @@ export function render_dashboard() {
                     </div>
                 </div>
             </div>
+
+            <!-- Requests & Notifications Hub -->
+            <div class="glass-panel p-lg rounded-xl border border-white/5">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-md border-b border-outline-variant pb-sm">
+                    <div class="flex items-center gap-xs">
+                        <span class="material-symbols-outlined text-primary text-[22px]">notifications_active</span>
+                        <h3 class="font-bold text-on-surface text-base">Requests & Notifications</h3>
+                    </div>
+                    <!-- Main Hub Tabs -->
+                    <div class="flex gap-1 bg-surface-container p-1 rounded-lg text-xs" id="hub-tab-buttons">
+                        <button id="tab-btn-join-requests" class="px-3 py-1.5 rounded-md font-bold transition-colors bg-primary text-on-primary flex items-center gap-1">
+                            <span>Join Requests</span>
+                            <span id="badge-join-requests-count" class="px-1.5 py-0.2 bg-white/20 text-white rounded-full text-[10px] hidden">0</span>
+                        </button>
+                        <button id="tab-btn-meeting-requests" class="px-3 py-1.5 rounded-md font-medium text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1">
+                            <span>Meetings</span>
+                            <span id="badge-meetings-count" class="px-1.5 py-0.2 bg-white/20 text-white rounded-full text-[10px] hidden">0</span>
+                        </button>
+                        <button id="tab-btn-notifications" class="px-3 py-1.5 rounded-md font-medium text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1">
+                            <span>Notifications</span>
+                            <span id="badge-notifications-count" class="px-1.5 py-0.2 bg-error text-white rounded-full text-[10px] hidden">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 1. Join Requests Tab Content -->
+                <div id="hub-content-join-requests" class="space-y-md">
+                    <div class="flex gap-2 text-xs border-b border-white/5 pb-2">
+                        <button id="subtab-join-received" class="px-2.5 py-1 rounded bg-surface-variant text-on-surface font-bold">Received (Owner)</button>
+                        <button id="subtab-join-sent" class="px-2.5 py-1 rounded text-on-surface-variant hover:text-on-surface">Sent by You</button>
+                    </div>
+                    <div id="join-requests-list" class="space-y-sm min-h-[100px]">
+                        <div class="p-6 text-center text-xs text-on-surface-variant">
+                            <span class="material-symbols-outlined text-[28px] opacity-40 mb-1 block">inbox</span>
+                            No join requests at this time.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Meeting Requests Tab Content -->
+                <div id="hub-content-meeting-requests" class="space-y-md hidden">
+                    <div class="flex gap-2 text-xs border-b border-white/5 pb-2">
+                        <button id="subtab-meet-received" class="px-2.5 py-1 rounded bg-surface-variant text-on-surface font-bold">Received (Owner)</button>
+                        <button id="subtab-meet-sent" class="px-2.5 py-1 rounded text-on-surface-variant hover:text-on-surface">Sent by You</button>
+                    </div>
+                    <div id="meeting-requests-list" class="space-y-sm min-h-[100px]">
+                        <div class="p-6 text-center text-xs text-on-surface-variant">
+                            <span class="material-symbols-outlined text-[28px] opacity-40 mb-1 block">event_busy</span>
+                            No meeting requests at this time.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Notifications Tab Content -->
+                <div id="hub-content-notifications" class="space-y-md hidden">
+                    <div class="flex justify-between items-center text-xs border-b border-white/5 pb-2">
+                        <span class="text-on-surface-variant">System and activity updates</span>
+                        <button id="btn-read-all-notifications" class="text-xs text-primary hover:underline flex items-center gap-1 font-bold">
+                            <span class="material-symbols-outlined text-[14px]">done_all</span> Mark all read
+                        </button>
+                    </div>
+                    <div id="notifications-list" class="space-y-sm min-h-[100px]">
+                        <div class="p-6 text-center text-xs text-on-surface-variant">
+                            <span class="material-symbols-outlined text-[28px] opacity-40 mb-1 block">notifications_off</span>
+                            No notifications yet.
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Sidebar Column -->
@@ -334,8 +403,470 @@ export async function initDashboard() {
             }
         }
 
+        // Initialize and load Requests & Notifications Hub
+        await loadRequestsAndNotificationsHub(currentUser, allProjects);
+
     } catch (err) {
         console.error('Error loading dynamic dashboard data:', err);
+    }
+}
+
+async function loadRequestsAndNotificationsHub(currentUser, allProjects) {
+    if (!currentUser) return;
+
+    try {
+        const [jrRecRes, jrSentRes, meetRecRes, meetSentRes, notifRes] = await Promise.all([
+            window.apiFetch('/api/join-requests/received').catch(() => null),
+            window.apiFetch('/api/join-requests/sent').catch(() => null),
+            window.apiFetch('/api/meetings/received').catch(() => null),
+            window.apiFetch('/api/meetings/sent').catch(() => null),
+            window.apiFetch('/api/notifications').catch(() => null)
+        ]);
+
+        const joinReceived = (jrRecRes && jrRecRes.ok) ? await jrRecRes.json() : [];
+        const joinSent = (jrSentRes && jrSentRes.ok) ? await jrSentRes.json() : [];
+        const meetReceived = (meetRecRes && meetRecRes.ok) ? await meetRecRes.json() : [];
+        const meetSent = (meetSentRes && meetSentRes.ok) ? await meetSentRes.json() : [];
+        const notifications = (notifRes && notifRes.ok) ? await notifRes.json() : [];
+
+        // Tab count badges
+        const pendingJoinCount = joinReceived.filter(r => r.status === 'PENDING').length;
+        const pendingMeetCount = meetReceived.filter(m => m.status === 'PENDING').length;
+        const unreadNotifCount = notifications.filter(n => !n.read).length;
+
+        const badgeJoin = document.getElementById('badge-join-requests-count');
+        if (badgeJoin) {
+            if (pendingJoinCount > 0) {
+                badgeJoin.textContent = pendingJoinCount;
+                badgeJoin.classList.remove('hidden');
+            } else {
+                badgeJoin.classList.add('hidden');
+            }
+        }
+
+        const badgeMeet = document.getElementById('badge-meetings-count');
+        if (badgeMeet) {
+            if (pendingMeetCount > 0) {
+                badgeMeet.textContent = pendingMeetCount;
+                badgeMeet.classList.remove('hidden');
+            } else {
+                badgeMeet.classList.add('hidden');
+            }
+        }
+
+        const badgeNotif = document.getElementById('badge-notifications-count');
+        if (badgeNotif) {
+            if (unreadNotifCount > 0) {
+                badgeNotif.textContent = unreadNotifCount;
+                badgeNotif.classList.remove('hidden');
+            } else {
+                badgeNotif.classList.add('hidden');
+            }
+        }
+
+        // Setup Main Tab Switching
+        const tabBtnJoin = document.getElementById('tab-btn-join-requests');
+        const tabBtnMeet = document.getElementById('tab-btn-meeting-requests');
+        const tabBtnNotif = document.getElementById('tab-btn-notifications');
+
+        const contentJoin = document.getElementById('hub-content-join-requests');
+        const contentMeet = document.getElementById('hub-content-meeting-requests');
+        const contentNotif = document.getElementById('hub-content-notifications');
+
+        function switchTab(activeTab) {
+            const tabs = [
+                { btn: tabBtnJoin, content: contentJoin, id: 'join' },
+                { btn: tabBtnMeet, content: contentMeet, id: 'meet' },
+                { btn: tabBtnNotif, content: contentNotif, id: 'notif' }
+            ];
+            tabs.forEach(t => {
+                if (!t.btn || !t.content) return;
+                if (t.id === activeTab) {
+                    t.btn.className = 'px-3 py-1.5 rounded-md font-bold transition-colors bg-primary text-on-primary flex items-center gap-1';
+                    t.content.classList.remove('hidden');
+                } else {
+                    t.btn.className = 'px-3 py-1.5 rounded-md font-medium text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1';
+                    t.content.classList.add('hidden');
+                }
+            });
+        }
+
+        if (tabBtnJoin) tabBtnJoin.onclick = () => switchTab('join');
+        if (tabBtnMeet) tabBtnMeet.onclick = () => switchTab('meet');
+        if (tabBtnNotif) tabBtnNotif.onclick = () => switchTab('notif');
+
+        // Subtabs: Join Requests (Received vs Sent)
+        let activeJoinSubtab = 'received';
+        const subtabJoinReceived = document.getElementById('subtab-join-received');
+        const subtabJoinSent = document.getElementById('subtab-join-sent');
+        const joinList = document.getElementById('join-requests-list');
+
+        function renderJoinRequests() {
+            if (!joinList) return;
+            const list = activeJoinSubtab === 'received' ? joinReceived : joinSent;
+
+            if (subtabJoinReceived && subtabJoinSent) {
+                if (activeJoinSubtab === 'received') {
+                    subtabJoinReceived.className = 'px-2.5 py-1 rounded bg-surface-variant text-on-surface font-bold';
+                    subtabJoinSent.className = 'px-2.5 py-1 rounded text-on-surface-variant hover:text-on-surface';
+                } else {
+                    subtabJoinReceived.className = 'px-2.5 py-1 rounded text-on-surface-variant hover:text-on-surface';
+                    subtabJoinSent.className = 'px-2.5 py-1 rounded bg-surface-variant text-on-surface font-bold';
+                }
+            }
+
+            if (list.length === 0) {
+                joinList.innerHTML = `
+                    <div class="p-6 text-center text-xs text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[28px] opacity-40 mb-1 block">inbox</span>
+                        ${activeJoinSubtab === 'received' ? 'No join requests received for your projects.' : 'You have not sent any join requests.'}
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            list.forEach(r => {
+                const project = allProjects.find(p => p.id === r.projectId) || r.project;
+                const projectTitle = project ? (project.title || 'Project') : 'Project';
+                const requesterName = r.user?.name || 'Developer';
+                const requesterInitial = requesterName.charAt(0).toUpperCase();
+                const formattedDate = r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '';
+
+                let statusBadge = '';
+                if (r.status === 'ACCEPTED') {
+                    statusBadge = '<span class="px-2 py-0.5 bg-tertiary/20 text-tertiary border border-tertiary/30 rounded text-[10px] font-bold uppercase">Accepted</span>';
+                } else if (r.status === 'REJECTED') {
+                    statusBadge = '<span class="px-2 py-0.5 bg-error/20 text-error border border-error/30 rounded text-[10px] font-bold uppercase">Declined</span>';
+                } else {
+                    statusBadge = '<span class="px-2 py-0.5 bg-primary/20 text-primary border border-primary/30 rounded text-[10px] font-bold uppercase animate-pulse">Pending Review</span>';
+                }
+
+                let actionsHtml = '';
+                if (activeJoinSubtab === 'received' && r.status === 'PENDING') {
+                    actionsHtml = `
+                        <div class="flex items-center gap-2 mt-2 sm:mt-0">
+                            <button data-action-accept-join="${r.id}" class="px-3 py-1 bg-tertiary text-on-tertiary rounded-lg text-xs font-bold shadow hover:scale-105 active:scale-95 transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">check</span> Accept
+                            </button>
+                            <button data-action-reject-join="${r.id}" class="px-3 py-1 bg-surface-variant hover:bg-error/20 hover:text-error text-on-surface-variant rounded-lg text-xs font-medium transition-colors flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">close</span> Decline
+                            </button>
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="p-3 bg-surface-container/70 border border-white/5 rounded-xl flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                        <div class="flex items-start sm:items-center gap-3 min-w-0">
+                            <div class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                ${requesterInitial}
+                            </div>
+                            <div class="min-w-0 space-y-0.5">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="font-bold text-on-surface text-sm">${escapeHtml(requesterName)}</span>
+                                    <span class="text-xs text-on-surface-variant">requested to join</span>
+                                    <a href="#project_details?projectId=${r.projectId}" class="text-primary hover:underline font-bold text-xs truncate max-w-[200px]">${escapeHtml(projectTitle)}</a>
+                                </div>
+                                <div class="text-[11px] text-on-surface-variant flex items-center gap-2">
+                                    <span>${formattedDate}</span>
+                                    ${r.message ? `<span>• "${escapeHtml(r.message)}"</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 self-end sm:self-center">
+                            ${statusBadge}
+                            ${actionsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            joinList.innerHTML = html;
+
+            // Attach Accept & Reject Handlers
+            joinList.querySelectorAll('[data-action-accept-join]').forEach(btn => {
+                btn.onclick = async () => {
+                    const reqId = btn.getAttribute('data-action-accept-join');
+                    btn.disabled = true;
+                    try {
+                        const res = await window.apiFetch(`/api/join-requests/${reqId}`, {
+                            method: 'PATCH',
+                            body: JSON.stringify({ status: 'ACCEPTED' })
+                        });
+                        if (res.ok) {
+                            window.UI.showToast('Join request accepted! User is now a project member.', 'success');
+                            initDashboard();
+                        } else {
+                            window.UI.showToast('Failed to update join request', 'error');
+                            btn.disabled = false;
+                        }
+                    } catch (err) {
+                        window.UI.showToast('Error updating request', 'error');
+                        btn.disabled = false;
+                    }
+                };
+            });
+
+            joinList.querySelectorAll('[data-action-reject-join]').forEach(btn => {
+                btn.onclick = async () => {
+                    const reqId = btn.getAttribute('data-action-reject-join');
+                    btn.disabled = true;
+                    try {
+                        const res = await window.apiFetch(`/api/join-requests/${reqId}`, {
+                            method: 'PATCH',
+                            body: JSON.stringify({ status: 'REJECTED' })
+                        });
+                        if (res.ok) {
+                            window.UI.showToast('Join request declined', 'info');
+                            initDashboard();
+                        } else {
+                            window.UI.showToast('Failed to update join request', 'error');
+                            btn.disabled = false;
+                        }
+                    } catch (err) {
+                        window.UI.showToast('Error updating request', 'error');
+                        btn.disabled = false;
+                    }
+                };
+            });
+        }
+
+        if (subtabJoinReceived) subtabJoinReceived.onclick = () => { activeJoinSubtab = 'received'; renderJoinRequests(); };
+        if (subtabJoinSent) subtabJoinSent.onclick = () => { activeJoinSubtab = 'sent'; renderJoinRequests(); };
+        renderJoinRequests();
+
+        // Subtabs: Meeting Requests (Received vs Sent)
+        let activeMeetSubtab = 'received';
+        const subtabMeetReceived = document.getElementById('subtab-meet-received');
+        const subtabMeetSent = document.getElementById('subtab-meet-sent');
+        const meetList = document.getElementById('meeting-requests-list');
+
+        function renderMeetingRequests() {
+            if (!meetList) return;
+            const list = activeMeetSubtab === 'received' ? meetReceived : meetSent;
+
+            if (subtabMeetReceived && subtabMeetSent) {
+                if (activeMeetSubtab === 'received') {
+                    subtabMeetReceived.className = 'px-2.5 py-1 rounded bg-surface-variant text-on-surface font-bold';
+                    subtabMeetSent.className = 'px-2.5 py-1 rounded text-on-surface-variant hover:text-on-surface';
+                } else {
+                    subtabMeetReceived.className = 'px-2.5 py-1 rounded text-on-surface-variant hover:text-on-surface';
+                    subtabMeetSent.className = 'px-2.5 py-1 rounded bg-surface-variant text-on-surface font-bold';
+                }
+            }
+
+            if (list.length === 0) {
+                meetList.innerHTML = `
+                    <div class="p-6 text-center text-xs text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[28px] opacity-40 mb-1 block">event_busy</span>
+                        ${activeMeetSubtab === 'received' ? 'No meeting requests received.' : 'You have not scheduled any meetings yet.'}
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            list.forEach(m => {
+                const project = allProjects.find(p => p.id === m.projectId) || m.project;
+                const projectTitle = project ? (project.title || 'Project') : 'Project';
+                const requesterName = m.user?.name || 'Developer';
+                const requesterInitial = requesterName.charAt(0).toUpperCase();
+                const formattedDate = m.preferredDate ? new Date(m.preferredDate).toLocaleString() : 'Date TBD';
+
+                let statusBadge = '';
+                if (m.status === 'ACCEPTED') {
+                    statusBadge = '<span class="px-2 py-0.5 bg-tertiary/20 text-tertiary border border-tertiary/30 rounded text-[10px] font-bold uppercase">Accepted</span>';
+                } else if (m.status === 'REJECTED') {
+                    statusBadge = '<span class="px-2 py-0.5 bg-error/20 text-error border border-error/30 rounded text-[10px] font-bold uppercase">Declined</span>';
+                } else {
+                    statusBadge = '<span class="px-2 py-0.5 bg-secondary/20 text-secondary border border-secondary/30 rounded text-[10px] font-bold uppercase animate-pulse">Pending Review</span>';
+                }
+
+                let actionsHtml = '';
+                if (activeMeetSubtab === 'received' && m.status === 'PENDING') {
+                    actionsHtml = `
+                        <div class="flex items-center gap-2 mt-2 sm:mt-0">
+                            <button data-action-accept-meet="${m.id}" class="px-3 py-1 bg-secondary text-on-secondary rounded-lg text-xs font-bold shadow hover:scale-105 active:scale-95 transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">check</span> Accept
+                            </button>
+                            <button data-action-reject-meet="${m.id}" class="px-3 py-1 bg-surface-variant hover:bg-error/20 hover:text-error text-on-surface-variant rounded-lg text-xs font-medium transition-colors flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">close</span> Decline
+                            </button>
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="p-3 bg-surface-container/70 border border-white/5 rounded-xl flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                        <div class="flex items-start sm:items-center gap-3 min-w-0">
+                            <div class="w-10 h-10 rounded-full bg-secondary/20 text-secondary flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                ${requesterInitial}
+                            </div>
+                            <div class="min-w-0 space-y-0.5">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="font-bold text-on-surface text-sm">${escapeHtml(requesterName)}</span>
+                                    <span class="text-xs text-on-surface-variant">requested a sync for</span>
+                                    <a href="#project_details?projectId=${m.projectId}" class="text-secondary hover:underline font-bold text-xs truncate max-w-[200px]">${escapeHtml(projectTitle)}</a>
+                                </div>
+                                <div class="text-[11px] text-on-surface-variant flex items-center gap-2 flex-wrap">
+                                    <span class="flex items-center gap-1 text-on-surface"><span class="material-symbols-outlined text-[13px]">schedule</span> ${formattedDate}</span>
+                                    ${m.message ? `<span>• ${escapeHtml(m.message)}</span>` : ''}
+                                </div>
+                                ${m.responseNotes ? `<div class="text-xs text-tertiary mt-1"><strong>Owner note:</strong> ${escapeHtml(m.responseNotes)}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 self-end sm:self-center">
+                            ${statusBadge}
+                            ${actionsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            meetList.innerHTML = html;
+
+            // Attach Meeting Accept & Reject Handlers
+            meetList.querySelectorAll('[data-action-accept-meet]').forEach(btn => {
+                btn.onclick = async () => {
+                    const reqId = btn.getAttribute('data-action-accept-meet');
+                    btn.disabled = true;
+                    try {
+                        const res = await window.apiFetch(`/api/meetings/${reqId}`, {
+                            method: 'PATCH',
+                            body: JSON.stringify({ status: 'ACCEPTED' })
+                        });
+                        if (res.ok) {
+                            window.UI.showToast('Meeting request accepted!', 'success');
+                            initDashboard();
+                        } else {
+                            window.UI.showToast('Failed to update meeting', 'error');
+                            btn.disabled = false;
+                        }
+                    } catch (err) {
+                        window.UI.showToast('Error updating meeting', 'error');
+                        btn.disabled = false;
+                    }
+                };
+            });
+
+            meetList.querySelectorAll('[data-action-reject-meet]').forEach(btn => {
+                btn.onclick = async () => {
+                    const reqId = btn.getAttribute('data-action-reject-meet');
+                    btn.disabled = true;
+                    try {
+                        const res = await window.apiFetch(`/api/meetings/${reqId}`, {
+                            method: 'PATCH',
+                            body: JSON.stringify({ status: 'REJECTED' })
+                        });
+                        if (res.ok) {
+                            window.UI.showToast('Meeting request declined', 'info');
+                            initDashboard();
+                        } else {
+                            window.UI.showToast('Failed to update meeting', 'error');
+                            btn.disabled = false;
+                        }
+                    } catch (err) {
+                        window.UI.showToast('Error updating meeting', 'error');
+                        btn.disabled = false;
+                    }
+                };
+            });
+        }
+
+        if (subtabMeetReceived) subtabMeetReceived.onclick = () => { activeMeetSubtab = 'received'; renderMeetingRequests(); };
+        if (subtabMeetSent) subtabMeetSent.onclick = () => { activeMeetSubtab = 'sent'; renderMeetingRequests(); };
+        renderMeetingRequests();
+
+        // Notifications List
+        const notifList = document.getElementById('notifications-list');
+        const readAllBtn = document.getElementById('btn-read-all-notifications');
+
+        function renderNotificationsList() {
+            if (!notifList) return;
+
+            if (notifications.length === 0) {
+                notifList.innerHTML = `
+                    <div class="p-6 text-center text-xs text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[28px] opacity-40 mb-1 block">notifications_off</span>
+                        No notifications yet.
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            notifications.forEach(n => {
+                let icon = 'notifications';
+                let iconColor = 'text-primary bg-primary/10';
+
+                if (n.type.includes('JOIN')) {
+                    icon = n.type.includes('ACCEPTED') ? 'how_to_reg' : 'person_add';
+                    iconColor = n.type.includes('ACCEPTED') ? 'text-tertiary bg-tertiary/10' : 'text-primary bg-primary/10';
+                } else if (n.type.includes('MEET')) {
+                    icon = n.type.includes('ACCEPTED') ? 'event_available' : 'calendar_month';
+                    iconColor = n.type.includes('ACCEPTED') ? 'text-tertiary bg-tertiary/10' : 'text-secondary bg-secondary/10';
+                }
+
+                const formattedTime = n.createdAt ? new Date(n.createdAt).toLocaleString() : '';
+                const unreadClass = !n.read ? 'border-l-4 border-l-primary bg-surface-container/90' : 'bg-surface-container/40 opacity-75';
+
+                html += `
+                    <div class="p-3 border border-white/5 rounded-xl flex items-start justify-between gap-3 ${unreadClass}">
+                        <div class="flex items-start gap-3 min-w-0">
+                            <div class="w-8 h-8 rounded-lg ${iconColor} flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="material-symbols-outlined text-[18px]">${icon}</span>
+                            </div>
+                            <div class="min-w-0 space-y-0.5">
+                                <div class="font-bold text-on-surface text-xs">${escapeHtml(n.title)}</div>
+                                <div class="text-xs text-on-surface-variant">${escapeHtml(n.message)}</div>
+                                <div class="text-[10px] text-on-surface-variant/70 mt-1">${formattedTime}</div>
+                            </div>
+                        </div>
+                        ${!n.read ? `
+                            <button data-action-mark-read="${n.id}" class="text-[11px] text-primary hover:underline flex-shrink-0 font-medium">
+                                Mark read
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            notifList.innerHTML = html;
+
+            notifList.querySelectorAll('[data-action-mark-read]').forEach(btn => {
+                btn.onclick = async () => {
+                    const nId = btn.getAttribute('data-action-mark-read');
+                    try {
+                        const res = await window.apiFetch(`/api/notifications/${nId}/read`, { method: 'PATCH' });
+                        if (res.ok) {
+                            initDashboard();
+                        }
+                    } catch (err) {
+                        console.warn('Could not mark notification read:', err);
+                    }
+                };
+            });
+        }
+
+        if (readAllBtn) {
+            readAllBtn.onclick = async () => {
+                try {
+                    const res = await window.apiFetch('/api/notifications/read-all', { method: 'POST' });
+                    if (res.ok) {
+                        window.UI.showToast('All notifications marked as read', 'success');
+                        initDashboard();
+                    }
+                } catch (err) {
+                    console.warn('Could not mark all notifications read:', err);
+                }
+            };
+        }
+
+        renderNotificationsList();
+
+    } catch (err) {
+        console.error('Error loading requests and notifications hub:', err);
     }
 }
 

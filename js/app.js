@@ -119,6 +119,11 @@ const currentUserStr = localStorage.getItem('currentUser');
         const urlParams = new URLSearchParams(hash.split('?')[1] || '');
         const projectId = urlParams.get('projectId');
         
+        // Ensure any active modal is closed on view change
+        if (window.UI && window.UI.closeModal) {
+            window.UI.closeModal();
+        }
+        
         // Nebula Background Logic
         if (nebulaBg) {
             if (viewName === 'home') {
@@ -192,6 +197,11 @@ const currentUserStr = localStorage.getItem('currentUser');
                     } else if (window.initDashboard) {
                         window.initDashboard();
                     }
+                }
+
+                // Initialize Community view
+                if (viewName === 'community' && module && module.initCommunity) {
+                    module.initCommunity();
                 }
 
                 // Fetch projects if on the explore page

@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated/client"
 }
 
 datasource db {
@@ -28,6 +29,13 @@ model User {
   projectMembers ProjectMember[]
   createdIssues  Issue[]         @relation("IssueCreator")
   assignedIssues Issue[]         @relation("IssueAssignee")
+
+  joinRequestsSent     JoinRequest[]    @relation("UserJoinRequests")
+  joinRequestsReceived JoinRequest[]    @relation("OwnerJoinRequests")
+  meetingsRequested    MeetingRequest[] @relation("UserMeetingRequests")
+  meetingsReceived     MeetingRequest[] @relation("OwnerMeetingRequests")
+  notifications        Notification[]   @relation("UserNotifications")
+  actorNotifications   Notification[]   @relation("ActorNotifications")
 }
 
 model UserProfile {
@@ -159,9 +167,12 @@ model Project {
   ownerId String?
   owner   User?   @relation("ProjectOwner", fields: [ownerId], references: [id])
 
-  members ProjectMember[]
-  apiKeys ApiKey[]
-  issues  Issue[]
+  members         ProjectMember[]
+  apiKeys         ApiKey[]
+  issues          Issue[]
+  joinRequests    JoinRequest[]
+  meetingRequests MeetingRequest[]
+  notifications   Notification[]
 }
 
 model ProjectMember {
@@ -207,4 +218,57 @@ model Issue {
 
   assigneeId  String?
   assignee    User?         @relation("IssueAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model JoinRequest {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation("UserJoinRequests", fields: [userId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  ownerId   String
+  owner     User          @relation("OwnerJoinRequests", fields: [ownerId], references: [id], onDelete: Cascade)
+  status    RequestStatus @default(PENDING)
+  message   String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model MeetingRequest {
+  id            String        @id @default(uuid())
+  userId        String
+  user          User          @relation("UserMeetingRequests", fields: [userId], references: [id], onDelete: Cascade)
+  projectId     String
+  project       Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  ownerId       String
+  owner         User          @relation("OwnerMeetingRequests", fields: [ownerId], references: [id], onDelete: Cascade)
+  preferredDate DateTime?
+  message       String?
+  status        RequestStatus @default(PENDING)
+  responseNotes String?
+  meetingLink   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  actorId   String?
+  actor     User?    @relation("ActorNotifications", fields: [actorId], references: [id], onDelete: SetNull)
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type      String   // JOIN_REQUEST_RECEIVED, JOIN_REQUEST_ACCEPTED, JOIN_REQUEST_REJECTED, MEETING_REQUEST_RECEIVED, MEETING_REQUEST_ACCEPTED, MEETING_REQUEST_REJECTED
+  title     String
+  message   String
+  data      Json?    @default("{}")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

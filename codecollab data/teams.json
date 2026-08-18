@@ -1,14 +1,146 @@
 [
   {
     "id": "team_001",
-    "organizationId": "org_001",
-    "teamName": "Core Developers",
-    "description": "Team responsible for core development of the platform.",
-    "leadId": "1785007805649",
-    "members": ["1785007805649", "1784903103220"],
-    "assignedProjects": ["proj_001", "proj_002"],
-    "permissions": {"createProject": true, "deleteProject": false},
+    "teamName": "Rustacean Core Guild",
+    "description": "High-performance systems engineering guild focused on building next-generation memory-safe distributed runtimes and zero-copy networking engines.",
+    "leadId": "1785998502411",
+    "members": [
+      "1785998502411",
+      "1786746884946",
+      "1786978624580"
+    ],
+    "assignedProjects": [
+      "Distributed Cache Engine",
+      "Zero-Copy RPC Gateway"
+    ],
+    "skills": [
+      "Rust",
+      "Tokio",
+      "WebAssembly",
+      "gRPC",
+      "Docker"
+    ],
+    "upvotes": 249,
+    "upvoters": [
+      "1786747907456",
+      "1786990429294",
+      "1786828340958",
+      "1785998502411"
+    ],
+    "lookingFor": "Senior Rust Backend Developer with Tokio async experience",
+    "openPositions": [
+      "Async Runtime Specialist",
+      "Systems Performance Engineer"
+    ],
+    "availability": "Active · 15 hrs/wk",
+    "rating": 4.9,
     "createdAt": "2026-08-01T11:00:00.000Z",
-    "updatedAt": "2026-08-02T13:00:00.000Z"
+    "updatedAt": "2026-08-15T13:00:00.000Z"
+  },
+  {
+    "id": "team_002",
+    "teamName": "Nebula AI Lab",
+    "description": "Collaborative machine learning collective designing intelligent code-completion agents, automated AST analyzers, and neural test synthesizers.",
+    "leadId": "1786746884946",
+    "members": [
+      "1786746884946",
+      "1786990429294"
+    ],
+    "assignedProjects": [
+      "CodeCollab AI Reviewer",
+      "Prompt Orchestration Framework"
+    ],
+    "skills": [
+      "Python",
+      "PyTorch",
+      "FastAPI",
+      "TypeScript",
+      "LangChain"
+    ],
+    "upvotes": 195,
+    "upvoters": [
+      "1785998502411",
+      "1786747907456"
+    ],
+    "lookingFor": "ML Engineer experienced in fine-tuning open-source LLMs & embeddings",
+    "openPositions": [
+      "LLM Fine-tuning Engineer",
+      "Python Backend Dev"
+    ],
+    "availability": "Active · Recruiting",
+    "rating": 4.8,
+    "createdAt": "2026-08-03T14:30:00.000Z",
+    "updatedAt": "2026-08-16T10:00:00.000Z"
+  },
+  {
+    "id": "team_003",
+    "teamName": "PixelCraft UI Collective",
+    "description": "Frontend craftsmen pushing the boundaries of web interfaces with Three.js, WebGL shader animations, Tailwind CSS, and ultra-accessible design systems.",
+    "leadId": "1786747907456",
+    "members": [
+      "1786747907456",
+      "1786828340958",
+      "1785998502411"
+    ],
+    "assignedProjects": [
+      "Rose Nebula Canvas",
+      "Modern Design Tokens CLI"
+    ],
+    "skills": [
+      "React",
+      "Three.js",
+      "TailwindCSS",
+      "WebGL",
+      "TypeScript"
+    ],
+    "upvotes": 164,
+    "upvoters": [
+      "1786978624580",
+      "1786990429294"
+    ],
+    "lookingFor": "Creative Frontend Engineer with WebGL / GLSL shader passion",
+    "openPositions": [
+      "Creative Frontend Developer",
+      "UI Motion Designer"
+    ],
+    "availability": "Open · 10-20 hrs/wk",
+    "rating": 4.7,
+    "createdAt": "2026-08-05T09:15:00.000Z",
+    "updatedAt": "2026-08-17T08:20:00.000Z"
+  },
+  {
+    "id": "team_004",
+    "teamName": "CloudMesh DevOps Guild",
+    "description": "Infrastructure automation team managing multi-region Kubernetes clusters, GitOps pipelines, eBPF telemetry, and resilient microservices topology.",
+    "leadId": "1786978624580",
+    "members": [
+      "1786978624580",
+      "1786377283959",
+      "1786746884946"
+    ],
+    "assignedProjects": [
+      "K8s Edge Controller",
+      "Prometheus Metrics Exporter"
+    ],
+    "skills": [
+      "Kubernetes",
+      "Go",
+      "Terraform",
+      "GitHub Actions",
+      "Prometheus"
+    ],
+    "upvotes": 132,
+    "upvoters": [
+      "1785998502411"
+    ],
+    "lookingFor": "Golang Kubernetes Operator builder for cloud-native deployment automation",
+    "openPositions": [
+      "Go Platform Engineer",
+      "Site Reliability Architect"
+    ],
+    "availability": "Part-time · Open",
+    "rating": 4.8,
+    "createdAt": "2026-08-08T16:00:00.000Z",
+    "updatedAt": "2026-08-17T23:34:07.520Z"
   }
 ]

@@ -9,7 +9,7 @@ export function render_Home_Explore() {
 <path clip-rule="evenodd" d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z" fill="currentColor" fill-rule="evenodd"></path>
 </svg>
 </div>
-<h2 class="text-on-background text-lg font-bold leading-tight tracking-[-0.015em]">CODECOLLAB</h2>
+<h2 class="text-on-background text-lg font-bold leading-tight tracking-[-0.015em]" style="font-family: 'Bandito', cursive, sans-serif;">CODECOLLAB</h2>
 </div>
 <label class="hidden md:flex flex-col min-w-40 h-10 max-w-64">
 <div class="flex w-full flex-1 items-stretch rounded-lg h-full overflow-hidden">
@@ -40,7 +40,7 @@ export function render_Home_Explore() {
 <div class="absolute inset-0 w-full h-full bg-[#0b0e14]"></div>
 <div class="hero-gradient-overlay absolute inset-0 z-10"></div>
 <div class="relative z-20 container mx-auto px-6 text-center max-w-4xl">
-<h1 class="text-on-background text-display lg:text-[72px] font-bold leading-tight tracking-tight mb-6">Looking someone who can <span class="text-primary italic">commit</span></h1>
+<h1 class="text-on-background lg:text-[72px] font-bold leading-tight tracking-tight mb-6" style="font-family: 'Orpheus', 'Orpheus Pro', serif;">Looking for someone who can <span class="text-primary italic">commit</span></h1>
 <p class="text-on-surface-variant text-body-lg lg:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
                     CODECOLLAB connects developers, students, maintainers, and organizations through open-source collaboration, project discovery, and community building.
                 </p>

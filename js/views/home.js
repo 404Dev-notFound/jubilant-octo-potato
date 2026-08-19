@@ -4,8 +4,8 @@ export function render_home() {
         CODECOLLAB 2.0 IS LIVE
     </div>
     
-    <h1 class="font-display text-[48px] md:text-[72px] lg:text-[84px] leading-tight font-extrabold text-on-surface tracking-tight mb-md" style="text-shadow: 0 0 40px rgba(0,255,136,0.2);">
-        Looking someone who <br>
+    <h1 class="text-[48px] md:text-[72px] lg:text-[84px] leading-tight font-extrabold text-on-surface tracking-tight mb-md" style="font-family: 'Orpheus', 'Orpheus Pro', serif; text-shadow: 0 0 40px rgba(0,255,136,0.2);">
+        Looking for someone who <br>
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-tertiary">can commit</span>
     </h1>
     

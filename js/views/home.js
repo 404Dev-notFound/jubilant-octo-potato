@@ -14,11 +14,15 @@ export function render_home() {
     </p>
     
     <div class="flex flex-col sm:flex-row gap-md justify-center w-full max-w-2xl">
-        <button onclick="window.location.hash='explore'" class="px-xl py-md bg-primary text-on-primary rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform flex justify-center items-center gap-xs">
-            <span class="material-symbols-outlined">explore</span> Explore Projects
+        <button onclick="window.location.hash='explore'" class="glass-glow-btn glass-glow-btn-primary">
+            <span class="glass-glow-inner">
+                <span class="material-symbols-outlined text-[20px]">explore</span> Explore Projects
+            </span>
         </button>
-        <button data-form="sign_up_form" title="Sign Up" class="px-xl py-md bg-surface-container rounded-xl border border-white/10 hover:bg-surface-variant hover:border-primary/50 transition-all flex justify-center items-center gap-xs text-on-surface font-bold">
-            <span class="material-symbols-outlined">rocket_launch</span> Start Contributing
+        <button data-form="sign_up_form" title="Sign Up" class="glass-glow-btn glass-glow-btn-secondary">
+            <span class="glass-glow-inner">
+                <span class="material-symbols-outlined text-[20px]">rocket_launch</span> Start Contributing
+            </span>
         </button>
         <button onclick="window.location.hash='about'" class="px-xl py-md bg-transparent text-on-surface-variant hover:text-on-surface rounded-xl transition-colors flex justify-center items-center gap-xs font-bold">
             Learn More <span class="material-symbols-outlined">arrow_forward</span>

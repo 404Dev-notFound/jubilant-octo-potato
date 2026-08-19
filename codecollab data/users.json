@@ -2,12 +2,12 @@
   {
     "id": "1785998502411",
     "createdAt": "2026-08-06T06:41:42.411Z",
-    "name": "Dev (Alex Rivera)",
-    "title": "Systems Architect & Rust Core Maintainer",
+    "name": "Dev Goel",
+    "title": "Principal Systems Architect & Core Contributor",
     "email": "dev@gmail.com",
     "password": "$2b$10$920Vh1NdC10pCD6tADiCmOPD6WWi4tVz7c2jsVUK1myP0gHenM0.u",
     "role": "Lead Architect",
-    "bio": "Building memory-safe distributed runtimes, low-latency microservices, and AST analyzers. Active contributor to Tokio, Hyper, and WebAssembly tooling.",
+    "bio": "Building memory-safe distributed runtimes and high-concurrency systems.",
     "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
     "verifiedSkills": [
       "Rust",
@@ -17,12 +17,10 @@
     ],
     "skills": [
       "Rust",
-      "Tokio",
+      "Go",
+      "Kubernetes",
       "WebAssembly",
-      "Distributed Systems",
-      "Docker",
-      "gRPC",
-      "Linux"
+      "Distributed Systems"
     ],
     "rating": 4.9,
     "upvotes": 313,
@@ -41,10 +39,10 @@
     "availability": "Available · Part-time",
     "lookingFor": "Looking for: Tokio Async Specialist & Frontend Partner",
     "socialLinks": {
-      "github": "https://github.com/alexrivera-systems",
-      "linkedin": "https://linkedin.com/in/alexrivera-systems",
-      "twitter": "https://x.com/alexrivera_dev",
-      "website": "https://alexrivera.io"
+      "github": "http://localhost:8080/#home",
+      "twitter": "http://localhost:8080/#home",
+      "linkedin": "http://localhost:8080/#home",
+      "website": "http://localhost:8080/#home"
     },
     "projects": [
       "Distributed Cache Engine",
@@ -52,7 +50,18 @@
       "CodeCollab CLI"
     ],
     "progress": 0,
-    "potion": 0
+    "potion": 0,
+    "username": "devgoel06",
+    "location": "delhi, india",
+    "education": "M.S. Computer Science, Stanford University",
+    "experience": "8+ years in Systems Engineering",
+    "interests": [
+      "Distributed Systems",
+      "Compilers",
+      "Async I/O",
+      "Performance"
+    ],
+    "updatedAt": "2026-08-19T22:43:37.965Z"
   },
   {
     "id": "1786746884946",

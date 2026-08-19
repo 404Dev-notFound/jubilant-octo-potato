@@ -162,7 +162,7 @@
                 
                 <!-- Authentication Buttons -->
                 <div id="auth-buttons-container" class="hidden md:flex items-center gap-sm ml-sm">
-                    <button data-form="login_form" class="px-md py-sm text-sm font-bold text-on-surface hover:text-primary transition-colors">Log In</button>
+                    <button data-form="login_form" class="px-md py-sm text-sm font-bold text-on-surface hover:text-primary transition-colors">Sign In</button>
                     <button data-form="sign_up_form" class="px-md py-sm text-sm font-bold bg-primary text-on-primary rounded-lg hover:scale-105 transition-transform shadow-lg shadow-primary/20">Sign Up</button>
                 </div>
 
@@ -171,13 +171,12 @@
                     <div id="profile-avatar" class="w-[32px] h-[32px] rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm hover:ring-2 hover:ring-primary/50 transition-all uppercase">
                         U
                     </div>
-                    <!-- Dropdown -->
-                        <div class="absolute right-0 mt-2 w-48 py-sm bg-surface-container-high rounded-xl border border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                            <a href="#" data-form="edit_profile_form" class="px-md py-sm text-sm text-on-surface hover:bg-surface-variant rounded-lg transition-colors block">Edit Profile</a>
-                            <a href="#settings" class="px-md py-sm text-sm text-on-surface hover:bg-surface-variant rounded-lg transition-colors block">Settings</a>
-                            <div class="h-px bg-white/10 my-xs mx-md"></div>
-                            <a href="#" id="logout-btn" class="px-md py-sm text-sm text-error hover:bg-error/10 rounded-lg transition-colors block">Sign out</a>
-                        </div>
+                    <!-- Dropdown Menu -->
+                    <div id="profile-dropdown-menu" class="absolute right-0 mt-2 w-48 py-sm bg-surface-container-high rounded-xl border border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                        <a href="#settings" class="px-md py-sm text-sm text-on-surface hover:bg-surface-variant rounded-lg transition-colors block">Settings</a>
+                        <a href="#" data-form="edit_profile_form" class="px-md py-sm text-sm text-on-surface hover:bg-surface-variant rounded-lg transition-colors block">Edit Profile</a>
+                        <div class="h-px bg-white/10 my-xs mx-md"></div>
+                        <a href="#" id="logout-btn" class="px-md py-sm text-sm text-error hover:bg-error/10 rounded-lg transition-colors block">Logout</a>
                     </div>
                 </div>
             </div>

@@ -44,18 +44,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.updateAuthUI = function() {
         // Update UI based on authentication status (show/hide login, profile, etc.)
-const currentUserStr = localStorage.getItem('currentUser');
+        const currentUserStr = localStorage.getItem('currentUser');
         const authButtons = document.getElementById('auth-buttons-container');
         const profileDropdown = document.getElementById('profile-dropdown-container');
         const profileAvatar = document.getElementById('profile-avatar');
         
+        let user = null;
         if (currentUserStr) {
-            const user = JSON.parse(currentUserStr);
-            if (authButtons) authButtons.classList.add('hidden');
+            try {
+                user = JSON.parse(currentUserStr);
+            } catch (e) {
+                localStorage.removeItem('currentUser');
+            }
+        }
+
+        if (user) {
+            if (authButtons) {
+                authButtons.classList.add('hidden');
+                authButtons.classList.remove('md:flex', 'flex');
+            }
             if (profileDropdown) profileDropdown.classList.remove('hidden');
             if (profileAvatar) profileAvatar.textContent = (user.name ? user.name.charAt(0) : 'U').toUpperCase();
         } else {
-            if (authButtons) authButtons.classList.remove('hidden');
+            if (authButtons) {
+                authButtons.classList.remove('hidden');
+                authButtons.classList.add('hidden', 'md:flex');
+            }
             if (profileDropdown) profileDropdown.classList.add('hidden');
             if (profileAvatar) profileAvatar.textContent = 'U';
         }
@@ -114,6 +128,7 @@ const currentUserStr = localStorage.getItem('currentUser');
 
     async function navigate() {
         // SPA navigation: parse hash, load appropriate view, display skeleton loader, and fetch dynamic data
+        window.updateAuthUI();
         let hash = window.location.hash.substring(1) || 'home';
         const viewName = hash.split('?')[0].toLowerCase();
         const urlParams = new URLSearchParams(hash.split('?')[1] || '');
@@ -204,6 +219,16 @@ const currentUserStr = localStorage.getItem('currentUser');
                     module.initCommunity();
                 }
 
+                // Initialize Settings view
+                if (viewName === 'settings' && module && module.initSettings) {
+                    module.initSettings();
+                }
+
+                // Initialize User Profile view
+                if ((viewName === 'user_profile' || viewName === 'user-profile' || viewName === 'profile') && module && module.initUserProfile) {
+                    module.initUserProfile();
+                }
+
                 // Fetch projects if on the explore page
                 if (viewName === 'explore' || viewName === 'home_explore') {
                     const gridElement = document.getElementById('project-grid') || document.getElementById('explore-projects-container');
@@ -266,7 +291,17 @@ window.addEventListener('scroll', () => {
 
     // Global Link Interceptor & Action Handler
     // Global click interceptor: handle internal navigation, logout, modals, and action buttons
-document.body.addEventListener('click', (e) => {
+    document.body.addEventListener('click', (e) => {
+        // Toggle profile dropdown on avatar click and close when clicked outside or on a link
+        const profileAvatarBtn = e.target.closest('#profile-avatar');
+        const menu = document.getElementById('profile-dropdown-menu');
+        if (profileAvatarBtn && menu) {
+            menu.classList.toggle('!opacity-100');
+            menu.classList.toggle('!visible');
+        } else if (menu && (e.target.closest('#profile-dropdown-menu a') || !e.target.closest('#profile-dropdown-container'))) {
+            menu.classList.remove('!opacity-100', '!visible');
+        }
+
         const link = e.target.closest('a');
         if (link) {
             const href = link.getAttribute('href');
@@ -293,6 +328,31 @@ document.body.addEventListener('click', (e) => {
             const protectedForms = ['add_project_form', 'create_org_form', 'edit_profile_form', 'add_issue_form'];
             if (protectedForms.includes(formName) && !localStorage.getItem('currentUser')) {
                 window.UI.showToast('Please log in to access this feature', 'error');
+                return;
+            }
+
+            if (formName === 'edit_profile_form') {
+                (async () => {
+                    try {
+                        const res = await window.apiFetch('/api/users/profile');
+                        let userData = {};
+                        if (res.ok) {
+                            userData = await res.json();
+                        } else {
+                            const curStr = localStorage.getItem('currentUser');
+                            if (curStr) userData = JSON.parse(curStr);
+                        }
+                        const module = await import('./forms/edit_profile_form.js');
+                        const html = module.render_edit_profile_form(userData);
+                        window.UI.openModal(html);
+                        if (module.initEditProfileForm) {
+                            module.initEditProfileForm(userData);
+                        }
+                    } catch (err) {
+                        console.error('Error opening edit profile form:', err);
+                        window.UI.showToast('Failed to load profile data', 'error');
+                    }
+                })();
                 return;
             }
 
@@ -411,10 +471,59 @@ document.addEventListener('submit', async (e) => {
             return;
         }
 
+        if (form.id === 'editProfileForm') {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            const inputs = form.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                if (input.name) data[input.name] = input.value;
+            });
+
+            try {
+                const response = await window.apiFetch('/api/users/profile', {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    const updatedUser = await response.json();
+                    const curUserStr = localStorage.getItem('currentUser');
+                    if (curUserStr) {
+                        try {
+                            const cur = JSON.parse(curUserStr);
+                            localStorage.setItem('currentUser', JSON.stringify({
+                                ...cur,
+                                ...updatedUser,
+                                token: cur.token,
+                                refreshToken: cur.refreshToken
+                            }));
+                        } catch (e) {
+                            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                        }
+                    }
+                    window.updateAuthUI();
+                    window.UI.closeModal();
+                    window.UI.showToast('Profile updated successfully!', 'success');
+                    
+                    if (window.location.hash.includes('user_profile') || window.location.hash.includes('profile') || window.location.hash.includes('settings')) {
+                        window.dispatchEvent(new HashChangeEvent('hashchange'));
+                    }
+                } else {
+                    const err = await response.json().catch(() => ({}));
+                    window.UI.showToast(err.error || 'Failed to save profile.', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                window.UI.showToast('Error connecting to backend.', 'error');
+            }
+            return;
+        }
+
         const formIdToTable = {
             'addProjectForm': 'projects',
-            'createOrgForm': 'organizations',
-            'editProfileForm': 'users'
+            'createOrgForm': 'organizations'
         };
 
         const table = formIdToTable[form.id];

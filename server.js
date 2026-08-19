@@ -609,6 +609,253 @@ app.get('/api/projectMembers', async (req, res) => {
     }
 });
 
+// Authenticated user profile endpoint (with real database teams membership)
+app.get('/api/users/profile', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        const usersPath = getFilePath('users');
+        const teamsPath = getFilePath('teams');
+
+        let users = [];
+        try { users = JSON.parse(await fs.readFile(usersPath, 'utf-8')); } catch {}
+
+        let user = users.find(u => String(u.id) === userId);
+        
+        let dbUser = null;
+        try {
+            dbUser = await prisma.user.findUnique({
+                where: { id: userId },
+                include: { profile: true }
+            });
+        } catch (dbErr) {}
+
+        let teams = [];
+        try { teams = JSON.parse(await fs.readFile(teamsPath, 'utf-8')); } catch {}
+
+        // Find teams where user is lead or member
+        const userTeams = teams.filter(t => {
+            const isLead = String(t.leadId) === userId;
+            const isMember = Array.isArray(t.members) && t.members.map(String).includes(userId);
+            return isLead || isMember;
+        }).map(t => ({
+            id: t.id,
+            teamName: t.teamName || 'Untitled Team',
+            description: t.description || '',
+            role: String(t.leadId) === userId ? 'Team Lead' : 'Member',
+            leadId: t.leadId,
+            skills: t.skills || [],
+            assignedProjects: t.assignedProjects || [],
+            availability: t.availability || 'Active',
+            rating: t.rating || 4.8,
+            membersCount: Array.isArray(t.members) ? t.members.length : 1
+        }));
+
+        const rawPreferences = dbUser?.profile?.preferences || {};
+        const safePreferences = typeof rawPreferences === 'object' && rawPreferences !== null ? rawPreferences : {};
+
+        const name = user?.name || (dbUser?.profile?.firstName ? `${dbUser.profile.firstName} ${dbUser.profile.lastName || ''}`.trim() : (user?.email ? user.email.split('@')[0] : ''));
+        const username = user?.username || safePreferences.username || (user?.email ? user.email.split('@')[0] : '');
+        const title = user?.title || safePreferences.title || user?.role || '';
+        const bio = user?.bio || safePreferences.bio || '';
+        const location = user?.location || safePreferences.location || '';
+        const education = user?.education || safePreferences.education || '';
+        const experience = user?.experience || safePreferences.experience || '';
+        const skills = Array.isArray(user?.skills) ? user.skills : (Array.isArray(safePreferences.skills) ? safePreferences.skills : (user?.verifiedSkills || []));
+        const interests = Array.isArray(user?.interests) ? user.interests : (Array.isArray(safePreferences.interests) ? safePreferences.interests : []);
+        const socialLinks = user?.socialLinks || safePreferences.socialLinks || {};
+
+        const profileData = {
+            id: userId,
+            email: user?.email || dbUser?.email || '',
+            name,
+            username,
+            title,
+            bio,
+            location,
+            education,
+            experience,
+            skills,
+            interests,
+            socialLinks: {
+                github: socialLinks.github || '',
+                twitter: socialLinks.twitter || '',
+                linkedin: socialLinks.linkedin || '',
+                website: socialLinks.website || ''
+            },
+            teams: userTeams
+        };
+
+        res.json(profileData);
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        res.status(500).json({ error: 'Failed to fetch profile' });
+    }
+});
+
+// Update authenticated user profile
+app.put('/api/users/profile', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        const {
+            name,
+            username,
+            title,
+            bio,
+            location,
+            education,
+            experience,
+            skills,
+            interests,
+            github,
+            twitter,
+            linkedin,
+            website,
+            socialLinks
+        } = req.body;
+
+        const usersPath = getFilePath('users');
+        let users = [];
+        try { users = JSON.parse(await fs.readFile(usersPath, 'utf-8')); } catch {}
+
+        let userIndex = users.findIndex(u => String(u.id) === userId);
+        
+        // Parse skills & interests
+        const parsedSkills = Array.isArray(skills)
+            ? skills.map(s => String(s).trim()).filter(Boolean)
+            : (typeof skills === 'string' ? skills.split(',').map(s => s.trim()).filter(Boolean) : []);
+
+        const parsedInterests = Array.isArray(interests)
+            ? interests.map(s => String(s).trim()).filter(Boolean)
+            : (typeof interests === 'string' ? interests.split(',').map(s => s.trim()).filter(Boolean) : []);
+
+        const mergedSocialLinks = {
+            github: (github !== undefined ? github : socialLinks?.github || '').trim(),
+            twitter: (twitter !== undefined ? twitter : socialLinks?.twitter || '').trim(),
+            linkedin: (linkedin !== undefined ? linkedin : socialLinks?.linkedin || '').trim(),
+            website: (website !== undefined ? website : socialLinks?.website || '').trim()
+        };
+
+        if (userIndex === -1) {
+            const newUser = {
+                id: userId,
+                createdAt: new Date().toISOString(),
+                name: (name || '').trim() || `User_${userId}`,
+                username: (username || '').trim() || `user_${userId}`,
+                email: req.user.email || `user_${userId}@example.com`,
+                title: (title || '').trim(),
+                role: 'user',
+                bio: (bio || '').trim(),
+                location: (location || '').trim(),
+                education: (education || '').trim(),
+                experience: (experience || '').trim(),
+                skills: parsedSkills,
+                interests: parsedInterests,
+                socialLinks: mergedSocialLinks,
+                updatedAt: new Date().toISOString()
+            };
+            users.push(newUser);
+            userIndex = users.length - 1;
+        } else {
+            const existing = users[userIndex];
+            if (name !== undefined) existing.name = name.trim();
+            if (username !== undefined) existing.username = username.trim();
+            if (title !== undefined) existing.title = title.trim();
+            if (bio !== undefined) existing.bio = bio.trim();
+            if (location !== undefined) existing.location = location.trim();
+            if (education !== undefined) existing.education = education.trim();
+            if (experience !== undefined) existing.experience = experience.trim();
+            if (skills !== undefined) existing.skills = parsedSkills;
+            if (interests !== undefined) existing.interests = parsedInterests;
+            existing.socialLinks = mergedSocialLinks;
+            existing.updatedAt = new Date().toISOString();
+        }
+
+        await fs.writeFile(usersPath, JSON.stringify(users, null, 2));
+
+        // Sync to PostgreSQL via Prisma
+        try {
+            const userExists = await prisma.user.findUnique({ where: { id: userId } });
+            if (userExists) {
+                await prisma.userProfile.upsert({
+                    where: { userId: userId },
+                    update: {
+                        firstName: users[userIndex].name,
+                        avatarUrl: users[userIndex].avatarUrl,
+                        preferences: {
+                            username: users[userIndex].username,
+                            title: users[userIndex].title,
+                            bio: users[userIndex].bio,
+                            location: users[userIndex].location,
+                            education: users[userIndex].education,
+                            experience: users[userIndex].experience,
+                            skills: parsedSkills,
+                            interests: parsedInterests,
+                            socialLinks: mergedSocialLinks
+                        }
+                    },
+                    create: {
+                        userId: userId,
+                        firstName: users[userIndex].name,
+                        lastName: '',
+                        avatarUrl: users[userIndex].avatarUrl,
+                        preferences: {
+                            username: users[userIndex].username,
+                            title: users[userIndex].title,
+                            bio: users[userIndex].bio,
+                            location: users[userIndex].location,
+                            education: users[userIndex].education,
+                            experience: users[userIndex].experience,
+                            skills: parsedSkills,
+                            interests: parsedInterests,
+                            socialLinks: mergedSocialLinks
+                        }
+                    }
+                });
+            }
+        } catch (prismaErr) {
+            console.error('Error syncing profile update to Prisma:', prismaErr);
+        }
+
+        // Fetch user teams
+        const teamsPath = getFilePath('teams');
+        let teams = [];
+        try { teams = JSON.parse(await fs.readFile(teamsPath, 'utf-8')); } catch {}
+
+        const userTeams = teams.filter(t => {
+            const isLead = String(t.leadId) === userId;
+            const isMember = Array.isArray(t.members) && t.members.map(String).includes(userId);
+            return isLead || isMember;
+        }).map(t => ({
+            id: t.id,
+            teamName: t.teamName || 'Untitled Team',
+            description: t.description || '',
+            role: String(t.leadId) === userId ? 'Team Lead' : 'Member',
+            leadId: t.leadId,
+            skills: t.skills || [],
+            assignedProjects: t.assignedProjects || [],
+            availability: t.availability || 'Active',
+            rating: t.rating || 4.8,
+            membersCount: Array.isArray(t.members) ? t.members.length : 1
+        }));
+
+        const updated = users[userIndex];
+        const { password: _, ...sanitizedUser } = updated;
+        res.json({
+            ...sanitizedUser,
+            teams: userTeams
+        });
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+        res.status(500).json({ error: 'Failed to update profile' });
+    }
+});
+
+// Support POST alias for PUT /api/users/profile
+app.post('/api/users/profile', authMiddleware, async (req, res, next) => {
+    req.method = 'PUT';
+    app._router.handle(req, res, next);
+});
+
 // Sanitized users list endpoint for Assignee picker, member picker, and profiles (no email exposure)
 app.get('/api/users', async (req, res) => {
     try {

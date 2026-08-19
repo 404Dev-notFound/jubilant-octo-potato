@@ -49,6 +49,8 @@
   --font-family-display: 'Geist', sans-serif;
   --font-family-body: 'Geist', sans-serif;
   --font-family-mono: 'JetBrains Mono', monospace;
+  --font-family-orpheus: 'Orpheus', 'Orpheus Pro', serif;
+  --font-family-bandito: 'Bandito', cursive, sans-serif;
 
   --rounded-sm: 0.25rem;
   --rounded-DEFAULT: 0.5rem;

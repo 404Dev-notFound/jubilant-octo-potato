@@ -17,6 +17,34 @@ To view the seeded project data in your browser, run:
 npx prisma studio
 ```
 
+### 3. Start the API Server
+In a new terminal window inside the project folder, run the Node.js API server:
+```bash
+node server.js
+```
+
+### 4. Start the Frontend Website
+In another new terminal window inside the project folder, run a local Python server:
+```bash
+python -m http.server 8080
+```
+
+### 5. View the App
+Open your web browser and go to:
+```
+http://localhost:8080/
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -82,21 +110,3 @@ TL;DR: Ensure DATABASE_URL points to the container’s password, bring the conta
 
 
 
-
-### 3. Start the API Server
-In a new terminal window inside the project folder, run the Node.js API server:
-```bash
-node server.js
-```
-
-### 4. Start the Frontend Website
-In another new terminal window inside the project folder, run a local Python server:
-```bash
-python -m http.server 8080
-```
-
-### 5. View the App
-Open your web browser and go to:
-```
-http://localhost:8080/
-```

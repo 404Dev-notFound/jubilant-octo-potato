@@ -1,31 +1,43 @@
 export function render_home() {
-    return `<div class="relative w-full max-w-[1400px] mx-auto p-xl flex flex-col min-h-[80vh] items-center justify-center text-center mt-12">
-    <div class="inline-block px-md py-xs rounded-full bg-primary/10 border border-primary/30 text-primary font-bold text-xs tracking-widest mb-lg animate-pulse">
-        CODECOLLAB 2.0 IS LIVE
+    return `<div class="relative w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col min-h-[85vh] items-center justify-center text-center">
+    <!-- Subtle Background Ambient Glow -->
+    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[650px] h-[320px] bg-gradient-to-tr from-primary/15 via-secondary/15 to-transparent rounded-full blur-[120px] pointer-events-none -z-10"></div>
+
+    <!-- Live Status Badge -->
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-secondary/10 border border-secondary/25 text-secondary text-xs font-semibold tracking-wider uppercase mb-8 shadow-[0_0_20px_rgba(219,184,255,0.12)] backdrop-blur-md">
+        <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+        <span>CODECOLLAB 2.0 IS LIVE</span>
     </div>
     
-    <h1 class="text-[48px] md:text-[72px] lg:text-[84px] leading-tight font-extrabold text-on-surface tracking-tight mb-md" style="font-family: 'Orpheus', 'Orpheus Pro', serif; text-shadow: 0 0 40px rgba(0,255,136,0.2);">
-        Looking for someone who <br>
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-tertiary">can commit</span>
+    <!-- Hero Heading -->
+    <h1 class="text-4xl sm:text-6xl md:text-7xl lg:text-[80px] font-extrabold text-on-surface tracking-tight leading-[1.12] mb-6 max-w-5xl font-display">
+        Looking for someone who <br class="hidden sm:inline" />
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-tertiary drop-shadow-[0_0_35px_rgba(174,198,255,0.25)]">can commit</span>
     </h1>
     
-    <p class="font-['Oleo_Script'] font-bold text-transparent text-lg md:text-xl max-w-3xl mb-xl tracking-wide" style="-webkit-text-stroke: 1px #ffffff; text-stroke: 1px #ffffff; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));">
+    <!-- Hero Description -->
+    <p class="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-3xl mx-auto mb-10 leading-relaxed font-normal antialiased">
         Find your next project, meet developers who share your passion, and build something that matters. Join teams, solve real-world issues, contribute your skills, and grow from every collaboration — from your first contribution to your next big open-source project.
     </p>
     
-    <div class="flex flex-col sm:flex-row gap-md justify-center w-full max-w-2xl">
-        <button onclick="window.location.hash='explore'" class="glass-glow-btn glass-glow-btn-primary">
-            <span class="glass-glow-inner">
-                <span class="material-symbols-outlined text-[20px]">explore</span> Explore Projects
-            </span>
+    <!-- Actions (3 CTAs with distinct visual hierarchy) -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 w-full max-w-2xl mx-auto">
+        <!-- 1. Primary CTA: Explore Projects -->
+        <button onclick="window.location.hash='explore'" class="w-full sm:w-auto group relative inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-xl bg-gradient-to-r from-[#0070f3] to-[#6807ba] text-white font-bold text-sm sm:text-base shadow-[0_0_25px_rgba(0,112,243,0.35)] hover:shadow-[0_0_35px_rgba(104,7,186,0.55)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer">
+            <span class="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:rotate-45">explore</span>
+            <span>Explore Projects</span>
         </button>
-        <button data-form="sign_up_form" title="Sign Up" class="glass-glow-btn glass-glow-btn-secondary">
-            <span class="glass-glow-inner">
-                <span class="material-symbols-outlined text-[20px]">rocket_launch</span> Start Contributing
-            </span>
+
+        <!-- 2. Secondary CTA: Start Contributing -->
+        <button data-form="sign_up_form" title="Sign Up" class="w-full sm:w-auto group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-surface-container-high/80 hover:bg-surface-variant border border-white/10 hover:border-secondary/40 text-on-surface hover:text-secondary font-bold text-sm sm:text-base backdrop-blur-md shadow-lg shadow-black/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer">
+            <span class="material-symbols-outlined text-[20px] text-secondary transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">rocket_launch</span>
+            <span>Start Contributing</span>
         </button>
-        <button onclick="window.location.hash='about'" class="px-xl py-md bg-transparent text-on-surface-variant hover:text-on-surface rounded-xl transition-colors flex justify-center items-center gap-xs font-bold">
-            Learn More <span class="material-symbols-outlined">arrow_forward</span>
+
+        <!-- 3. Subtle/Text CTA: Learn More -->
+        <button onclick="window.location.hash='about'" class="w-full sm:w-auto group inline-flex items-center justify-center gap-1.5 px-5 py-3.5 text-on-surface-variant hover:text-on-surface font-semibold text-sm sm:text-base rounded-xl transition-all duration-300 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-outline focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer">
+            <span>Learn More</span>
+            <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
         </button>
     </div>
     

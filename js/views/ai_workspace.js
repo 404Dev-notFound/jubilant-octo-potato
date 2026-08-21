@@ -1,4 +1,47 @@
 export function render_ai_workspace() {
+    const AI_WORKSPACE_AVAILABLE = false;
+    
+    if (!AI_WORKSPACE_AVAILABLE) {
+        return `
+        <main class="relative w-full max-w-[1400px] mx-auto p-xl flex flex-col h-[calc(100vh-70px)] pt-4 justify-center items-center">
+            
+            <div class="glass-panel rounded-2xl flex flex-col items-center justify-center p-2xl w-full max-w-6xl min-h-[60vh] border border-tertiary/20 text-center relative overflow-hidden shadow-2xl shadow-black/50">
+                <!-- Background glow effect -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-tertiary/10 rounded-full blur-[100px] pointer-events-none"></div>
+                
+                <div class="relative z-10 flex flex-col items-center w-full max-w-4xl">
+                    <div class="flex items-center gap-md mb-2xl">
+                        <h1 class="font-display text-[48px] text-tertiary flex items-center gap-sm font-bold">
+                            <span class="material-symbols-outlined text-[56px]">smart_toy</span> AI Workspace
+                        </h1>
+                        <span class="px-md py-1 bg-tertiary/10 text-tertiary border border-tertiary/30 rounded-full text-sm font-bold tracking-widest shadow-[0_0_15px_rgba(var(--tertiary),0.2)]">COMING SOON</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-lg w-full mt-lg">
+                        <div class="bg-surface-container/50 border border-white/5 p-lg rounded-xl flex flex-col items-center text-center transition-transform hover:scale-105 hover:border-tertiary/30 hover:bg-surface-variant/30">
+                            <span class="material-symbols-outlined text-tertiary mb-md text-[36px]">auto_fix_high</span>
+                            <h4 class="font-bold text-sm tracking-wide">AI Coding Assistance</h4>
+                        </div>
+                        <div class="bg-surface-container/50 border border-white/5 p-lg rounded-xl flex flex-col items-center text-center transition-transform hover:scale-105 hover:border-tertiary/30 hover:bg-surface-variant/30">
+                            <span class="material-symbols-outlined text-tertiary mb-md text-[36px]">account_tree</span>
+                            <h4 class="font-bold text-sm tracking-wide">Project Context</h4>
+                        </div>
+                        <div class="bg-surface-container/50 border border-white/5 p-lg rounded-xl flex flex-col items-center text-center transition-transform hover:scale-105 hover:border-tertiary/30 hover:bg-surface-variant/30">
+                            <span class="material-symbols-outlined text-tertiary mb-md text-[36px]">psychology</span>
+                            <h4 class="font-bold text-sm tracking-wide">Code Understanding</h4>
+                        </div>
+                        <div class="bg-surface-container/50 border border-white/5 p-lg rounded-xl flex flex-col items-center text-center transition-transform hover:scale-105 hover:border-tertiary/30 hover:bg-surface-variant/30">
+                            <span class="material-symbols-outlined text-tertiary mb-md text-[36px]">speed</span>
+                            <h4 class="font-bold text-sm tracking-wide">Developer Productivity</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        `;
+    }
+
+    // Existing implementation preserved below
     return `<main class="relative w-full max-w-[1400px] mx-auto p-xl flex flex-col h-[calc(100vh-70px)] pt-4">
     <div class="flex items-center justify-between mb-lg flex-shrink-0">
         <div>

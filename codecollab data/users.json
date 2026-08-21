@@ -36,7 +36,7 @@
       "1786747907456",
       "1786978624580"
     ],
-    "availability": "Available · Part-time",
+    "availability": "Busy / Focused on Sprints",
     "lookingFor": "Looking for: Tokio Async Specialist & Frontend Partner",
     "socialLinks": {
       "github": "http://localhost:8080/#home",
@@ -61,7 +61,10 @@
       "Async I/O",
       "Performance"
     ],
-    "updatedAt": "2026-08-19T22:43:37.965Z"
+    "updatedAt": "2026-08-21T19:02:00.616Z",
+    "hoursPerWeek": "10-20 hrs/wk",
+    "collaborationType": "Fullstack Developer",
+    "timezone": "UTC+5:30"
   },
   {
     "id": "1786746884946",

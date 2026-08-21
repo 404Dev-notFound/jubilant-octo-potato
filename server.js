@@ -3,16 +3,19 @@
  * Handles authentication, CRUD operations, and token refresh.
  */
 const { loadEnv } = require('./load-env.js');
-loadEnv();
+loadEnv({ required: ['JWT_SECRET', 'DATABASE_URL'] });
 
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library'); // Google OAuth
 const { v4: uuidv4 } = require('uuid'); // Refresh token generator
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const oauthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
+const JWT_SECRET = process.env.JWT_SECRET;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+const oauthClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
 const fs = require('fs/promises');
 const path = require('path');
 let PrismaClient;
@@ -31,9 +34,20 @@ const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'codecollab data');
 
 // Middleware
+app.use(helmet({
+    contentSecurityPolicy: false, // Disabling CSP for now to prevent breaking existing inline scripts/styles unless we can fully configure it
+}));
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
+
+// Rate Limiting for auth routes
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: { error: 'Too many requests from this IP, please try again later.' }
+});
+app.use('/api/auth/', authLimiter);
 
 // JWT verification middleware for protected routes
 /*
@@ -57,7 +71,7 @@ function authMiddleware(req, res, next) {
 
 // Helper function to get file path
 /* Helper to construct absolute paths for JSON data tables */
-const getFilePath = (table) => path.join(DATA_DIR, `${table}.json`);
+const getFilePath = (table) => path.join(DATA_DIR, `${path.basename(table)}.json`);
 const getStatsPath = () => path.join(DATA_DIR, 'stats.json');
 
 // Sync existing users from users.json into PostgreSQL Prisma User table on startup
@@ -1765,6 +1779,13 @@ app.post('/api/projects/:projectId/issues', authMiddleware, async (req, res) => 
         if (!project) {
             return res.status(404).json({ error: 'Project not found' });
         }
+        
+        // Enforce Authorization: Must be project owner or member to create an issue
+        const isAuthorized = await isProjectAuthorized(projectId, creatorId);
+        if (!isAuthorized) {
+            return res.status(403).json({ error: 'Not authorized to create issues in this project' });
+        }
+
 
         // Ensure creator exists in PostgreSQL User table
         try {
@@ -1884,16 +1905,35 @@ app.post('/api/projects/:projectId/issues', authMiddleware, async (req, res) => 
 });
 
 // Update issue handler
+async function isProjectAuthorized(projectId, userId) {
+    if (!projectId || !userId) return false;
+    const project = await prisma.project.findUnique({
+        where: { id: projectId },
+        include: { members: true }
+    });
+    if (!project) return false;
+    if (project.ownerId === userId) return true;
+    if (project.members && project.members.some(m => m.userId === userId)) return true;
+    return false;
+}
+
 async function handleUpdateIssue(req, res) {
     try {
         const { status, priority, description, assigneeId, tags, title } = req.body;
         const issueId = req.params.issueId;
+        const userId = String(req.user.id);
 
         const existing = await prisma.issue.findUnique({
             where: { id: issueId }
         });
         if (!existing) {
             return res.status(404).json({ error: 'Issue not found' });
+        }
+
+        // Enforce Authorization: Must be project owner, member, or issue creator
+        const isAuthorized = await isProjectAuthorized(existing.projectId, userId);
+        if (!isAuthorized && existing.creatorId !== userId) {
+            return res.status(403).json({ error: 'Not authorized to modify this issue' });
         }
 
         // If route specified projectId, verify match
@@ -1971,6 +2011,12 @@ async function handleDeleteIssue(req, res) {
         }
         if (req.params.projectId && existing.projectId !== req.params.projectId) {
             return res.status(400).json({ error: 'Issue does not belong to the specified project' });
+        }
+        
+        const userId = String(req.user.id);
+        const isAuthorized = await isProjectAuthorized(existing.projectId, userId);
+        if (!isAuthorized && existing.creatorId !== userId) {
+            return res.status(403).json({ error: 'Not authorized to delete this issue' });
         }
 
         await prisma.issue.delete({
@@ -3478,6 +3524,10 @@ app.post('/api/users/availability', authMiddleware, async (req, res) => {
 // Write data (protected)
 app.post('/api/:table', authMiddleware, async (req, res) => {
     try {
+        const allowedTables = ['organizations', 'teams'];
+        if (!allowedTables.includes(req.params.table)) {
+            return res.status(403).json({ error: 'Access to this table is forbidden via generic endpoint' });
+        }
         const filePath = getFilePath(req.params.table);
         let records = [];
         try {
@@ -3608,6 +3658,10 @@ app.post('/api/auth/google', async (req, res) => {
 // Fallback generic data table route
 app.get('/api/:table', async (req, res) => {
     try {
+        const allowedTables = ['organizations', 'teams', 'stats', 'community'];
+        if (!allowedTables.includes(req.params.table)) {
+            return res.status(403).json({ error: 'Access to this table is forbidden via generic endpoint' });
+        }
         const filePath = getFilePath(req.params.table);
         try { await fs.access(filePath); } catch { return res.json([]); }
         const data = await fs.readFile(filePath, 'utf-8');

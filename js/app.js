@@ -133,6 +133,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(hash.split('?')[1] || '');
         const projectId = urlParams.get('projectId');
 
+        // AI Chat feature disabled as per request
+        if (viewName === 'ai_chat') {
+            window.location.hash = 'home';
+            return;
+        }
+
         // Ensure any active modal is closed on view change
         if (window.UI && window.UI.closeModal) {
             window.UI.closeModal();

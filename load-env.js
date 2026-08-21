@@ -6,9 +6,8 @@ const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
 
-// Load environment variables, ensuring DATABASE_URL is set
-
-
+// Load environment variables, ensuring required variables are set
+const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
 const envPath = path.join(__dirname, '.env');
 
 /*

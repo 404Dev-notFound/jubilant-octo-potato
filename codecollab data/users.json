@@ -348,5 +348,19 @@
     ],
     "progress": 0,
     "potion": 0
+  },
+  {
+    "id": "1",
+    "name": "dev",
+    "email": "dev@codecollab.io",
+    "availability": "Available Now",
+    "lookingFor": "Building distributed systems in Rust and Go",
+    "timezone": "UTC+5:30",
+    "hoursPerWeek": "15-20 hrs/wk",
+    "collaborationType": "Systems & Rust Specialist",
+    "updatedAt": "2026-08-20T20:39:35.297Z",
+    "followers": [
+      "2"
+    ]
   }
 ]

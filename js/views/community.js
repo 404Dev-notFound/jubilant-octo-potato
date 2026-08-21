@@ -1,7 +1,7 @@
 /*
  * Community View for CodeCollab
- * Matchmaking platform for developers to find coding mates, discover teams,
- * follow peers, and collaborate on open-source projects.
+ * Production-ready Matchmaking platform for developers to find coding mates,
+ * discover teams & guilds, follow peers, and collaborate on open-source projects.
  */
 
 export function render_community() {
@@ -21,10 +21,10 @@ export function render_community() {
                     </div>
                     <h1 class="text-3xl md:text-5xl font-display font-extrabold text-on-surface tracking-tight leading-tight">
                         Find Coding Mates, Discover Teams, <br class="hidden sm:inline">
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-tertiary">and Grow Together</span>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-tertiary">and Build Together</span>
                     </h1>
                     <p class="text-on-surface-variant text-base md:text-lg mt-3 max-w-2xl leading-relaxed">
-                        Connect with verified developers, discover teams actively looking for talent, explore open roles, and form unstoppable open-source alliances.
+                        Connect with verified developers, explore active teams recruiting talent, discover open-source alliances, and partner up on impactful repositories.
                     </p>
                 </div>
                 
@@ -35,7 +35,7 @@ export function render_community() {
                             <span class="material-symbols-outlined text-[20px]">groups</span>
                         </div>
                         <div>
-                            <div id="stat-community-teams" class="text-xl font-bold text-on-surface">4+</div>
+                            <div id="stat-community-teams" class="text-xl font-bold text-on-surface">...</div>
                             <div class="text-xs text-on-surface-variant font-medium">Active Teams</div>
                         </div>
                     </div>
@@ -44,22 +44,34 @@ export function render_community() {
                             <span class="material-symbols-outlined text-[20px]">person_search</span>
                         </div>
                         <div>
-                            <div id="stat-community-devs" class="text-xl font-bold text-on-surface">150+</div>
+                            <div id="stat-community-devs" class="text-xl font-bold text-on-surface">...</div>
                             <div class="text-xs text-on-surface-variant font-medium">Coding Mates</div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Quick Search Bar inside Hero -->
-            <div class="relative mt-8 max-w-3xl">
-                <div class="relative flex items-center bg-surface-container-lowest/90 border border-white/10 rounded-2xl p-2 shadow-inner focus-within:border-primary/50 transition-all">
-                    <span class="material-symbols-outlined pl-3 pr-2 text-on-surface-variant text-[22px]">search</span>
-                    <input id="community-search-input" type="text" placeholder="Search by name, skill (e.g. React, Rust, Python), team, or role..." class="w-full bg-transparent border-none outline-none text-on-surface placeholder:text-on-surface-variant/60 text-sm md:text-base py-2">
-                    <button id="community-clear-search" class="hidden text-xs px-2.5 py-1 text-on-surface-variant hover:text-on-surface bg-white/5 rounded-lg mr-2 transition-colors">Clear</button>
-                    <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-surface-container rounded-xl border border-white/5 text-xs text-on-surface-variant font-mono">
-                        <span>⌘</span><span>K</span>
+            <!-- Quick Search Bar & Action Buttons -->
+            <div class="relative mt-8 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                <div class="relative flex-1 max-w-2xl">
+                    <div class="relative flex items-center bg-surface-container-lowest/90 border border-white/10 rounded-2xl p-2 shadow-inner focus-within:border-primary/50 transition-all">
+                        <span class="material-symbols-outlined pl-3 pr-2 text-on-surface-variant text-[22px]">search</span>
+                        <input id="community-search-input" type="text" placeholder="Search by name, skill (e.g. React, Rust, Python), team, or role..." class="w-full bg-transparent border-none outline-none text-on-surface placeholder:text-on-surface-variant/60 text-sm md:text-base py-2">
+                        <button id="community-clear-search" class="hidden text-xs px-2.5 py-1 text-on-surface-variant hover:text-on-surface bg-white/5 rounded-lg mr-2 transition-colors">Clear</button>
                     </div>
+                </div>
+
+                <!-- Primary CTAs in Hero -->
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <button data-form="create_team_form" class="px-4 py-2.5 bg-primary text-on-primary font-bold text-xs md:text-sm rounded-xl hover:scale-105 transition-transform flex items-center gap-1.5 shadow-lg shadow-primary/25">
+                        <span class="material-symbols-outlined text-[18px]">add_circle</span> Create Team
+                    </button>
+                    <button data-form="create_looking_for_form" class="px-4 py-2.5 bg-tertiary text-on-tertiary font-bold text-xs md:text-sm rounded-xl hover:scale-105 transition-transform flex items-center gap-1.5 shadow-lg shadow-tertiary/25">
+                        <span class="material-symbols-outlined text-[18px]">handshake</span> Post Looking-For
+                    </button>
+                    <button data-form="update_availability_form" class="px-3.5 py-2.5 bg-surface-container hover:bg-surface-variant text-on-surface border border-white/10 rounded-xl text-xs md:text-sm font-semibold transition-all flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px] text-tertiary">schedule</span> My Availability
+                    </button>
                 </div>
             </div>
         </section>
@@ -74,32 +86,25 @@ export function render_community() {
                     </button>
                     <button data-tab="teams" class="community-tab-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all text-on-surface-variant hover:text-on-surface hover:bg-white/5 flex items-center gap-2">
                         <span class="material-symbols-outlined text-[18px]">groups</span> Teams & Guilds
-                        <span id="tab-count-teams" class="px-2 py-0.5 text-xs rounded-full bg-surface-container-highest text-on-surface-variant">4</span>
+                        <span id="tab-count-teams" class="px-2 py-0.5 text-xs rounded-full bg-surface-container-highest text-on-surface-variant">0</span>
                     </button>
                     <button data-tab="developers" class="community-tab-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all text-on-surface-variant hover:text-on-surface hover:bg-white/5 flex items-center gap-2">
                         <span class="material-symbols-outlined text-[18px]">person</span> Developers
-                        <span id="tab-count-devs" class="px-2 py-0.5 text-xs rounded-full bg-surface-container-highest text-on-surface-variant">7</span>
+                        <span id="tab-count-devs" class="px-2 py-0.5 text-xs rounded-full bg-surface-container-highest text-on-surface-variant">0</span>
                     </button>
                     <button data-tab="looking-for" class="community-tab-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all text-on-surface-variant hover:text-on-surface hover:bg-white/5 flex items-center gap-2">
                         <span class="material-symbols-outlined text-[18px]">handshake</span> Looking for Mates
-                        <span id="tab-count-match" class="px-2 py-0.5 text-xs rounded-full bg-surface-container-highest text-on-surface-variant">4</span>
-                    </button>
-                </div>
-
-                <!-- Action Shortcut -->
-                <div class="shrink-0 flex items-center gap-2">
-                    <button id="btn-post-looking-for" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 bg-surface-container-high hover:bg-surface-variant text-on-surface border border-white/10 rounded-xl text-xs font-bold transition-all hover:scale-105">
-                        <span class="material-symbols-outlined text-[16px] text-tertiary">add_circle</span> Post Looking-For
+                        <span id="tab-count-match" class="px-2 py-0.5 text-xs rounded-full bg-surface-container-highest text-on-surface-variant">0</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Compact Filter Controls -->
+            <!-- Filter Controls -->
             <div class="bg-surface-container-low/60 border border-white/5 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 backdrop-blur-md">
                 <div class="flex flex-wrap items-center gap-3">
                     <!-- Looking For filter -->
                     <div class="flex items-center gap-2">
-                        <label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Looking For:</label>
+                        <label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Role:</label>
                         <select id="filter-looking-for" class="bg-surface-container border border-white/10 rounded-xl px-3 py-1.5 text-xs text-on-surface outline-none focus:border-primary/50 cursor-pointer">
                             <option value="all">All Roles</option>
                             <option value="frontend">Frontend Dev</option>
@@ -108,6 +113,7 @@ export function render_community() {
                             <option value="ai">AI / ML Engineer</option>
                             <option value="devops">DevOps / Cloud</option>
                             <option value="rust">Rust Specialist</option>
+                            <option value="systems">Systems Engineer</option>
                         </select>
                     </div>
 
@@ -124,6 +130,7 @@ export function render_community() {
                             <option value="three.js">Three.js</option>
                             <option value="kubernetes">Kubernetes</option>
                             <option value="fastapi">FastAPI</option>
+                            <option value="websockets">WebSockets</option>
                         </select>
                     </div>
 
@@ -172,9 +179,14 @@ export function render_community() {
                             <span class="w-3 h-3 rounded-full bg-primary"></span>
                             Discoverable Teams & Guilds
                         </h2>
-                        <p class="text-sm text-on-surface-variant mt-0.5">Explore active teams building impactful open-source projects and looking for collaborators.</p>
+                        <p class="text-sm text-on-surface-variant mt-0.5">Explore active teams building open-source projects and looking for collaborators.</p>
                     </div>
-                    <button data-action="filter-tab" data-target="teams" class="text-xs text-primary hover:underline font-semibold">View All Teams →</button>
+                    <div class="flex items-center gap-3">
+                        <button data-form="create_team_form" class="text-xs text-primary font-bold hover:underline flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">add</span> Create Team
+                        </button>
+                        <button data-action="filter-tab" data-target="teams" class="text-xs text-on-surface-variant hover:text-on-surface font-semibold">View All →</button>
+                    </div>
                 </div>
 
                 <div id="teams-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -194,7 +206,12 @@ export function render_community() {
                         </h2>
                         <p class="text-sm text-on-surface-variant mt-0.5">Direct matchmaking requests from developers actively seeking partners for specific repos & sprints.</p>
                     </div>
-                    <button data-action="filter-tab" data-target="looking-for" class="text-xs text-tertiary hover:underline font-semibold">View All Match Requests →</button>
+                    <div class="flex items-center gap-3">
+                        <button data-form="create_looking_for_form" class="text-xs text-tertiary font-bold hover:underline flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">add</span> Post Request
+                        </button>
+                        <button data-action="filter-tab" data-target="looking-for" class="text-xs text-on-surface-variant hover:text-on-surface font-semibold">View All →</button>
+                    </div>
                 </div>
 
                 <div id="looking-for-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -214,7 +231,12 @@ export function render_community() {
                         </h2>
                         <p class="text-sm text-on-surface-variant mt-0.5">Discover verified engineers, follow inspiring builders, and expand your coding circle.</p>
                     </div>
-                    <button data-action="filter-tab" data-target="developers" class="text-xs text-secondary hover:underline font-semibold">View All Developers →</button>
+                    <div class="flex items-center gap-3">
+                        <button data-form="update_availability_form" class="text-xs text-secondary font-bold hover:underline flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">edit</span> My Status
+                        </button>
+                        <button data-action="filter-tab" data-target="developers" class="text-xs text-on-surface-variant hover:text-on-surface font-semibold">View All →</button>
+                    </div>
                 </div>
 
                 <div id="developers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -231,50 +253,11 @@ export function render_community() {
         <div id="community-empty-state" class="hidden py-16 text-center bg-surface-container-low/40 rounded-3xl border border-white/5 my-8">
             <span class="material-symbols-outlined text-[64px] text-on-surface-variant/40 mb-3 block">search_off</span>
             <h3 class="text-xl font-bold text-on-surface">No matching results found</h3>
-            <p class="text-sm text-on-surface-variant max-w-md mx-auto mt-1">Try adjusting your search terms, removing filters, or toggling off the Verified Skills constraint.</p>
+            <p class="text-sm text-on-surface-variant max-w-md mx-auto mt-1">Try adjusting your search terms, removing active filters, or toggling off the Verified Skills constraint.</p>
             <button id="btn-reset-filters" class="mt-4 px-4 py-2 bg-primary text-on-primary rounded-xl text-xs font-bold hover:scale-105 transition-transform">Reset All Filters</button>
         </div>
 
     </main>
-
-    <!-- JOIN TEAM MODAL -->
-    <div id="join-team-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/70 backdrop-blur-md p-4" style="display: none;">
-        <div class="bg-surface-container-high border border-white/10 rounded-2xl w-full max-w-lg p-6 shadow-2xl relative">
-            <button id="close-join-modal" type="button" class="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface p-1 rounded-lg hover:bg-white/5 transition-colors">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-primary/20 text-primary flex items-center justify-center font-bold">
-                    <span class="material-symbols-outlined">group_add</span>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-on-surface" id="join-modal-team-name">Join Team</h3>
-                    <p class="text-xs text-on-surface-variant">Request will be sent directly to the team leader</p>
-                </div>
-            </div>
-            
-            <form id="join-team-form" class="space-y-4">
-                <input type="hidden" id="join-modal-team-id" value="">
-                
-                <div>
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase tracking-wider">Target Position / Role</label>
-                    <input id="join-modal-position" type="text" placeholder="e.g. Frontend Developer, Rust Backend Specialist" class="w-full bg-surface-container-lowest border border-white/10 rounded-xl px-3.5 py-2 text-sm text-on-surface outline-none focus:border-primary/50" required>
-                </div>
-                
-                <div>
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase tracking-wider">Message to Team Lead</label>
-                    <textarea id="join-modal-message" rows="4" placeholder="Introduce yourself, your primary skills, and why you would love to collaborate on their projects..." class="w-full bg-surface-container-lowest border border-white/10 rounded-xl px-3.5 py-2 text-sm text-on-surface outline-none focus:border-primary/50 resize-none" required></textarea>
-                </div>
-                
-                <div class="flex justify-end gap-3 pt-2">
-                    <button type="button" id="cancel-join-btn" class="px-4 py-2 bg-surface-container rounded-xl text-sm font-semibold hover:bg-surface-variant transition-colors">Cancel</button>
-                    <button type="submit" id="submit-join-btn" class="px-5 py-2 bg-primary text-on-primary rounded-xl text-sm font-bold hover:scale-105 transition-transform flex items-center gap-1.5 shadow-lg shadow-primary/25">
-                        <span class="material-symbols-outlined text-[18px]">send</span> Send Request
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
     `;
 }
 
@@ -291,22 +274,29 @@ export async function initCommunity() {
     let expandedTeamIds = new Set();
     let expandedDevIds = new Set();
 
-    const currentUserStr = localStorage.getItem('currentUser');
-    const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
-    const currentUserId = currentUser ? String(currentUser.id) : null;
+    function getCurrentUser() {
+        const currentUserStr = localStorage.getItem('currentUser');
+        return currentUserStr ? JSON.parse(currentUserStr) : null;
+    }
 
-    // Load Data from API
+    // Load Data from Live Backend APIs
     async function loadCommunityData() {
         try {
-            const [teamsRes, devsRes, matchRes] = await Promise.all([
-                window.apiFetch ? window.apiFetch('/api/teams') : fetch('http://localhost:3000/api/teams'),
-                window.apiFetch ? window.apiFetch('/api/community/developers') : fetch('http://localhost:3000/api/community/developers'),
-                window.apiFetch ? window.apiFetch('/api/community/looking-for') : fetch('http://localhost:3000/api/community/looking-for')
+            const [teamsRes, devsRes, matchRes, statsRes] = await Promise.all([
+                window.apiFetch ? window.apiFetch('/api/teams') : fetch('/api/teams'),
+                window.apiFetch ? window.apiFetch('/api/community/developers') : fetch('/api/community/developers'),
+                window.apiFetch ? window.apiFetch('/api/community/looking-for') : fetch('/api/community/looking-for'),
+                window.apiFetch ? window.apiFetch('/api/community/stats') : fetch('/api/community/stats')
             ]);
 
             if (teamsRes.ok) teamsData = await teamsRes.json();
             if (devsRes.ok) developersData = await devsRes.json();
             if (matchRes.ok) lookingForData = await matchRes.json();
+
+            let stats = { activeTeams: teamsData.length, totalDevelopers: developersData.length, lookingForRequests: lookingForData.length };
+            if (statsRes.ok) {
+                stats = await statsRes.json();
+            }
 
             // Update Counts in UI
             const teamsCountEl = document.getElementById('stat-community-teams');
@@ -315,16 +305,56 @@ export async function initCommunity() {
             const tabDevsCount = document.getElementById('tab-count-devs');
             const tabMatchCount = document.getElementById('tab-count-match');
 
-            if (teamsCountEl) teamsCountEl.textContent = `${teamsData.length}+`;
-            if (devsCountEl) devsCountEl.textContent = `${developersData.length}+`;
+            if (teamsCountEl) teamsCountEl.textContent = `${stats.activeTeams || teamsData.length}+`;
+            if (devsCountEl) devsCountEl.textContent = `${stats.totalDevelopers || developersData.length}+`;
             if (tabTeamsCount) tabTeamsCount.textContent = teamsData.length;
             if (tabDevsCount) tabDevsCount.textContent = developersData.length;
             if (tabMatchCount) tabMatchCount.textContent = lookingForData.length;
 
+            // Populate skills filter dynamically with unique skills from data
+            populateDynamicSkillsFilter();
+
             renderAllSections();
         } catch (err) {
             console.error('Failed to load community data:', err);
+            const container = document.getElementById('community-sections-container');
+            if (container) {
+                container.innerHTML = `
+                <div class="py-16 text-center bg-surface-container-low/40 rounded-3xl border border-error/20 my-8">
+                    <span class="material-symbols-outlined text-[48px] text-error mb-2 block">cloud_off</span>
+                    <h3 class="text-lg font-bold text-on-surface">Unable to load community data</h3>
+                    <p class="text-xs text-on-surface-variant max-w-sm mx-auto mt-1 mb-4">A connection error occurred while communicating with the server.</p>
+                    <button onclick="window.refreshCommunityData()" class="px-4 py-2 bg-primary text-on-primary rounded-xl text-xs font-bold hover:scale-105 transition-transform">Retry</button>
+                </div>`;
+            }
         }
+    }
+
+    // Expose global live-refresh hook for modal forms
+    window.refreshCommunityData = loadCommunityData;
+
+    // Dynamically extract skills from backend records to populate skills dropdown
+    function populateDynamicSkillsFilter() {
+        const skillsSelect = document.getElementById('filter-skills');
+        if (!skillsSelect) return;
+
+        const currentVal = skillsSelect.value;
+        const skillsSet = new Set(['React', 'TypeScript', 'Rust', 'Python', 'Go', 'Three.js', 'Kubernetes', 'FastAPI', 'WebSockets']);
+        
+        teamsData.forEach(t => (t.skills || []).forEach(s => skillsSet.add(s)));
+        developersData.forEach(d => {
+            (d.skills || []).forEach(s => skillsSet.add(s));
+            (d.verifiedSkills || []).forEach(s => skillsSet.add(s));
+        });
+        lookingForData.forEach(m => (m.requiredSkills || []).forEach(s => skillsSet.add(s)));
+
+        const sortedSkills = Array.from(skillsSet).sort();
+        let optionsHtml = `<option value="all">All Technologies</option>`;
+        sortedSkills.forEach(s => {
+            const val = s.toLowerCase();
+            optionsHtml += `<option value="${val}" ${currentVal === val ? 'selected' : ''}>${s}</option>`;
+        });
+        skillsSelect.innerHTML = optionsHtml;
     }
 
     // Helper to render verified skill badge
@@ -342,43 +372,46 @@ export async function initCommunity() {
         </span>`;
     }
 
-    // Render Teams
+    // Render Teams Grid
     function renderTeams(filteredTeams) {
         const container = document.getElementById('teams-grid');
         if (!container) return;
 
+        const currentUser = getCurrentUser();
+        const currentUserId = currentUser ? String(currentUser.id) : null;
+
         if (filteredTeams.length === 0) {
-            container.innerHTML = `<div class="col-span-full py-8 text-center text-on-surface-variant text-sm bg-surface-container-low/30 rounded-2xl border border-white/5">No teams match your active filters.</div>`;
+            container.innerHTML = `<div class="col-span-full py-10 text-center text-on-surface-variant text-sm bg-surface-container-low/30 rounded-2xl border border-white/5">No teams match your active search or filters.</div>`;
             return;
         }
 
         container.innerHTML = filteredTeams.map(team => {
             const isExpanded = expandedTeamIds.has(team.id);
-            const hasUpvoted = Array.isArray(team.upvoters) && currentUserId && team.upvoters.includes(currentUserId);
+            const hasUpvoted = Array.isArray(team.upvoters) && currentUserId && team.upvoters.map(String).includes(currentUserId);
             const isLead = currentUserId && String(team.leadId) === currentUserId;
-            const isMember = currentUserId && Array.isArray(team.members) && team.members.includes(currentUserId);
+            const isMember = currentUserId && Array.isArray(team.members) && team.members.map(String).includes(currentUserId);
 
             const skillsBadges = (team.skills || []).map(s => renderVerifiedSkillBadge(s, true)).join('');
             
             const memberAvatars = (team.memberDetails || []).map(m => `
-                <div class="w-8 h-8 rounded-full border-2 border-surface-container-high overflow-hidden bg-primary/20 flex items-center justify-center font-bold text-xs text-primary" title="${m.name || 'Member'}">
+                <div class="w-8 h-8 rounded-full border-2 border-surface-container-high overflow-hidden bg-primary/20 flex items-center justify-center font-bold text-xs text-primary shrink-0" title="${m.name || 'Member'}">
                     ${m.avatarUrl ? `<img src="${m.avatarUrl}" class="w-full h-full object-cover">` : (m.name ? m.name.charAt(0).toUpperCase() : 'M')}
                 </div>
             `).join('');
 
             const projectTags = (team.assignedProjects || []).map(p => `
-                <span class="px-2 py-0.5 text-[11px] font-mono bg-surface-container rounded-md text-on-surface-variant border border-white/5 flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[13px] text-primary">folder</span> ${p}
+                <span class="px-2.5 py-1 text-xs font-mono bg-surface-container rounded-lg text-on-surface-variant border border-white/5 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-primary">folder</span> ${p}
                 </span>
             `).join('');
 
             const openPositionsList = (team.openPositions || []).map(pos => `
-                <div class="flex items-center justify-between px-3 py-2 bg-surface-container-highest/60 rounded-xl border border-white/5 text-xs">
+                <div class="flex items-center justify-between px-3.5 py-2.5 bg-surface-container rounded-xl border border-white/5 text-xs">
                     <span class="font-semibold text-on-surface flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> ${pos}
+                        <span class="w-2 h-2 rounded-full bg-tertiary"></span> ${pos}
                     </span>
                     ${(!isLead && !isMember) ? `
-                    <button data-action="join-team-pos" data-team-id="${team.id}" data-team-name="${team.teamName}" data-position="${pos}" class="px-2.5 py-1 bg-primary/10 hover:bg-primary text-primary hover:text-on-primary rounded-lg font-bold transition-all text-[11px]">
+                    <button data-form="join_team_form" data-team-id="${team.id}" data-team-name="${team.teamName}" data-position="${pos}" data-lead-name="${team.lead?.name || 'Lead'}" class="px-3 py-1 bg-primary/10 hover:bg-primary text-primary hover:text-on-primary rounded-lg font-bold transition-all text-xs">
                         Apply
                     </button>` : ''}
                 </div>
@@ -389,8 +422,8 @@ export async function initCommunity() {
                 <!-- Header / Top Bar -->
                 <div class="p-6 pb-4 flex flex-col flex-1">
                     <div class="flex items-start justify-between gap-4 mb-3">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 via-secondary/20 to-tertiary/20 border border-white/10 flex items-center justify-center font-bold text-lg text-primary shadow-inner">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 via-secondary/20 to-tertiary/20 border border-white/10 flex items-center justify-center font-bold text-lg text-primary shadow-inner shrink-0">
                                 <span class="material-symbols-outlined text-[26px]">groups</span>
                             </div>
                             <div>
@@ -398,9 +431,9 @@ export async function initCommunity() {
                                     ${team.teamName}
                                 </h3>
                                 <div class="flex items-center gap-2 text-xs text-on-surface-variant">
-                                    <span>Lead: <strong class="text-on-surface">${team.lead?.name || 'Lead'}</strong></span>
+                                    <span>Lead: <strong class="text-on-surface">${team.lead?.name || 'Team Lead'}</strong></span>
                                     <span>•</span>
-                                    <span class="text-tertiary flex items-center gap-0.5">
+                                    <span class="text-tertiary flex items-center gap-0.5 font-bold">
                                         <span class="material-symbols-outlined text-[13px]">star</span> ${team.rating || '4.9'}
                                     </span>
                                 </div>
@@ -427,14 +460,14 @@ export async function initCommunity() {
                     <!-- Highlight Badges: Looking For & Availability -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
                         <div class="px-3 py-2 rounded-xl bg-surface-container border border-white/5 flex items-center gap-2 text-xs">
-                            <span class="material-symbols-outlined text-[16px] text-secondary">search</span>
+                            <span class="material-symbols-outlined text-[16px] text-secondary shrink-0">search</span>
                             <div class="truncate">
                                 <span class="text-on-surface-variant text-[10px] block uppercase font-bold tracking-wider">Looking For</span>
                                 <span class="font-semibold text-on-surface truncate block" title="${team.lookingFor}">${team.lookingFor}</span>
                             </div>
                         </div>
                         <div class="px-3 py-2 rounded-xl bg-surface-container border border-white/5 flex items-center gap-2 text-xs">
-                            <span class="material-symbols-outlined text-[16px] text-tertiary">schedule</span>
+                            <span class="material-symbols-outlined text-[16px] text-tertiary shrink-0">schedule</span>
                             <div class="truncate">
                                 <span class="text-on-surface-variant text-[10px] block uppercase font-bold tracking-wider">Availability</span>
                                 <span class="font-semibold text-on-surface truncate block">${team.availability}</span>
@@ -448,11 +481,11 @@ export async function initCommunity() {
                             <div class="flex -space-x-2 overflow-hidden">
                                 ${memberAvatars}
                             </div>
-                            <span class="text-on-surface-variant font-medium text-xs">${team.members?.length || 0} members</span>
+                            <span class="text-on-surface-variant font-medium text-xs">${team.members?.length || 1} members</span>
                         </div>
                         
                         <div class="flex items-center gap-1.5">
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-secondary/10 text-secondary border border-secondary/20">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-secondary/10 text-secondary border border-secondary/20">
                                 ${(team.openPositions || []).length} Open Roles
                             </span>
                         </div>
@@ -460,8 +493,8 @@ export async function initCommunity() {
                 </div>
 
                 <!-- EXPANDED IN-PLACE DETAILS CONTAINER -->
-                <div class="team-expanded-details transition-all duration-500 ease-in-out border-t border-white/10 bg-surface-container-lowest/80 ${isExpanded ? 'max-h-[1000px] opacity-100 p-6' : 'max-h-0 opacity-0 p-0 overflow-hidden'}">
-                    <div class="space-y-4">
+                <div class="team-expanded-details transition-all duration-300 ease-in-out border-t border-white/10 bg-surface-container-lowest/80 ${isExpanded ? 'max-h-[1000px] opacity-100 p-6' : 'max-h-0 opacity-0 p-0 overflow-hidden'}">
+                    <div class="space-y-5">
                         <!-- Full Description -->
                         <div>
                             <h4 class="text-xs font-bold uppercase tracking-wider text-primary mb-1">About the Guild</h4>
@@ -470,9 +503,9 @@ export async function initCommunity() {
 
                         <!-- Active Projects -->
                         <div>
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-secondary mb-2">Team Projects</h4>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-secondary mb-2">Guild Projects</h4>
                             <div class="flex flex-wrap gap-2">
-                                ${projectTags || '<span class="text-xs text-on-surface-variant">No public projects assigned.</span>'}
+                                ${projectTags || '<span class="text-xs text-on-surface-variant italic">No public projects assigned.</span>'}
                             </div>
                         </div>
 
@@ -480,7 +513,7 @@ export async function initCommunity() {
                         <div>
                             <h4 class="text-xs font-bold uppercase tracking-wider text-tertiary mb-2">Open Positions & Opportunities</h4>
                             <div class="space-y-2">
-                                ${openPositionsList || '<span class="text-xs text-on-surface-variant">Currently no open positions.</span>'}
+                                ${openPositionsList || '<span class="text-xs text-on-surface-variant italic">Currently no open positions.</span>'}
                             </div>
                         </div>
 
@@ -490,7 +523,7 @@ export async function initCommunity() {
                             <div class="grid grid-cols-2 gap-2">
                                 ${(team.memberDetails || []).map(m => `
                                     <div class="flex items-center gap-2 p-2 bg-surface-container rounded-xl border border-white/5">
-                                        <div class="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center font-bold text-xs text-primary overflow-hidden">
+                                        <div class="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center font-bold text-xs text-primary overflow-hidden shrink-0">
                                             ${m.avatarUrl ? `<img src="${m.avatarUrl}" class="w-full h-full object-cover">` : (m.name ? m.name.charAt(0).toUpperCase() : 'M')}
                                         </div>
                                         <div class="truncate">
@@ -512,11 +545,11 @@ export async function initCommunity() {
                     </button>
 
                     ${isLead ? `
-                    <span class="px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold">You Lead this Team</span>
+                    <span class="px-3 py-1 bg-primary/15 text-primary border border-primary/30 rounded-xl text-xs font-bold">You Lead this Team</span>
                     ` : isMember ? `
-                    <span class="px-3 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-xl text-xs font-bold">Team Member</span>
+                    <span class="px-3 py-1 bg-tertiary/15 text-tertiary border border-tertiary/30 rounded-xl text-xs font-bold">Team Member</span>
                     ` : `
-                    <button data-action="join-team-btn" data-team-id="${team.id}" data-team-name="${team.teamName}" class="px-4 py-1.5 bg-primary text-on-primary hover:bg-primary-container rounded-xl text-xs font-bold hover:scale-105 transition-all shadow-md shadow-primary/20 flex items-center gap-1">
+                    <button data-form="join_team_form" data-team-id="${team.id}" data-team-name="${team.teamName}" data-lead-name="${team.lead?.name || 'Lead'}" class="px-4 py-1.5 bg-primary text-on-primary hover:bg-primary-container rounded-xl text-xs font-bold hover:scale-105 transition-all shadow-md shadow-primary/20 flex items-center gap-1">
                         <span class="material-symbols-outlined text-[16px]">group_add</span> Join Team
                     </button>
                     `}
@@ -530,13 +563,17 @@ export async function initCommunity() {
         const container = document.getElementById('looking-for-grid');
         if (!container) return;
 
+        const currentUser = getCurrentUser();
+        const currentUserId = currentUser ? String(currentUser.id) : null;
+
         if (filteredPosts.length === 0) {
-            container.innerHTML = `<div class="col-span-full py-8 text-center text-on-surface-variant text-sm bg-surface-container-low/30 rounded-2xl border border-white/5">No coding mate requests match your search.</div>`;
+            container.innerHTML = `<div class="col-span-full py-10 text-center text-on-surface-variant text-sm bg-surface-container-low/30 rounded-2xl border border-white/5">No coding mate requests match your active filters.</div>`;
             return;
         }
 
         container.innerHTML = filteredPosts.map(post => {
             const author = post.author || {};
+            const isSelf = currentUserId && String(post.userId) === currentUserId;
             const skillsBadges = (post.requiredSkills || []).map(s => `
                 <span class="px-2.5 py-1 text-xs font-mono rounded-lg bg-surface-container text-primary border border-primary/20">
                     ${s}
@@ -548,23 +585,29 @@ export async function initCommunity() {
                 <div class="absolute top-0 right-0 w-32 h-32 bg-tertiary/5 rounded-full blur-2xl pointer-events-none"></div>
                 
                 <div>
-                    <!-- Matchmaking Goal -->
+                    <!-- Matchmaking Goal & Top Bar -->
                     <div class="flex items-start justify-between gap-3 mb-3">
                         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary/10 text-tertiary border border-tertiary/20 text-xs font-bold uppercase tracking-wider">
                             <span class="material-symbols-outlined text-[14px]">bolt</span> Looking for Mate
                         </div>
-                        <span class="text-[11px] text-on-surface-variant font-mono">${post.commitment || 'Part-time'}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-on-surface-variant font-mono bg-surface-container px-2.5 py-1 rounded-lg border border-white/5">${post.commitment || 'Part-time'}</span>
+                            ${isSelf ? `
+                            <button data-action="delete-looking-for" data-post-id="${post.id}" class="text-on-surface-variant hover:text-error p-1 rounded-lg hover:bg-white/5 transition-colors" title="Delete your request">
+                                <span class="material-symbols-outlined text-[16px]">delete</span>
+                            </button>` : ''}
+                        </div>
                     </div>
 
                     <!-- Highlighted Criteria Blocks -->
-                    <div class="space-y-2 mb-4">
+                    <div class="space-y-2.5 mb-4">
                         <div class="text-base font-bold text-on-surface group-hover:text-tertiary transition-colors">
                             <span class="text-tertiary font-extrabold">Looking for:</span> ${post.lookingFor}
                         </div>
-                        <div class="text-xs font-semibold text-on-surface-variant">
-                            <strong class="text-on-surface">For:</strong> ${post.for}
+                        <div class="text-xs font-semibold text-on-surface-variant flex items-center gap-1.5">
+                            <strong class="text-on-surface">For:</strong> <span class="text-primary">${post.for}</span>
                         </div>
-                        <div class="text-xs text-on-surface-variant/90 leading-relaxed bg-surface-container-lowest/60 p-3 rounded-xl border border-white/5">
+                        <div class="text-xs text-on-surface-variant/90 leading-relaxed bg-surface-container-lowest/60 p-3.5 rounded-xl border border-white/5">
                             ${post.context}
                         </div>
                     </div>
@@ -581,7 +624,7 @@ export async function initCommunity() {
                 <!-- Author Footer & Action -->
                 <div class="pt-4 border-t border-white/5 flex items-center justify-between gap-3 mt-4">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 rounded-xl bg-secondary/20 overflow-hidden border border-white/10 flex items-center justify-center font-bold text-sm text-secondary">
+                        <div class="w-9 h-9 rounded-xl bg-secondary/20 overflow-hidden border border-white/10 flex items-center justify-center font-bold text-sm text-secondary shrink-0">
                             ${author.avatarUrl ? `<img src="${author.avatarUrl}" class="w-full h-full object-cover">` : (author.name ? author.name.charAt(0).toUpperCase() : 'D')}
                         </div>
                         <div>
@@ -589,13 +632,16 @@ export async function initCommunity() {
                                 ${author.name || 'Developer'}
                                 ${(author.verifiedSkills || []).length > 0 ? `<span class="material-symbols-outlined text-[13px] text-tertiary font-bold" title="Verified Developer">verified</span>` : ''}
                             </div>
-                            <div class="text-[10px] text-on-surface-variant">${post.availability || 'Available'}</div>
+                            <div class="text-[10px] text-on-surface-variant">${post.availability || 'Available Now'}</div>
                         </div>
                     </div>
 
+                    ${!isSelf ? `
                     <button data-action="connect-mate" data-user-id="${post.userId}" data-user-name="${author.name || 'Developer'}" data-topic="${post.for}" class="px-3.5 py-1.5 bg-tertiary text-on-tertiary font-bold text-xs rounded-xl hover:scale-105 transition-transform flex items-center gap-1 shadow-md shadow-tertiary/20">
                         <span class="material-symbols-outlined text-[15px]">send</span> Connect
-                    </button>
+                    </button>` : `
+                    <span class="text-xs font-semibold text-tertiary bg-tertiary/10 px-3 py-1 rounded-xl border border-tertiary/20">Your Post</span>
+                    `}
                 </div>
             </div>`;
         }).join('');
@@ -606,20 +652,22 @@ export async function initCommunity() {
         const container = document.getElementById('developers-grid');
         if (!container) return;
 
+        const currentUser = getCurrentUser();
+        const currentUserId = currentUser ? String(currentUser.id) : null;
+
         if (filteredDevs.length === 0) {
-            container.innerHTML = `<div class="col-span-full py-8 text-center text-on-surface-variant text-sm bg-surface-container-low/30 rounded-2xl border border-white/5">No developers match your active filters.</div>`;
+            container.innerHTML = `<div class="col-span-full py-10 text-center text-on-surface-variant text-sm bg-surface-container-low/30 rounded-2xl border border-white/5">No developers match your active filters.</div>`;
             return;
         }
 
         container.innerHTML = filteredDevs.map(dev => {
             const isExpanded = expandedDevIds.has(dev.id);
-            const hasUpvoted = Array.isArray(dev.upvoters) && currentUserId && dev.upvoters.includes(currentUserId);
-            const hasFollowed = Array.isArray(dev.followers) && currentUserId && dev.followers.includes(currentUserId);
+            const hasUpvoted = Array.isArray(dev.upvoters) && currentUserId && dev.upvoters.map(String).includes(currentUserId);
+            const hasFollowed = Array.isArray(dev.followers) && currentUserId && dev.followers.map(String).includes(currentUserId);
             const isSelf = currentUserId && String(dev.id) === currentUserId;
 
-            // Split verified vs standard skills
             const verifiedList = Array.isArray(dev.verifiedSkills) ? dev.verifiedSkills : [];
-            const allSkills = Array.isArray(dev.skills) ? dev.skills : verifiedList;
+            const allSkills = Array.isArray(dev.skills) && dev.skills.length > 0 ? dev.skills : (verifiedList.length > 0 ? verifiedList : ['JavaScript', 'React']);
             
             const skillsBadges = allSkills.map(s => {
                 const isV = verifiedList.includes(s);
@@ -628,11 +676,11 @@ export async function initCommunity() {
 
             const socialLinks = dev.socialLinks || {};
             const socialIcons = `
-                <div class="flex items-center gap-2">
-                    ${socialLinks.github ? `<a href="${socialLinks.github}" target="_blank" class="p-1.5 bg-surface-container rounded-lg text-on-surface-variant hover:text-primary transition-colors" title="GitHub"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg></a>` : ''}
-                    ${socialLinks.linkedin ? `<a href="${socialLinks.linkedin}" target="_blank" class="p-1.5 bg-surface-container rounded-lg text-on-surface-variant hover:text-primary transition-colors" title="LinkedIn"><span class="material-symbols-outlined text-[16px]">business_center</span></a>` : ''}
-                    ${socialLinks.twitter ? `<a href="${socialLinks.twitter}" target="_blank" class="p-1.5 bg-surface-container rounded-lg text-on-surface-variant hover:text-primary transition-colors" title="Twitter/X"><span class="material-symbols-outlined text-[16px]">tag</span></a>` : ''}
-                    ${socialLinks.website ? `<a href="${socialLinks.website}" target="_blank" class="p-1.5 bg-surface-container rounded-lg text-on-surface-variant hover:text-primary transition-colors" title="Portfolio"><span class="material-symbols-outlined text-[16px]">language</span></a>` : ''}
+                <div class="flex items-center gap-2 pt-1">
+                    ${socialLinks.github ? `<a href="${socialLinks.github}" target="_blank" class="p-2 bg-surface-container rounded-xl text-on-surface-variant hover:text-primary transition-colors border border-white/5" title="GitHub"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg></a>` : ''}
+                    ${socialLinks.linkedin ? `<a href="${socialLinks.linkedin}" target="_blank" class="p-2 bg-surface-container rounded-xl text-on-surface-variant hover:text-primary transition-colors border border-white/5" title="LinkedIn"><span class="material-symbols-outlined text-[16px]">business_center</span></a>` : ''}
+                    ${socialLinks.twitter ? `<a href="${socialLinks.twitter}" target="_blank" class="p-2 bg-surface-container rounded-xl text-on-surface-variant hover:text-primary transition-colors border border-white/5" title="Twitter/X"><span class="material-symbols-outlined text-[16px]">tag</span></a>` : ''}
+                    ${socialLinks.website ? `<a href="${socialLinks.website}" target="_blank" class="p-2 bg-surface-container rounded-xl text-on-surface-variant hover:text-primary transition-colors border border-white/5" title="Portfolio"><span class="material-symbols-outlined text-[16px]">language</span></a>` : ''}
                 </div>`;
 
             return `
@@ -642,19 +690,19 @@ export async function initCommunity() {
                     <div class="flex items-start justify-between gap-4 mb-4">
                         <div class="flex items-center gap-3.5">
                             <div class="relative">
-                                <div class="w-14 h-14 rounded-2xl overflow-hidden border border-white/10 bg-surface-container flex items-center justify-center font-bold text-lg text-secondary">
+                                <div class="w-14 h-14 rounded-2xl overflow-hidden border border-white/10 bg-surface-container flex items-center justify-center font-bold text-lg text-secondary shrink-0">
                                     ${dev.avatarUrl ? `<img src="${dev.avatarUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">` : (dev.name ? dev.name.charAt(0).toUpperCase() : 'D')}
                                 </div>
-                                <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-tertiary border-2 border-surface-container-lowest" title="Active"></span>
+                                <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-tertiary border-2 border-surface-container-lowest" title="Available"></span>
                             </div>
                             <div>
                                 <h3 class="text-base font-bold text-on-surface group-hover:text-secondary transition-colors flex items-center gap-1.5">
                                     ${dev.name}
                                     ${verifiedList.length > 0 ? `<span class="material-symbols-outlined text-[16px] text-tertiary" title="Verified Skills Available">verified</span>` : ''}
                                 </h3>
-                                <div class="text-xs text-on-surface-variant font-medium">${dev.title || 'Developer'}</div>
-                                <div class="text-[11px] text-tertiary flex items-center gap-1 mt-0.5">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> ${dev.availability}
+                                <div class="text-xs text-on-surface-variant font-medium">${dev.title || dev.role || 'Developer'}</div>
+                                <div class="text-[11px] text-tertiary flex items-center gap-1 mt-0.5 font-semibold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> ${dev.availability || 'Available Now'}
                                 </div>
                             </div>
                         </div>
@@ -668,13 +716,13 @@ export async function initCommunity() {
 
                     <!-- Short Bio -->
                     <p class="text-xs text-on-surface-variant mb-4 leading-relaxed line-clamp-2">
-                        ${dev.bio}
+                        ${dev.bio || 'Passionate open-source developer actively collaborating on modern web and system architectures.'}
                     </p>
 
                     <!-- Looking For Badge -->
                     <div class="p-2.5 rounded-xl bg-surface-container/70 border border-white/5 text-xs mb-4">
                         <span class="text-[10px] uppercase tracking-wider font-bold text-secondary block">Looking For</span>
-                        <span class="text-on-surface font-semibold truncate block">${dev.lookingFor}</span>
+                        <span class="text-on-surface font-semibold truncate block">${dev.lookingFor || 'Open for collaboration'}</span>
                     </div>
 
                     <!-- Skills Badges -->
@@ -684,21 +732,21 @@ export async function initCommunity() {
                 </div>
 
                 <!-- EXPANDED IN-PLACE PROFILE CONTAINER -->
-                <div class="dev-expanded-details transition-all duration-500 ease-in-out border-t border-white/10 bg-surface-container-lowest/80 ${isExpanded ? 'max-h-[800px] opacity-100 p-6' : 'max-h-0 opacity-0 p-0 overflow-hidden'}">
+                <div class="dev-expanded-details transition-all duration-300 ease-in-out border-t border-white/10 bg-surface-container-lowest/80 ${isExpanded ? 'max-h-[800px] opacity-100 p-6' : 'max-h-0 opacity-0 p-0 overflow-hidden'}">
                     <div class="space-y-4 text-xs">
                         <div>
                             <h4 class="text-xs font-bold uppercase tracking-wider text-secondary mb-1">Full Biography</h4>
-                            <p class="text-xs text-on-surface-variant leading-relaxed">${dev.bio}</p>
+                            <p class="text-xs text-on-surface-variant leading-relaxed">${dev.bio || 'Developer on CodeCollab platform.'}</p>
                         </div>
 
                         <div>
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-primary mb-2">Projects & Contributions</h4>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-primary mb-2">Projects & Repositories</h4>
                             <div class="flex flex-wrap gap-1.5">
                                 ${(dev.projects || []).map(p => `
                                     <span class="px-2.5 py-1 bg-surface-container rounded-lg text-on-surface border border-white/5 flex items-center gap-1 font-mono text-[11px]">
                                         <span class="material-symbols-outlined text-[13px] text-primary">code</span> ${p}
                                     </span>
-                                `).join('') || '<span class="text-on-surface-variant">Active in community repositories.</span>'}
+                                `).join('') || '<span class="text-on-surface-variant italic">Active in community repositories.</span>'}
                             </div>
                         </div>
 
@@ -718,14 +766,16 @@ export async function initCommunity() {
 
                     <div class="flex items-center gap-2">
                         ${!isSelf ? `
-                        <button data-action="follow-dev" data-user-id="${dev.id}" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${hasFollowed ? 'bg-white/10 text-on-surface border-white/20' : 'bg-surface-container text-on-surface border-white/10 hover:bg-surface-variant'}">
-                            ${hasFollowed ? 'Following' : '+ Follow'}
+                        <button data-action="follow-dev" data-user-id="${dev.id}" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${hasFollowed ? 'bg-secondary/20 text-secondary border-secondary/40' : 'bg-surface-container text-on-surface border-white/10 hover:bg-surface-variant'}">
+                            ${hasFollowed ? '✓ Following' : '+ Follow'}
                         </button>
                         <button data-action="connect-dev" data-user-id="${dev.id}" data-user-name="${dev.name}" class="px-3 py-1.5 bg-secondary text-on-secondary hover:bg-secondary-fixed-dim rounded-xl text-xs font-bold hover:scale-105 transition-all shadow-md shadow-secondary/20 flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[14px]">chat</span> Chat
+                            <span class="material-symbols-outlined text-[14px]">chat</span> Connect
                         </button>
                         ` : `
-                        <span class="px-3 py-1 bg-surface-container text-on-surface-variant rounded-xl text-xs font-semibold">Your Profile</span>
+                        <button data-form="update_availability_form" class="px-3 py-1.5 bg-surface-container hover:bg-surface-variant text-tertiary border border-tertiary/20 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors">
+                            <span class="material-symbols-outlined text-[14px]">edit</span> Edit Availability
+                        </button>
                         `}
                     </div>
                 </div>
@@ -733,7 +783,7 @@ export async function initCommunity() {
         }).join('');
     }
 
-    // Master Filter & Sort function
+    // Filter & Sort function
     function filterAndSortData() {
         const searchQuery = (document.getElementById('community-search-input')?.value || '').toLowerCase().trim();
         const lookingForFilter = document.getElementById('filter-looking-for')?.value || 'all';
@@ -748,7 +798,9 @@ export async function initCommunity() {
                 const matchDesc = (team.description || '').toLowerCase().includes(searchQuery);
                 const matchSkills = (team.skills || []).some(s => s.toLowerCase().includes(searchQuery));
                 const matchLead = (team.lead?.name || '').toLowerCase().includes(searchQuery);
-                if (!matchName && !matchDesc && !matchSkills && !matchLead) return false;
+                const matchLooking = (team.lookingFor || '').toLowerCase().includes(searchQuery);
+                const matchPos = (team.openPositions || []).some(p => p.toLowerCase().includes(searchQuery));
+                if (!matchName && !matchDesc && !matchSkills && !matchLead && !matchLooking && !matchPos) return false;
             }
 
             if (lookingForFilter !== 'all') {
@@ -776,8 +828,9 @@ export async function initCommunity() {
                 const matchName = (dev.name || '').toLowerCase().includes(searchQuery);
                 const matchBio = (dev.bio || '').toLowerCase().includes(searchQuery);
                 const matchSkills = (dev.skills || []).concat(dev.verifiedSkills || []).some(s => s.toLowerCase().includes(searchQuery));
-                const matchTitle = (dev.title || '').toLowerCase().includes(searchQuery);
-                if (!matchName && !matchBio && !matchSkills && !matchTitle) return false;
+                const matchTitle = (dev.title || dev.role || '').toLowerCase().includes(searchQuery);
+                const matchLooking = (dev.lookingFor || '').toLowerCase().includes(searchQuery);
+                if (!matchName && !matchBio && !matchSkills && !matchTitle && !matchLooking) return false;
             }
 
             if (verifiedOnly) {
@@ -786,7 +839,7 @@ export async function initCommunity() {
 
             if (lookingForFilter !== 'all') {
                 const lookingText = (dev.lookingFor || '').toLowerCase();
-                const titleText = (dev.title || '').toLowerCase();
+                const titleText = (dev.title || dev.role || '').toLowerCase();
                 if (!lookingText.includes(lookingForFilter) && !titleText.includes(lookingForFilter)) return false;
             }
 
@@ -811,7 +864,8 @@ export async function initCommunity() {
                 const matchFor = (post.for || '').toLowerCase().includes(searchQuery);
                 const matchSkills = (post.requiredSkills || []).some(s => s.toLowerCase().includes(searchQuery));
                 const matchContext = (post.context || '').toLowerCase().includes(searchQuery);
-                if (!matchLooking && !matchFor && !matchSkills && !matchContext) return false;
+                const matchAuthor = (post.author?.name || '').toLowerCase().includes(searchQuery);
+                if (!matchLooking && !matchFor && !matchSkills && !matchContext && !matchAuthor) return false;
             }
 
             if (lookingForFilter !== 'all') {
@@ -839,6 +893,10 @@ export async function initCommunity() {
         } else if (sortBy === 'newest') {
             filteredTeams.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
             filteredDevs.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+            filteredMatch.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        } else if (sortBy === 'active') {
+            filteredTeams.sort((a, b) => (b.members?.length || 0) - (a.members?.length || 0));
+            filteredDevs.sort((a, b) => (b.followers?.length || 0) - (a.followers?.length || 0));
         }
 
         return { filteredTeams, filteredDevs, filteredMatch };
@@ -896,10 +954,6 @@ export async function initCommunity() {
         const sortBySelect = document.getElementById('sort-by-select');
         const toggleVerifiedBtn = document.getElementById('toggle-verified-only');
         const resetFiltersBtn = document.getElementById('btn-reset-filters');
-        const joinModal = document.getElementById('join-team-modal');
-        const closeJoinModal = document.getElementById('close-join-modal');
-        const cancelJoinBtn = document.getElementById('cancel-join-btn');
-        const joinForm = document.getElementById('join-team-form');
 
         // Search Input
         if (searchInput) {
@@ -985,8 +1039,11 @@ export async function initCommunity() {
             }
         });
 
-        // Delegate Dynamic Card Actions (Upvotes, Expansions, Follow, Modals)
+        // Delegate Dynamic Card Actions (Upvotes, Expansions, Follow, Delete Looking-For, Connect)
         document.addEventListener('click', async (e) => {
+            const currentUser = getCurrentUser();
+            const currentUserId = currentUser ? String(currentUser.id) : null;
+
             // 1. Toggle Expand Team
             const expandTeamBtn = e.target.closest('[data-action="toggle-expand-team"]');
             if (expandTeamBtn) {
@@ -1019,12 +1076,12 @@ export async function initCommunity() {
             const upvoteTeamBtn = e.target.closest('[data-action="upvote-team"]');
             if (upvoteTeamBtn) {
                 if (!currentUserId) {
-                    if (window.UI?.showToast) window.UI.showToast('Please log in to upvote teams', 'info');
+                    if (window.UI?.showToast) window.UI.showToast('Please log in to upvote teams', 'error');
                     return;
                 }
                 const teamId = upvoteTeamBtn.dataset.teamId;
                 try {
-                    const res = await (window.apiFetch ? window.apiFetch(`/api/teams/${teamId}/upvote`, { method: 'POST' }) : fetch(`http://localhost:3000/api/teams/${teamId}/upvote`, { method: 'POST' }));
+                    const res = await window.apiFetch(`/api/teams/${teamId}/upvote`, { method: 'POST' });
                     if (res.ok) {
                         const data = await res.json();
                         const team = teamsData.find(t => t.id === teamId);
@@ -1046,12 +1103,12 @@ export async function initCommunity() {
             const upvoteDevBtn = e.target.closest('[data-action="upvote-dev"]');
             if (upvoteDevBtn) {
                 if (!currentUserId) {
-                    if (window.UI?.showToast) window.UI.showToast('Please log in to upvote developers', 'info');
+                    if (window.UI?.showToast) window.UI.showToast('Please log in to upvote developers', 'error');
                     return;
                 }
                 const devId = upvoteDevBtn.dataset.userId;
                 try {
-                    const res = await (window.apiFetch ? window.apiFetch(`/api/users/${devId}/upvote`, { method: 'POST' }) : fetch(`http://localhost:3000/api/users/${devId}/upvote`, { method: 'POST' }));
+                    const res = await window.apiFetch(`/api/users/${devId}/upvote`, { method: 'POST' });
                     if (res.ok) {
                         const data = await res.json();
                         const dev = developersData.find(d => d.id === devId);
@@ -1073,12 +1130,12 @@ export async function initCommunity() {
             const followDevBtn = e.target.closest('[data-action="follow-dev"]');
             if (followDevBtn) {
                 if (!currentUserId) {
-                    if (window.UI?.showToast) window.UI.showToast('Please log in to follow developers', 'info');
+                    if (window.UI?.showToast) window.UI.showToast('Please log in to follow developers', 'error');
                     return;
                 }
                 const devId = followDevBtn.dataset.userId;
                 try {
-                    const res = await (window.apiFetch ? window.apiFetch(`/api/users/${devId}/follow`, { method: 'POST' }) : fetch(`http://localhost:3000/api/users/${devId}/follow`, { method: 'POST' }));
+                    const res = await window.apiFetch(`/api/users/${devId}/follow`, { method: 'POST' });
                     if (res.ok) {
                         const data = await res.json();
                         const dev = developersData.find(d => d.id === devId);
@@ -1095,29 +1152,23 @@ export async function initCommunity() {
                 return;
             }
 
-            // 6. Open Join Team Modal
-            const joinTeamBtn = e.target.closest('[data-action="join-team-btn"]') || e.target.closest('[data-action="join-team-pos"]');
-            if (joinTeamBtn) {
-                if (!currentUserId) {
-                    if (window.UI?.showToast) window.UI.showToast('Please log in to join a team', 'info');
-                    return;
-                }
-                const teamId = joinTeamBtn.dataset.teamId;
-                const teamName = joinTeamBtn.dataset.teamName || 'Team';
-                const position = joinTeamBtn.dataset.position || '';
-
-                const teamNameEl = document.getElementById('join-modal-team-name');
-                const teamIdEl = document.getElementById('join-modal-team-id');
-                const positionEl = document.getElementById('join-modal-position');
-
-                if (teamNameEl) teamNameEl.textContent = `Join ${teamName}`;
-                if (teamIdEl) teamIdEl.value = teamId;
-                if (positionEl) positionEl.value = position;
-
-                if (joinModal) {
-                    joinModal.style.display = 'flex';
-                    joinModal.classList.remove('hidden');
-                    joinModal.classList.add('flex');
+            // 6. Delete Looking-For Post
+            const deleteMatchBtn = e.target.closest('[data-action="delete-looking-for"]');
+            if (deleteMatchBtn) {
+                const postId = deleteMatchBtn.dataset.postId;
+                if (!confirm('Are you sure you want to delete this matchmaking request?')) return;
+                try {
+                    const res = await window.apiFetch(`/api/community/looking-for/${postId}`, { method: 'DELETE' });
+                    if (res.ok) {
+                        lookingForData = lookingForData.filter(p => p.id !== postId);
+                        const tabMatchCount = document.getElementById('tab-count-match');
+                        if (tabMatchCount) tabMatchCount.textContent = lookingForData.length;
+                        const { filteredMatch } = filterAndSortData();
+                        renderLookingFor(filteredMatch);
+                        if (window.UI?.showToast) window.UI.showToast('Matchmaking request removed', 'info');
+                    }
+                } catch (err) {
+                    console.error('Error deleting matchmaking request:', err);
                 }
                 return;
             }
@@ -1127,85 +1178,11 @@ export async function initCommunity() {
             if (connectMateBtn) {
                 const targetName = connectMateBtn.dataset.userName || 'Developer';
                 if (window.UI?.showToast) {
-                    window.UI.showToast(`Direct message channel ready for ${targetName}!`, 'info');
+                    window.UI.showToast(`Collaboration channel opened with ${targetName}!`, 'info');
                 }
                 return;
             }
         });
-
-        // Close Join Modal Handlers
-        if (closeJoinModal) {
-            closeJoinModal.addEventListener('click', () => {
-                if (joinModal) {
-                    joinModal.style.display = 'none';
-                    joinModal.classList.add('hidden');
-                    joinModal.classList.remove('flex');
-                }
-            });
-        }
-
-        if (cancelJoinBtn) {
-            cancelJoinBtn.addEventListener('click', () => {
-                if (joinModal) {
-                    joinModal.style.display = 'none';
-                    joinModal.classList.add('hidden');
-                    joinModal.classList.remove('flex');
-                }
-            });
-        }
-
-        if (joinModal) {
-            joinModal.addEventListener('click', (e) => {
-                if (e.target === joinModal) {
-                    joinModal.style.display = 'none';
-                    joinModal.classList.add('hidden');
-                    joinModal.classList.remove('flex');
-                }
-            });
-        }
-
-        // Submit Join Team Form
-        if (joinForm) {
-            joinForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const teamId = document.getElementById('join-modal-team-id')?.value;
-                const position = document.getElementById('join-modal-position')?.value;
-                const message = document.getElementById('join-modal-message')?.value;
-
-                try {
-                    const res = await (window.apiFetch ? window.apiFetch(`/api/teams/${teamId}/join`, {
-                        method: 'POST',
-                        body: JSON.stringify({ position, message })
-                    }) : fetch(`http://localhost:3000/api/teams/${teamId}/join`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ position, message })
-                    }));
-
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (joinModal) {
-                            joinModal.style.display = 'none';
-                            joinModal.classList.add('hidden');
-                            joinModal.classList.remove('flex');
-                        }
-                        if (window.UI?.showToast) {
-                            window.UI.showToast(data.message || 'Join request sent to team leader!', 'success');
-                        }
-                    } else {
-                        const errData = await res.json();
-                        if (window.UI?.showToast) {
-                            window.UI.showToast(errData.error || 'Failed to submit request', 'error');
-                        }
-                    }
-                } catch (err) {
-                    console.error('Error submitting join request:', err);
-                    if (window.UI?.showToast) {
-                        window.UI.showToast('Network error while sending request', 'error');
-                    }
-                }
-            });
-        }
     }
 
     // Initialize

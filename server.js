@@ -1075,7 +1075,7 @@ app.get('/api/teams', async (req, res) => {
                 memberDetails: memberDetails,
                 assignedProjects: t.assignedProjects || [],
                 skills: t.skills || [],
-                upvotes: typeof t.upvotes === 'number' ? t.upvotes : (Array.isArray(t.upvoters) ? t.upvoters.length : 10),
+                upvotes: typeof t.upvotes === 'number' ? t.upvotes : (Array.isArray(t.upvoters) ? t.upvoters.length : 0),
                 upvoters: Array.isArray(t.upvoters) ? t.upvoters : [],
                 lookingFor: t.lookingFor || 'Looking for passionate developers',
                 openPositions: t.openPositions || [],
@@ -1090,6 +1090,95 @@ app.get('/api/teams', async (req, res) => {
     } catch (error) {
         console.error('Error fetching teams:', error);
         res.status(500).json({ error: 'Failed to fetch teams' });
+    }
+});
+
+// Create Team (Protected)
+app.post('/api/teams', authMiddleware, async (req, res) => {
+    try {
+        const currentUserId = String(req.user.id);
+        const {
+            teamName,
+            description,
+            skills,
+            lookingFor,
+            openPositions,
+            availability,
+            assignedProjects
+        } = req.body;
+
+        if (!teamName || !teamName.trim()) {
+            return res.status(400).json({ error: 'Team name is required' });
+        }
+
+        const teamsPath = getFilePath('teams');
+        let teams = [];
+        try { teams = JSON.parse(await fs.readFile(teamsPath, 'utf-8')); } catch { teams = []; }
+
+        const parsedSkills = Array.isArray(skills)
+            ? skills.map(s => String(s).trim()).filter(Boolean)
+            : (typeof skills === 'string' ? skills.split(',').map(s => s.trim()).filter(Boolean) : []);
+
+        const parsedOpenPositions = Array.isArray(openPositions)
+            ? openPositions.map(s => String(s).trim()).filter(Boolean)
+            : (typeof openPositions === 'string' ? openPositions.split(',').map(s => s.trim()).filter(Boolean) : []);
+
+        const parsedProjects = Array.isArray(assignedProjects)
+            ? assignedProjects.map(s => String(s).trim()).filter(Boolean)
+            : (typeof assignedProjects === 'string' ? assignedProjects.split(',').map(s => s.trim()).filter(Boolean) : []);
+
+        const newTeam = {
+            id: `team_${Date.now()}`,
+            teamName: teamName.trim(),
+            description: (description || '').trim(),
+            leadId: currentUserId,
+            members: [currentUserId],
+            assignedProjects: parsedProjects,
+            skills: parsedSkills,
+            upvotes: 0,
+            upvoters: [],
+            lookingFor: (lookingFor || 'Looking for passionate developers').trim(),
+            openPositions: parsedOpenPositions.length > 0 ? parsedOpenPositions : ['Collaborator'],
+            availability: (availability || 'Active · Open for Collaboration').trim(),
+            rating: 5.0,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        teams.unshift(newTeam);
+        await fs.writeFile(teamsPath, JSON.stringify(teams, null, 2));
+
+        // Get author details for enrichment
+        const usersPath = getFilePath('users');
+        let users = [];
+        try { users = JSON.parse(await fs.readFile(usersPath, 'utf-8')); } catch {}
+        const user = users.find(u => String(u.id) === currentUserId) || {
+            id: currentUserId,
+            name: req.user.name || 'Team Lead',
+            avatarUrl: ''
+        };
+
+        const enrichedTeam = {
+            ...newTeam,
+            lead: {
+                id: currentUserId,
+                name: user.name || 'Team Lead',
+                title: user.title || 'Developer',
+                avatarUrl: user.avatarUrl || '',
+                verifiedSkills: user.verifiedSkills || []
+            },
+            memberDetails: [{
+                id: currentUserId,
+                name: user.name || 'Team Lead',
+                title: user.title || 'Team Lead',
+                avatarUrl: user.avatarUrl || ''
+            }]
+        };
+
+        res.status(201).json(enrichedTeam);
+    } catch (error) {
+        console.error('Error creating team:', error);
+        res.status(500).json({ error: 'Failed to create team' });
     }
 });
 
@@ -1156,6 +1245,21 @@ app.post('/api/teams/:id/join', authMiddleware, async (req, res) => {
         if (Array.isArray(team.members) && team.members.includes(currentUserId)) {
             return res.status(400).json({ error: 'You are already a member of this team' });
         }
+
+        // Check for existing pending request to prevent duplicates
+        try {
+            const existingNotif = await prisma.notification.findFirst({
+                where: {
+                    userId: String(team.leadId),
+                    actorId: currentUserId,
+                    type: 'TEAM_JOIN_REQUEST',
+                    read: false
+                }
+            });
+            if (existingNotif && existingNotif.data && typeof existingNotif.data === 'object' && existingNotif.data.teamId === teamId) {
+                return res.status(400).json({ error: 'You already have a pending join request for this team' });
+            }
+        } catch (e) {}
 
         let users = [];
         try { users = JSON.parse(await fs.readFile(usersPath, 'utf-8')); } catch {}
@@ -1315,7 +1419,7 @@ app.post('/api/teams/:id/respond', authMiddleware, async (req, res) => {
     }
 });
 
-// Community Looking-For Matchmaking Posts
+// Community Looking-For Matchmaking Posts (GET)
 app.get('/api/community/looking-for', async (req, res) => {
     try {
         const lookingForPath = getFilePath('lookingFor');
@@ -1348,6 +1452,214 @@ app.get('/api/community/looking-for', async (req, res) => {
     } catch (error) {
         console.error('Error fetching lookingFor posts:', error);
         res.status(500).json({ error: 'Failed to fetch lookingFor posts' });
+    }
+});
+
+// Create Looking-For Matchmaking Request (POST)
+app.post('/api/community/looking-for', authMiddleware, async (req, res) => {
+    try {
+        const currentUserId = String(req.user.id);
+        const { lookingFor, for: forGoal, requiredSkills, commitment, availability, context } = req.body;
+
+        if (!lookingFor || !lookingFor.trim()) {
+            return res.status(400).json({ error: 'Looking For field is required' });
+        }
+        if (!forGoal || !forGoal.trim()) {
+            return res.status(400).json({ error: 'Project / goal context is required' });
+        }
+
+        const lookingForPath = getFilePath('lookingFor');
+        let posts = [];
+        try { posts = JSON.parse(await fs.readFile(lookingForPath, 'utf-8')); } catch { posts = []; }
+
+        const parsedSkills = Array.isArray(requiredSkills)
+            ? requiredSkills.map(s => String(s).trim()).filter(Boolean)
+            : (typeof requiredSkills === 'string' ? requiredSkills.split(',').map(s => s.trim()).filter(Boolean) : []);
+
+        const newPost = {
+            id: `match_${Date.now()}`,
+            userId: currentUserId,
+            lookingFor: lookingFor.trim(),
+            for: forGoal.trim(),
+            commitment: (commitment || 'Part-time (8-10 hrs/wk)').trim(),
+            requiredSkills: parsedSkills,
+            availability: (availability || 'Available Now').trim(),
+            context: (context || '').trim(),
+            createdAt: new Date().toISOString()
+        };
+
+        posts.unshift(newPost);
+        await fs.writeFile(lookingForPath, JSON.stringify(posts, null, 2));
+
+        // Enrich with user info
+        const usersPath = getFilePath('users');
+        let users = [];
+        try { users = JSON.parse(await fs.readFile(usersPath, 'utf-8')); } catch {}
+        const author = users.find(u => String(u.id) === currentUserId) || {
+            id: currentUserId,
+            name: req.user.name || 'Developer',
+            avatarUrl: ''
+        };
+
+        res.status(201).json({
+            ...newPost,
+            author: {
+                id: currentUserId,
+                name: author.name || 'Developer',
+                title: author.title || 'Developer',
+                avatarUrl: author.avatarUrl || '',
+                verifiedSkills: author.verifiedSkills || []
+            }
+        });
+    } catch (error) {
+        console.error('Error creating looking-for request:', error);
+        res.status(500).json({ error: 'Failed to create looking-for request' });
+    }
+});
+
+// Delete Looking-For Matchmaking Request (DELETE)
+app.delete('/api/community/looking-for/:id', authMiddleware, async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const currentUserId = String(req.user.id);
+        const lookingForPath = getFilePath('lookingFor');
+
+        let posts = JSON.parse(await fs.readFile(lookingForPath, 'utf-8'));
+        const post = posts.find(p => p.id === postId);
+
+        if (!post) {
+            return res.status(404).json({ error: 'Matchmaking request not found' });
+        }
+
+        if (String(post.userId) !== currentUserId) {
+            return res.status(403).json({ error: 'You can only delete your own matchmaking request' });
+        }
+
+        posts = posts.filter(p => p.id !== postId);
+        await fs.writeFile(lookingForPath, JSON.stringify(posts, null, 2));
+
+        res.json({ success: true, message: 'Matchmaking request deleted' });
+    } catch (error) {
+        console.error('Error deleting looking-for request:', error);
+        res.status(500).json({ error: 'Failed to delete request' });
+    }
+});
+
+// Update Developer Availability & Collaboration Profile (PUT & POST alias)
+app.put('/api/users/availability', authMiddleware, async (req, res) => {
+    try {
+        const currentUserId = String(req.user.id);
+        const { availability, lookingFor, hoursPerWeek, collaborationType, timezone } = req.body;
+        const usersPath = getFilePath('users');
+
+        let users = [];
+        try { users = JSON.parse(await fs.readFile(usersPath, 'utf-8')); } catch { users = []; }
+
+        let userIndex = users.findIndex(u => String(u.id) === currentUserId);
+        if (userIndex === -1) {
+            const newUser = {
+                id: currentUserId,
+                name: req.user.name || (req.user.email ? req.user.email.split('@')[0] : `User_${currentUserId}`),
+                email: req.user.email,
+                availability: availability || 'Available Now',
+                lookingFor: lookingFor || 'Open for collaboration',
+                timezone: timezone || 'UTC',
+                hoursPerWeek: hoursPerWeek || '10-20 hrs/wk',
+                collaborationType: collaborationType || 'Fullstack',
+                updatedAt: new Date().toISOString()
+            };
+            users.push(newUser);
+            userIndex = users.length - 1;
+        } else {
+            const user = users[userIndex];
+            if (availability !== undefined) user.availability = String(availability).trim();
+            if (lookingFor !== undefined) user.lookingFor = String(lookingFor).trim();
+            if (hoursPerWeek !== undefined) user.hoursPerWeek = String(hoursPerWeek).trim();
+            if (collaborationType !== undefined) user.collaborationType = String(collaborationType).trim();
+            if (timezone !== undefined) user.timezone = String(timezone).trim();
+            user.updatedAt = new Date().toISOString();
+        }
+
+        await fs.writeFile(usersPath, JSON.stringify(users, null, 2));
+
+        // Sync to Postgres Prisma UserProfile preferences
+        try {
+            const userExists = await prisma.user.findUnique({ where: { id: currentUserId }, include: { profile: true } });
+            if (userExists) {
+                const currentPrefs = userExists.profile?.preferences || {};
+                await prisma.userProfile.upsert({
+                    where: { userId: currentUserId },
+                    update: {
+                        preferences: {
+                            ...currentPrefs,
+                            availability: users[userIndex].availability,
+                            lookingFor: users[userIndex].lookingFor,
+                            hoursPerWeek: users[userIndex].hoursPerWeek,
+                            collaborationType: users[userIndex].collaborationType,
+                            timezone: users[userIndex].timezone
+                        }
+                    },
+                    create: {
+                        userId: currentUserId,
+                        firstName: users[userIndex].name,
+                        lastName: '',
+                        avatarUrl: users[userIndex].avatarUrl || '',
+                        preferences: {
+                            availability: users[userIndex].availability,
+                            lookingFor: users[userIndex].lookingFor,
+                            hoursPerWeek: users[userIndex].hoursPerWeek,
+                            collaborationType: users[userIndex].collaborationType,
+                            timezone: users[userIndex].timezone
+                        }
+                    }
+                });
+            }
+        } catch (dbErr) {
+            console.error('Error syncing availability to Prisma:', dbErr);
+        }
+
+        const { password: _, email: __, ...sanitized } = users[userIndex];
+        res.json({
+            success: true,
+            user: sanitized
+        });
+    } catch (error) {
+        console.error('Error updating availability:', error);
+        res.status(500).json({ error: 'Failed to update availability' });
+    }
+});
+
+app.post('/api/users/availability', authMiddleware, async (req, res, next) => {
+    req.method = 'PUT';
+    app._router.handle(req, res, next);
+});
+
+// Community Statistics Endpoint (GET)
+app.get('/api/community/stats', async (req, res) => {
+    try {
+        const teamsPath = getFilePath('teams');
+        const usersPath = getFilePath('users');
+        const lookingForPath = getFilePath('lookingFor');
+
+        let teams = [], users = [], lookingFor = [];
+        try { teams = JSON.parse(await fs.readFile(teamsPath, 'utf-8')); } catch {}
+        try { users = JSON.parse(await fs.readFile(usersPath, 'utf-8')); } catch {}
+        try { lookingFor = JSON.parse(await fs.readFile(lookingForPath, 'utf-8')); } catch {}
+
+        const totalDevs = users.filter(u => u.name && u.name.trim().length > 0).length;
+        let totalUpvotes = 0;
+        teams.forEach(t => totalUpvotes += (typeof t.upvotes === 'number' ? t.upvotes : (Array.isArray(t.upvoters) ? t.upvoters.length : 0)));
+        users.forEach(u => totalUpvotes += (typeof u.upvotes === 'number' ? u.upvotes : (Array.isArray(u.upvoters) ? u.upvoters.length : 0)));
+
+        res.json({
+            activeTeams: teams.length,
+            totalDevelopers: totalDevs,
+            lookingForRequests: lookingFor.length,
+            totalUpvotes: totalUpvotes
+        });
+    } catch (error) {
+        console.error('Error fetching community stats:', error);
+        res.status(500).json({ error: 'Failed to fetch community statistics' });
     }
 });
 
@@ -2533,6 +2845,633 @@ app.post('/api/projects', authMiddleware, async (req, res) => {
     } catch (error) {
         console.error('Error writing project to Prisma:', error);
         res.status(500).json({ error: 'Failed to save data' });
+    }
+});
+
+// ==========================================
+// COMMUNITY & MATCHMAKING API ENDPOINTS
+// ==========================================
+
+// 1. Community Live Stats
+app.get('/api/community/stats', async (req, res) => {
+    try {
+        let teams = [];
+        let users = [];
+        let lookingFor = [];
+        try { teams = JSON.parse(await fs.readFile(getFilePath('teams'), 'utf-8')); } catch {}
+        try { users = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8')); } catch {}
+        try { lookingFor = JSON.parse(await fs.readFile(getFilePath('looking_for'), 'utf-8')); } catch {}
+
+        const totalUpvotes = (teams.reduce((acc, t) => acc + (t.upvotes || 0), 0)) + 
+                             (users.reduce((acc, u) => acc + (u.upvotes || 0), 0));
+
+        res.json({
+            activeTeams: teams.length,
+            totalDevelopers: users.length,
+            lookingForRequests: lookingFor.length,
+            totalUpvotes
+        });
+    } catch (err) {
+        console.error('Error getting community stats:', err);
+        res.status(500).json({ error: 'Failed to fetch community statistics' });
+    }
+});
+
+// 2. Discover Developers (Zero Email Exposure, Verified Skills)
+app.get('/api/community/developers', async (req, res) => {
+    try {
+        let users = [];
+        try { users = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8')); } catch {}
+
+        // Map and sanitize users
+        const developers = users.map(u => {
+            const { password, passwordHash, email, ...safeUser } = u;
+            return {
+                id: safeUser.id,
+                name: safeUser.name || 'Developer',
+                username: safeUser.username || `dev_${safeUser.id}`,
+                title: safeUser.title || safeUser.role || 'Software Engineer',
+                bio: safeUser.bio || 'Passionate developer building and collaborating on open-source code.',
+                avatarUrl: safeUser.avatarUrl || '',
+                skills: Array.isArray(safeUser.skills) ? safeUser.skills : ['JavaScript', 'React'],
+                verifiedSkills: Array.isArray(safeUser.verifiedSkills) ? safeUser.verifiedSkills : (safeUser.skills ? safeUser.skills.slice(0, 2) : ['React']),
+                availability: safeUser.availability || 'Available Now',
+                lookingFor: safeUser.lookingFor || 'Open for collaboration on exciting projects',
+                hoursPerWeek: safeUser.hoursPerWeek || '10-20 hrs/wk',
+                collaborationType: safeUser.collaborationType || 'Fullstack',
+                timezone: safeUser.timezone || 'UTC',
+                upvotes: typeof safeUser.upvotes === 'number' ? safeUser.upvotes : (Array.isArray(safeUser.upvoters) ? safeUser.upvoters.length : 0),
+                upvoters: Array.isArray(safeUser.upvoters) ? safeUser.upvoters : [],
+                followers: Array.isArray(safeUser.followers) ? safeUser.followers : [],
+                socialLinks: safeUser.socialLinks || { github: safeUser.github || '', twitter: safeUser.twitter || '', linkedin: safeUser.linkedin || '', website: safeUser.website || '' },
+                projects: Array.isArray(safeUser.projects) ? safeUser.projects : ['CodeCollab']
+            };
+        });
+
+        res.json(developers);
+    } catch (err) {
+        console.error('Error fetching community developers:', err);
+        res.status(500).json({ error: 'Failed to fetch developers' });
+    }
+});
+
+// 3. Matchmaking / Looking-For Feed (Enriched with Author Profiles)
+app.get('/api/community/looking-for', async (req, res) => {
+    try {
+        let lookingForList = [];
+        let users = [];
+        try { lookingForList = JSON.parse(await fs.readFile(getFilePath('looking_for'), 'utf-8')); } catch {}
+        try { users = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8')); } catch {}
+
+        const usersMap = new Map(users.map(u => [String(u.id), u]));
+
+        const enriched = lookingForList.map(item => {
+            const author = usersMap.get(String(item.userId)) || {};
+            return {
+                ...item,
+                author: {
+                    id: author.id || item.userId,
+                    name: author.name || 'Developer',
+                    avatarUrl: author.avatarUrl || '',
+                    title: author.title || author.role || 'Developer',
+                    verifiedSkills: Array.isArray(author.verifiedSkills) ? author.verifiedSkills : [],
+                    availability: author.availability || item.availability || 'Available Now'
+                }
+            };
+        });
+
+        // Sort newest first
+        enriched.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        res.json(enriched);
+    } catch (err) {
+        console.error('Error fetching looking-for feed:', err);
+        res.status(500).json({ error: 'Failed to fetch matchmaking requests' });
+    }
+});
+
+// 4. Create Looking-For Request (Protected)
+app.post('/api/community/looking-for', authMiddleware, async (req, res) => {
+    try {
+        const { lookingFor, for: forGoal, requiredSkills, commitment, availability, context } = req.body;
+        if (!lookingFor || !forGoal) {
+            return res.status(400).json({ error: 'Looking for role and target project/goal are required' });
+        }
+
+        const filePath = getFilePath('looking_for');
+        let list = [];
+        try { list = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch {}
+
+        const newEntry = {
+            id: Date.now().toString(),
+            userId: req.user.id,
+            lookingFor: lookingFor.trim(),
+            for: forGoal.trim(),
+            requiredSkills: Array.isArray(requiredSkills) ? requiredSkills : (typeof requiredSkills === 'string' ? requiredSkills.split(',').map(s => s.trim()).filter(Boolean) : []),
+            commitment: commitment || 'Part-time (8-10 hrs/wk)',
+            availability: availability || 'Available Now',
+            context: context || '',
+            createdAt: new Date().toISOString()
+        };
+
+        list.unshift(newEntry);
+        await fs.writeFile(filePath, JSON.stringify(list, null, 2));
+
+        // Get author details
+        let author = {};
+        try {
+            const users = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
+            author = users.find(u => String(u.id) === String(req.user.id)) || {};
+        } catch {}
+
+        res.status(201).json({
+            ...newEntry,
+            author: {
+                id: req.user.id,
+                name: author.name || 'Developer',
+                avatarUrl: author.avatarUrl || '',
+                title: author.title || 'Developer',
+                verifiedSkills: author.verifiedSkills || []
+            }
+        });
+    } catch (err) {
+        console.error('Error creating looking-for request:', err);
+        res.status(500).json({ error: 'Failed to create matchmaking request' });
+    }
+});
+
+// 5. Delete Looking-For Request (Protected)
+app.delete('/api/community/looking-for/:id', authMiddleware, async (req, res) => {
+    try {
+        const filePath = getFilePath('looking_for');
+        let list = [];
+        try { list = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch {}
+
+        const targetIndex = list.findIndex(item => item.id === req.params.id);
+        if (targetIndex === -1) {
+            return res.status(404).json({ error: 'Request not found' });
+        }
+
+        if (String(list[targetIndex].userId) !== String(req.user.id)) {
+            return res.status(403).json({ error: 'Unauthorized to delete this request' });
+        }
+
+        list.splice(targetIndex, 1);
+        await fs.writeFile(filePath, JSON.stringify(list, null, 2));
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Error deleting looking-for request:', err);
+        res.status(500).json({ error: 'Failed to delete request' });
+    }
+});
+
+// 6. Get Teams (Enriched with Member Profiles and Real Upvotes)
+app.get('/api/teams', async (req, res) => {
+    try {
+        let teams = [];
+        let users = [];
+        try { teams = JSON.parse(await fs.readFile(getFilePath('teams'), 'utf-8')); } catch {}
+        try { users = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8')); } catch {}
+
+        const usersMap = new Map(users.map(u => [String(u.id), u]));
+
+        const enrichedTeams = teams.map(t => {
+            const lead = usersMap.get(String(t.leadId)) || {};
+            const memberIds = Array.isArray(t.members) ? t.members : (t.leadId ? [t.leadId] : []);
+            const memberDetails = memberIds.map(mId => {
+                const u = usersMap.get(String(mId)) || {};
+                return {
+                    id: u.id || mId,
+                    name: u.name || `Dev #${mId}`,
+                    avatarUrl: u.avatarUrl || '',
+                    title: u.title || 'Team Member'
+                };
+            });
+
+            return {
+                id: t.id,
+                teamName: t.teamName,
+                description: t.description || 'Collaborative open-source team',
+                leadId: t.leadId,
+                lead: {
+                    id: lead.id || t.leadId,
+                    name: lead.name || 'Team Lead',
+                    avatarUrl: lead.avatarUrl || '',
+                    title: lead.title || 'Lead'
+                },
+                members: memberIds,
+                memberDetails,
+                skills: Array.isArray(t.skills) ? t.skills : ['JavaScript', 'TypeScript'],
+                lookingFor: t.lookingFor || 'Looking for collaborators',
+                openPositions: Array.isArray(t.openPositions) ? t.openPositions : ['Collaborator'],
+                availability: t.availability || 'Active · Open for Collaboration',
+                assignedProjects: Array.isArray(t.assignedProjects) ? t.assignedProjects : [],
+                upvotes: typeof t.upvotes === 'number' ? t.upvotes : (Array.isArray(t.upvoters) ? t.upvoters.length : 0),
+                upvoters: Array.isArray(t.upvoters) ? t.upvoters : [],
+                rating: t.rating || '5.0',
+                createdAt: t.createdAt || new Date().toISOString()
+            };
+        });
+
+        res.json(enrichedTeams);
+    } catch (err) {
+        console.error('Error fetching teams:', err);
+        res.status(500).json({ error: 'Failed to fetch teams' });
+    }
+});
+
+// 7. Create New Team (Protected)
+app.post('/api/teams', authMiddleware, async (req, res) => {
+    try {
+        const { teamName, description, skills, lookingFor, openPositions, availability, assignedProjects } = req.body;
+        if (!teamName || !teamName.trim()) {
+            return res.status(400).json({ error: 'Team name is required' });
+        }
+
+        const filePath = getFilePath('teams');
+        let teams = [];
+        try { teams = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch {}
+
+        const newTeam = {
+            id: Date.now().toString(),
+            leadId: req.user.id,
+            teamName: teamName.trim(),
+            description: description ? description.trim() : '',
+            skills: Array.isArray(skills) ? skills : (typeof skills === 'string' ? skills.split(',').map(s => s.trim()).filter(Boolean) : []),
+            lookingFor: lookingFor ? lookingFor.trim() : 'Looking for collaborators',
+            openPositions: Array.isArray(openPositions) ? openPositions : (typeof openPositions === 'string' ? openPositions.split(',').map(s => s.trim()).filter(Boolean) : ['Collaborator']),
+            availability: availability || 'Active · Open for Collaboration',
+            assignedProjects: Array.isArray(assignedProjects) ? assignedProjects : (typeof assignedProjects === 'string' ? assignedProjects.split(',').map(s => s.trim()).filter(Boolean) : []),
+            members: [String(req.user.id)],
+            upvotes: 0,
+            upvoters: [],
+            rating: '5.0',
+            createdAt: new Date().toISOString()
+        };
+
+        teams.unshift(newTeam);
+        await fs.writeFile(filePath, JSON.stringify(teams, null, 2));
+
+        // Update creator user profile teams array
+        try {
+            const usersFilePath = getFilePath('users');
+            let users = JSON.parse(await fs.readFile(usersFilePath, 'utf-8'));
+            const userIdx = users.findIndex(u => String(u.id) === String(req.user.id));
+            if (userIdx !== -1) {
+                if (!Array.isArray(users[userIdx].teams)) users[userIdx].teams = [];
+                users[userIdx].teams.push({
+                    teamId: newTeam.id,
+                    teamName: newTeam.teamName,
+                    role: 'Team Lead',
+                    description: newTeam.description,
+                    skills: newTeam.skills,
+                    rating: 5.0,
+                    membersCount: 1
+                });
+                await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2));
+            }
+        } catch (uErr) {
+            console.error('Error updating user teams array:', uErr);
+        }
+
+        res.status(201).json(newTeam);
+    } catch (err) {
+        console.error('Error creating team:', err);
+        res.status(500).json({ error: 'Failed to create team' });
+    }
+});
+
+// 8. Join Team / Apply to Open Position (Protected)
+app.post('/api/teams/:id/join', authMiddleware, async (req, res) => {
+    try {
+        const teamId = req.params.id;
+        const { position, message } = req.body;
+        const applicantId = req.user.id;
+
+        const teamsFilePath = getFilePath('teams');
+        let teams = [];
+        try { teams = JSON.parse(await fs.readFile(teamsFilePath, 'utf-8')); } catch {}
+
+        const team = teams.find(t => t.id === teamId);
+        if (!team) {
+            return res.status(404).json({ error: 'Team not found' });
+        }
+
+        if (String(team.leadId) === String(applicantId)) {
+            return res.status(400).json({ error: 'You are the lead of this team' });
+        }
+
+        if (Array.isArray(team.members) && team.members.map(String).includes(String(applicantId))) {
+            return res.status(400).json({ error: 'You are already a member of this team' });
+        }
+
+        // Get applicant details
+        let applicant = {};
+        try {
+            const users = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
+            applicant = users.find(u => String(u.id) === String(applicantId)) || {};
+        } catch {}
+
+        // Save join request
+        const reqFilePath = getFilePath('join_requests');
+        let joinReqs = [];
+        try { joinReqs = JSON.parse(await fs.readFile(reqFilePath, 'utf-8')); } catch {}
+
+        // Prevent duplicate pending requests
+        const existingReq = joinReqs.find(r => r.teamId === teamId && String(r.userId) === String(applicantId) && r.status === 'pending');
+        if (existingReq) {
+            return res.status(400).json({ error: 'You already have a pending join request for this team' });
+        }
+
+        const newJoinReq = {
+            id: Date.now().toString(),
+            teamId,
+            teamName: team.teamName,
+            userId: applicantId,
+            applicantName: applicant.name || 'Developer',
+            leadId: team.leadId,
+            position: position || 'Collaborator',
+            message: message || '',
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
+
+        joinReqs.push(newJoinReq);
+        await fs.writeFile(reqFilePath, JSON.stringify(joinReqs, null, 2));
+
+        // Dispatch Notification to Team Lead
+        const notifFilePath = getFilePath('notifications');
+        let notifs = [];
+        try { notifs = JSON.parse(await fs.readFile(notifFilePath, 'utf-8')); } catch {}
+
+        notifs.push({
+            id: Date.now().toString(),
+            userId: team.leadId,
+            actorId: applicantId,
+            type: 'TEAM_JOIN_REQUEST',
+            title: 'New Team Application',
+            message: `${applicant.name || 'A developer'} requested to join ${team.teamName} for "${position || 'Collaborator'}".`,
+            data: { teamId, requestId: newJoinReq.id },
+            read: false,
+            createdAt: new Date().toISOString()
+        });
+        await fs.writeFile(notifFilePath, JSON.stringify(notifs, null, 2));
+
+        res.json({ success: true, message: `Application submitted to ${team.teamName} lead!` });
+    } catch (err) {
+        console.error('Error applying to team:', err);
+        res.status(500).json({ error: 'Failed to submit application' });
+    }
+});
+
+// 9. Respond to Team Join Request (Accept / Reject) (Protected)
+app.post('/api/teams/:id/respond', authMiddleware, async (req, res) => {
+    try {
+        const teamId = req.params.id;
+        const { requestId, applicantId, action } = req.body; // action: 'accept' | 'reject'
+        const leadId = req.user.id;
+
+        const teamsFilePath = getFilePath('teams');
+        let teams = [];
+        try { teams = JSON.parse(await fs.readFile(teamsFilePath, 'utf-8')); } catch {}
+
+        const team = teams.find(t => t.id === teamId);
+        if (!team) return res.status(404).json({ error: 'Team not found' });
+        if (String(team.leadId) !== String(leadId)) return res.status(403).json({ error: 'Only the team lead can manage applications' });
+
+        if (action === 'accept') {
+            if (!Array.isArray(team.members)) team.members = [String(leadId)];
+            if (!team.members.map(String).includes(String(applicantId))) {
+                team.members.push(String(applicantId));
+            }
+            await fs.writeFile(teamsFilePath, JSON.stringify(teams, null, 2));
+
+            // Update user profile teams list
+            try {
+                const usersFilePath = getFilePath('users');
+                let users = JSON.parse(await fs.readFile(usersFilePath, 'utf-8'));
+                const uIdx = users.findIndex(u => String(u.id) === String(applicantId));
+                if (uIdx !== -1) {
+                    if (!Array.isArray(users[uIdx].teams)) users[uIdx].teams = [];
+                    users[uIdx].teams.push({
+                        teamId: team.id,
+                        teamName: team.teamName,
+                        role: 'Member',
+                        description: team.description,
+                        skills: team.skills,
+                        rating: 5.0,
+                        membersCount: team.members.length
+                    });
+                    await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2));
+                }
+            } catch (e) {}
+        }
+
+        // Update join request status if exists
+        try {
+            const reqFilePath = getFilePath('join_requests');
+            let joinReqs = JSON.parse(await fs.readFile(reqFilePath, 'utf-8'));
+            const reqItem = joinReqs.find(r => r.id === requestId || (r.teamId === teamId && String(r.userId) === String(applicantId)));
+            if (reqItem) {
+                reqItem.status = action === 'accept' ? 'accepted' : 'rejected';
+                await fs.writeFile(reqFilePath, JSON.stringify(joinReqs, null, 2));
+            }
+        } catch (e) {}
+
+        // Notify applicant
+        try {
+            const notifFilePath = getFilePath('notifications');
+            let notifs = JSON.parse(await fs.readFile(notifFilePath, 'utf-8'));
+            notifs.push({
+                id: Date.now().toString(),
+                userId: applicantId,
+                actorId: leadId,
+                type: action === 'accept' ? 'TEAM_JOIN_ACCEPTED' : 'TEAM_JOIN_REJECTED',
+                title: action === 'accept' ? 'Application Accepted!' : 'Application Update',
+                message: action === 'accept' ? `Congratulations! You have been accepted into ${team.teamName}.` : `Your request to join ${team.teamName} was not accepted at this time.`,
+                data: { teamId },
+                read: false,
+                createdAt: new Date().toISOString()
+            });
+            await fs.writeFile(notifFilePath, JSON.stringify(notifs, null, 2));
+        } catch (e) {}
+
+        res.json({ success: true, team });
+    } catch (err) {
+        console.error('Error responding to join request:', err);
+        res.status(500).json({ error: 'Failed to process response' });
+    }
+});
+
+// 10. Upvote Team (Toggle) (Protected)
+app.post('/api/teams/:id/upvote', authMiddleware, async (req, res) => {
+    try {
+        const teamId = req.params.id;
+        const userId = String(req.user.id);
+        const filePath = getFilePath('teams');
+        let teams = [];
+        try { teams = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch {}
+
+        const team = teams.find(t => t.id === teamId);
+        if (!team) return res.status(404).json({ error: 'Team not found' });
+
+        if (!Array.isArray(team.upvoters)) team.upvoters = [];
+        const idx = team.upvoters.map(String).indexOf(userId);
+        let hasUpvoted = false;
+
+        if (idx === -1) {
+            team.upvoters.push(userId);
+            hasUpvoted = true;
+        } else {
+            team.upvoters.splice(idx, 1);
+            hasUpvoted = false;
+        }
+
+        team.upvotes = team.upvoters.length;
+        await fs.writeFile(filePath, JSON.stringify(teams, null, 2));
+
+        res.json({ upvotes: team.upvotes, upvoters: team.upvoters, hasUpvoted });
+    } catch (err) {
+        console.error('Error upvoting team:', err);
+        res.status(500).json({ error: 'Failed to upvote team' });
+    }
+});
+
+// 11. Upvote Developer Profile (Toggle) (Protected)
+app.post('/api/users/:id/upvote', authMiddleware, async (req, res) => {
+    try {
+        const targetUserId = req.params.id;
+        const voterId = String(req.user.id);
+        const filePath = getFilePath('users');
+        let users = [];
+        try { users = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch {}
+
+        const user = users.find(u => String(u.id) === String(targetUserId));
+        if (!user) return res.status(404).json({ error: 'Developer not found' });
+
+        if (!Array.isArray(user.upvoters)) user.upvoters = [];
+        const idx = user.upvoters.map(String).indexOf(voterId);
+        let hasUpvoted = false;
+
+        if (idx === -1) {
+            user.upvoters.push(voterId);
+            hasUpvoted = true;
+        } else {
+            user.upvoters.splice(idx, 1);
+            hasUpvoted = false;
+        }
+
+        user.upvotes = user.upvoters.length;
+        await fs.writeFile(filePath, JSON.stringify(users, null, 2));
+
+        res.json({ upvotes: user.upvotes, upvoters: user.upvoters, hasUpvoted });
+    } catch (err) {
+        console.error('Error upvoting developer:', err);
+        res.status(500).json({ error: 'Failed to upvote developer' });
+    }
+});
+
+// 12. Follow Developer (Toggle) (Protected)
+app.post('/api/users/:id/follow', authMiddleware, async (req, res) => {
+    try {
+        const targetUserId = req.params.id;
+        const followerId = String(req.user.id);
+        if (targetUserId === followerId) {
+            return res.status(400).json({ error: 'You cannot follow yourself' });
+        }
+
+        const filePath = getFilePath('users');
+        let users = [];
+        try { users = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch {}
+
+        const user = users.find(u => String(u.id) === String(targetUserId));
+        if (!user) return res.status(404).json({ error: 'Developer not found' });
+
+        if (!Array.isArray(user.followers)) user.followers = [];
+        const idx = user.followers.map(String).indexOf(followerId);
+        let hasFollowed = false;
+
+        if (idx === -1) {
+            user.followers.push(followerId);
+            hasFollowed = true;
+        } else {
+            user.followers.splice(idx, 1);
+            hasFollowed = false;
+        }
+
+        await fs.writeFile(filePath, JSON.stringify(users, null, 2));
+        res.json({ followers: user.followers, hasFollowed });
+    } catch (err) {
+        console.error('Error following developer:', err);
+        res.status(500).json({ error: 'Failed to follow developer' });
+    }
+});
+
+// 13. Update Availability & Matchmaking Preferences (Protected)
+app.put('/api/users/availability', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        const { availability, lookingFor, hoursPerWeek, collaborationType, timezone } = req.body;
+
+        const filePath = getFilePath('users');
+        let users = [];
+        try { users = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch {}
+
+        const user = users.find(u => String(u.id) === userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        if (availability) user.availability = availability;
+        if (lookingFor) user.lookingFor = lookingFor;
+        if (hoursPerWeek) user.hoursPerWeek = hoursPerWeek;
+        if (collaborationType) user.collaborationType = collaborationType;
+        if (timezone) user.timezone = timezone;
+
+        await fs.writeFile(filePath, JSON.stringify(users, null, 2));
+
+        res.json({
+            success: true,
+            availability: user.availability,
+            lookingFor: user.lookingFor,
+            hoursPerWeek: user.hoursPerWeek,
+            collaborationType: user.collaborationType,
+            timezone: user.timezone
+        });
+    } catch (err) {
+        console.error('Error updating availability:', err);
+        res.status(500).json({ error: 'Failed to update availability' });
+    }
+});
+app.post('/api/users/availability', authMiddleware, async (req, res) => {
+    // Alias to PUT /api/users/availability
+    try {
+        const userId = String(req.user.id);
+        const { availability, lookingFor, hoursPerWeek, collaborationType, timezone } = req.body;
+
+        const filePath = getFilePath('users');
+        let users = [];
+        try { users = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch {}
+
+        const user = users.find(u => String(u.id) === userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        if (availability) user.availability = availability;
+        if (lookingFor) user.lookingFor = lookingFor;
+        if (hoursPerWeek) user.hoursPerWeek = hoursPerWeek;
+        if (collaborationType) user.collaborationType = collaborationType;
+        if (timezone) user.timezone = timezone;
+
+        await fs.writeFile(filePath, JSON.stringify(users, null, 2));
+
+        res.json({
+            success: true,
+            availability: user.availability,
+            lookingFor: user.lookingFor,
+            hoursPerWeek: user.hoursPerWeek,
+            collaborationType: user.collaborationType,
+            timezone: user.timezone
+        });
+    } catch (err) {
+        console.error('Error updating availability:', err);
+        res.status(500).json({ error: 'Failed to update availability' });
     }
 });
 

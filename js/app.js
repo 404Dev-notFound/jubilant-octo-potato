@@ -3,9 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const nebulaBg = document.getElementById('nebula-bg');
     const viewCache = {};
 
-    window.apiFetch = async function(endpoint, options = {}) {
+    window.apiFetch = async function (endpoint, options = {}) {
         const url = endpoint.startsWith('http') ? endpoint : `http://localhost:3000${endpoint}`;
-        
+
         const headers = { ...options.headers };
         if (!headers['Content-Type'] && !(options.body instanceof FormData) && options.method && options.method.toUpperCase() !== 'GET') {
             headers['Content-Type'] = 'application/json';
@@ -19,12 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentUser.token) {
                     headers['Authorization'] = `Bearer ${currentUser.token}`;
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
-        
+
         const fetchOptions = { cache: 'no-store', ...options, headers };
         const response = await fetch(url, fetchOptions);
-        
+
         if (response.status === 401) {
             localStorage.removeItem('currentUser');
             if (window.updateAuthUI) window.updateAuthUI();
@@ -38,17 +38,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             throw new Error('Forbidden');
         }
-        
+
         return response;
     };
 
-    window.updateAuthUI = function() {
+    window.updateAuthUI = function () {
         // Update UI based on authentication status (show/hide login, profile, etc.)
         const currentUserStr = localStorage.getItem('currentUser');
         const authButtons = document.getElementById('auth-buttons-container');
         const profileDropdown = document.getElementById('profile-dropdown-container');
         const profileAvatar = document.getElementById('profile-avatar');
-        
         let user = null;
         if (currentUserStr) {
             try {
@@ -74,18 +73,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (profileAvatar) profileAvatar.textContent = 'U';
         }
     };
-    
+
     // Call it initially
     window.updateAuthUI();
 
-    window.renderProjectCard = function(p) {
-        const safeTechStack = Array.isArray(p.techStack) ? p.techStack : (typeof p.techStack === 'string' ? p.techStack.split(',').map(s=>s.trim()) : []);
-        const techBadges = safeTechStack.map(tech => 
+    window.renderProjectCard = function (p) {
+        const safeTechStack = Array.isArray(p.techStack) ? p.techStack : (typeof p.techStack === 'string' ? p.techStack.split(',').map(s => s.trim()) : []);
+        const techBadges = safeTechStack.map(tech =>
             `<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5">${tech}</span>`
         ).join('');
         const demoBadge = p.isDemo ? `<span class="ml-2 px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">Demo</span>` : '';
         const ownerDisplay = p.owner?.name ? `<div class="flex items-center gap-1.5 text-xs text-on-surface-variant mb-3"><span class="w-4 h-4 rounded-full bg-secondary/30 text-secondary text-[10px] font-bold flex items-center justify-center">${p.owner.name.charAt(0).toUpperCase()}</span><span class="truncate">By ${p.owner.name}</span></div>` : '';
-        
+
         return `
         <div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2" data-project-id="${p.id || ''}">
             <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
@@ -133,12 +132,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const viewName = hash.split('?')[0].toLowerCase();
         const urlParams = new URLSearchParams(hash.split('?')[1] || '');
         const projectId = urlParams.get('projectId');
-        
+
         // Ensure any active modal is closed on view change
         if (window.UI && window.UI.closeModal) {
             window.UI.closeModal();
         }
-        
+
         // Nebula Background Logic
         if (nebulaBg) {
             if (viewName === 'home') {
@@ -149,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 nebulaBg.style.filter = 'blur(4px)';
             }
         }
-        
+
         // Render Skeleton Loader before fetching
         appContent.innerHTML = `
             <main class="w-full max-w-[1400px] mx-auto p-xl min-h-[80vh] flex flex-col gap-lg mt-8">
@@ -166,10 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
             let module;
             try {
                 module = await import(`./views/${viewName}.js?t=${Date.now()}`);
-            } catch(e) {
+            } catch (e) {
                 try {
                     module = await import(`./views/${viewName}.js`);
-                } catch(e2) {
+                } catch (e2) {
                     console.error(`Module import error for ${viewName}`, e2);
                 }
             }
@@ -189,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(async () => {
                 appContent.innerHTML = html;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                
+
                 // Initialize Home view
                 if (viewName === 'home' && module && module.initHome) {
                     module.initHome();
@@ -237,15 +236,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             const res = await window.apiFetch('/api/projects');
                             if (!res.ok) throw new Error('API Error');
                             const projects = await res.json();
-                            
+
                             let cardsHtml = '';
                             projects.forEach(p => {
                                 cardsHtml += window.renderProjectCard(p);
                             });
                             gridElement.innerHTML = cardsHtml;
-                            
-                            // Remove skeleton and inject real data
-                            gridElement.innerHTML = cardsHtml;
+
                             // Also hide the old hardcoded content if it exists
                             const realContent = document.getElementById('real-content');
                             if (realContent) realContent.remove();
@@ -284,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Scroll Progress for Nebula Background (Camera animation driven in index.html)
     // Scroll listener: adjust nebula background opacity/blur based on current view
-window.addEventListener('scroll', () => {
+    window.addEventListener('scroll', () => {
         // No longer translating the nebulaBg directly, it remains fixed.
         // The ThreeJS script in index.html will read window.scrollY.
     });
@@ -301,11 +298,10 @@ window.addEventListener('scroll', () => {
         } else if (menu && (e.target.closest('#profile-dropdown-menu a') || !e.target.closest('#profile-dropdown-container'))) {
             menu.classList.remove('!opacity-100', '!visible');
         }
-
         const link = e.target.closest('a');
         if (link) {
             const href = link.getAttribute('href');
-            
+
             if (link.id === 'logout-btn') {
                 e.preventDefault();
                 localStorage.removeItem('currentUser');
@@ -324,8 +320,12 @@ window.addEventListener('scroll', () => {
         if (formBtn) {
             e.preventDefault();
             const formName = formBtn.getAttribute('data-form');
-            
-            const protectedForms = ['add_project_form', 'create_org_form', 'edit_profile_form', 'add_issue_form'];
+
+            const protectedForms = [
+                'add_project_form', 'create_org_form', 'edit_profile_form',
+                'add_issue_form', 'create_team_form', 'update_availability_form',
+                'create_looking_for_form', 'join_team_form'
+            ];
             if (protectedForms.includes(formName) && !localStorage.getItem('currentUser')) {
                 window.UI.showToast('Please log in to access this feature', 'error');
                 return;
@@ -342,7 +342,7 @@ window.addEventListener('scroll', () => {
                             const curStr = localStorage.getItem('currentUser');
                             if (curStr) userData = JSON.parse(curStr);
                         }
-                        const module = await import('./forms/edit_profile_form.js');
+                        const module = await import(`./forms/edit_profile_form.js?t=${Date.now()}`);
                         const html = module.render_edit_profile_form(userData);
                         window.UI.openModal(html);
                         if (module.initEditProfileForm) {
@@ -356,28 +356,102 @@ window.addEventListener('scroll', () => {
                 return;
             }
 
-            if (viewCache[formName] && formName !== 'add_issue_form') {
-                window.UI.openModal(viewCache[formName]);
-            } else {
-                import(`./forms/${formName}.js`)
-                    .then(module => {
-                        const funcName = `render_${formName.replace(/-/g, '_')}`;
-                        if (module[funcName]) {
-                            const status = formBtn.getAttribute('data-status') || 'TODO';
-                            const html = formName === 'add_issue_form' 
-                                ? module[funcName](status, window.currentActiveProjectId || '', window.currentActiveProjectTitle || '')
-                                : module[funcName]();
-                            if (formName !== 'add_issue_form') viewCache[formName] = html;
-                            window.UI.openModal(html);
-                        } else {
-                            throw new Error(`Export ${funcName} not found`);
+            if (formName === 'update_availability_form') {
+                (async () => {
+                    try {
+                        const curStr = localStorage.getItem('currentUser');
+                        let userData = curStr ? JSON.parse(curStr) : {};
+                        const res = await window.apiFetch('/api/users/profile');
+                        if (res.ok) {
+                            userData = await res.json();
                         }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        window.UI.showToast('Error loading form', 'error');
-                    });
+                        const module = await import(`./forms/update_availability_form.js?t=${Date.now()}`);
+                        const html = module.render_update_availability_form(userData);
+                        window.UI.openModal(html);
+                        if (module.initUpdateAvailabilityForm) {
+                            module.initUpdateAvailabilityForm(userData);
+                        }
+                    } catch (err) {
+                        console.error('Error opening availability form:', err);
+                        window.UI.showToast('Failed to load availability form', 'error');
+                    }
+                })();
+                return;
             }
+
+            if (formName === 'create_team_form') {
+                (async () => {
+                    try {
+                        const module = await import(`./forms/create_team_form.js?t=${Date.now()}`);
+                        const html = module.render_create_team_form();
+                        window.UI.openModal(html);
+                        if (module.initCreateTeamForm) {
+                            module.initCreateTeamForm();
+                        }
+                    } catch (err) {
+                        console.error('Error opening create team form:', err);
+                        window.UI.showToast('Failed to load team form', 'error');
+                    }
+                })();
+                return;
+            }
+
+            if (formName === 'create_looking_for_form') {
+                (async () => {
+                    try {
+                        const module = await import(`./forms/create_looking_for_form.js?t=${Date.now()}`);
+                        const html = module.render_create_looking_for_form();
+                        window.UI.openModal(html);
+                        if (module.initCreateLookingForForm) {
+                            module.initCreateLookingForForm();
+                        }
+                    } catch (err) {
+                        console.error('Error opening looking-for form:', err);
+                        window.UI.showToast('Failed to load looking-for form', 'error');
+                    }
+                })();
+                return;
+            }
+
+            if (formName === 'join_team_form') {
+                (async () => {
+                    try {
+                        const teamId = formBtn.getAttribute('data-team-id') || '';
+                        const teamName = formBtn.getAttribute('data-team-name') || 'Team';
+                        const position = formBtn.getAttribute('data-position') || '';
+                        const leadName = formBtn.getAttribute('data-lead-name') || 'Team Lead';
+
+                        const module = await import(`./forms/join_team_form.js?t=${Date.now()}`);
+                        const html = module.render_join_team_form({ teamId, teamName, position, leadName });
+                        window.UI.openModal(html);
+                        if (module.initJoinTeamForm) {
+                            module.initJoinTeamForm({ teamId, teamName, position, leadName });
+                        }
+                    } catch (err) {
+                        console.error('Error opening join team form:', err);
+                        window.UI.showToast('Failed to load application form', 'error');
+                    }
+                })();
+                return;
+            }
+
+            import(`./forms/${formName}.js?t=${Date.now()}`)
+                .then(module => {
+                    const funcName = `render_${formName.replace(/-/g, '_')}`;
+                    if (module[funcName]) {
+                        const status = formBtn.getAttribute('data-status') || 'TODO';
+                        const html = formName === 'add_issue_form'
+                            ? module[funcName](status, window.currentActiveProjectId || '', window.currentActiveProjectTitle || '')
+                            : module[funcName]();
+                        window.UI.openModal(html);
+                    } else {
+                        throw new Error(`Export ${funcName} not found`);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    window.UI.showToast('Error loading form', 'error');
+                });
             return;
         }
 
@@ -419,15 +493,15 @@ window.addEventListener('scroll', () => {
 
     // Global Form Submit Interceptor
     // Global form submit handler: process auth forms and generic data forms, POST to backend APIs
-document.addEventListener('submit', async (e) => {
+    document.addEventListener('submit', async (e) => {
         const form = e.target;
-        
+
         // Handle auth forms specifically
         if (form.id === 'signUpForm' || form.id === 'loginForm') {
             e.preventDefault();
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
-            
+
             // Extract from un-named inputs just in case
             const inputs = form.querySelectorAll('input');
             inputs.forEach(input => {
@@ -435,7 +509,7 @@ document.addEventListener('submit', async (e) => {
                 else if (input.type === 'email') data['email'] = input.value;
                 else if (input.type === 'password') data['password'] = input.value;
             });
-            
+
             // Name field might be required for signup
             if (form.id === 'signUpForm' && !data.name) {
                 const textInput = form.querySelector('input[type="text"]');
@@ -443,14 +517,14 @@ document.addEventListener('submit', async (e) => {
             }
 
             const endpoint = form.id === 'signUpForm' ? '/api/auth/signup' : '/api/auth/login';
-            
+
             try {
                 const response = await window.apiFetch(endpoint, {
                     method: 'POST',
                     body: JSON.stringify(data)
                 });
                 const result = await response.json();
-                
+
                 if (response.ok) {
                     localStorage.setItem('currentUser', JSON.stringify(result));
                     window.updateAuthUI();
@@ -527,10 +601,10 @@ document.addEventListener('submit', async (e) => {
         };
 
         const table = formIdToTable[form.id];
-        
+
         if (table) {
             e.preventDefault();
-            
+
             // Gather form data
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
@@ -540,7 +614,7 @@ document.addEventListener('submit', async (e) => {
                 const memberIds = formData.getAll('memberIds');
                 data.memberIds = memberIds;
             }
-            
+
             const inputs = form.querySelectorAll('input, select, textarea');
             inputs.forEach(input => {
                 if (input.name) {
@@ -559,7 +633,7 @@ document.addEventListener('submit', async (e) => {
                     method: 'POST',
                     body: JSON.stringify(data)
                 });
-                
+
                 if (response.ok) {
                     window.UI.showToast('Project created successfully!', 'success');
                     window.UI.closeModal();

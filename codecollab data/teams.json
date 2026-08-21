@@ -1,5 +1,34 @@
 [
   {
+    "id": "team_1787258375278",
+    "teamName": "Automated Test Guild",
+    "description": "A cutting-edge team built for automated verification",
+    "leadId": "1",
+    "members": [
+      "1"
+    ],
+    "assignedProjects": [
+      "AutoTest Engine"
+    ],
+    "skills": [
+      "TypeScript",
+      "GraphQL",
+      "Docker"
+    ],
+    "upvotes": 1,
+    "upvoters": [
+      "2"
+    ],
+    "lookingFor": "Senior Fullstack Specialist",
+    "openPositions": [
+      "Backend Architect"
+    ],
+    "availability": "Active · 10-15 hrs/wk",
+    "rating": 5,
+    "createdAt": "2026-08-20T20:39:35.278Z",
+    "updatedAt": "2026-08-20T20:39:35.278Z"
+  },
+  {
     "id": "team_001",
     "teamName": "Rustacean Core Guild",
     "description": "High-performance systems engineering guild focused on building next-generation memory-safe distributed runtimes and zero-copy networking engines.",

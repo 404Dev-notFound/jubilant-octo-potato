@@ -5,7 +5,12 @@
     "lookingFor": "React & WebSockets Frontend Specialist",
     "for": "Real-time Collaborative Code Canvas & AST Visualizer",
     "commitment": "Part-time (8-10 hrs/wk)",
-    "requiredSkills": ["React", "TypeScript", "WebSockets", "Canvas API"],
+    "requiredSkills": [
+      "React",
+      "TypeScript",
+      "WebSockets",
+      "Canvas API"
+    ],
     "availability": "Available Now · UTC-5 / UTC+5:30",
     "context": "We are architecting a zero-latency real-time collaborative workspace where developers can visualize data structures and collaborate directly with AI teammates. Seeking someone with clean state-management skills.",
     "createdAt": "2026-08-16T12:00:00.000Z"
@@ -16,7 +21,12 @@
     "lookingFor": "Rust / C++ WASM Optimizer",
     "for": "In-Browser Neural AST Parser & Security Linter",
     "commitment": "Weekend Hackathon / Sprint",
-    "requiredSkills": ["Rust", "WebAssembly", "LLVM", "Compiler Design"],
+    "requiredSkills": [
+      "Rust",
+      "WebAssembly",
+      "LLVM",
+      "Compiler Design"
+    ],
     "availability": "Weekends · Open for Collab",
     "context": "Porting tree-sitter AST queries into ultra-light WebAssembly modules for instant client-side vulnerability detection before git commits. Need a Rustacean passionate about low memory footprint.",
     "createdAt": "2026-08-17T09:30:00.000Z"
@@ -27,7 +37,12 @@
     "lookingFor": "Fullstack Next.js & Tailwind Engineer",
     "for": "Open-Source API Mocking & Devtools Portal",
     "commitment": "Flexible (5-8 hrs/wk)",
-    "requiredSkills": ["Next.js", "TailwindCSS", "Node.js", "PostgreSQL"],
+    "requiredSkills": [
+      "Next.js",
+      "TailwindCSS",
+      "Node.js",
+      "PostgreSQL"
+    ],
     "availability": "Evenings · Worldwide",
     "context": "Building an open-source alternative to mock server suites with instant JWT auth generator and schema replay. Ready to pair-program and ship weekly releases.",
     "createdAt": "2026-08-17T15:45:00.000Z"
@@ -38,7 +53,12 @@
     "lookingFor": "AI / Prompt Evaluation Specialist",
     "for": "Multi-Agent Code Review & Benchmark Suite",
     "commitment": "Part-time (10-15 hrs/wk)",
-    "requiredSkills": ["Python", "FastAPI", "Prompt Engineering", "Evaluation Metrics"],
+    "requiredSkills": [
+      "Python",
+      "FastAPI",
+      "Prompt Engineering",
+      "Evaluation Metrics"
+    ],
     "availability": "Active · Open",
     "context": "Creating automated evaluation harnesses to test LLM code generation across 12 programming languages. Looking for a peer to co-author the open benchmark paper and CLI.",
     "createdAt": "2026-08-17T20:10:00.000Z"

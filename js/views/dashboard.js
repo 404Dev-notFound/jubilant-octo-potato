@@ -840,6 +840,7 @@ async function loadRequestsAndNotificationsHub(currentUser, allProjects) {
                     try {
                         const res = await window.apiFetch(`/api/notifications/${nId}/read`, { method: 'PATCH' });
                         if (res.ok) {
+                            if (window.updateNotificationBadge) window.updateNotificationBadge();
                             initDashboard();
                         }
                     } catch (err) {
@@ -854,6 +855,7 @@ async function loadRequestsAndNotificationsHub(currentUser, allProjects) {
                 try {
                     const res = await window.apiFetch('/api/notifications/read-all', { method: 'POST' });
                     if (res.ok) {
+                        if (window.updateNotificationBadge) window.updateNotificationBadge();
                         window.UI.showToast('All notifications marked as read', 'success');
                         initDashboard();
                     }

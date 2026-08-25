@@ -42,6 +42,32 @@ document.addEventListener('DOMContentLoaded', () => {
         return response;
     };
 
+    window.updateNotificationBadge = async function () {
+        const dot = document.getElementById('nav-notifications-dot');
+        if (!dot) return;
+        const currentUserStr = localStorage.getItem('currentUser');
+        if (!currentUserStr) {
+            dot.classList.add('hidden');
+            return;
+        }
+        try {
+            const res = await window.apiFetch('/api/notifications/unread');
+            if (res && res.ok) {
+                const data = await res.json();
+                const unreadCount = Number(data.unreadCount ?? data.count) || 0;
+                if (unreadCount > 0) {
+                    dot.classList.remove('hidden');
+                } else {
+                    dot.classList.add('hidden');
+                }
+            } else {
+                dot.classList.add('hidden');
+            }
+        } catch (e) {
+            dot.classList.add('hidden');
+        }
+    };
+
     window.updateAuthUI = function () {
         // Update UI based on authentication status (show/hide login, profile, etc.)
         const currentUserStr = localStorage.getItem('currentUser');
@@ -72,10 +98,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (profileDropdown) profileDropdown.classList.add('hidden');
             if (profileAvatar) profileAvatar.textContent = 'U';
         }
+
+        window.updateNotificationBadge();
     };
 
     // Call it initially
     window.updateAuthUI();
+
+    // Live periodic check for notifications every 15 seconds
+    setInterval(() => {
+        if (localStorage.getItem('currentUser')) {
+            window.updateNotificationBadge();
+        }
+    }, 15000);
 
     window.renderProjectCard = function (p) {
         const safeTechStack = Array.isArray(p.techStack) ? p.techStack : (typeof p.techStack === 'string' ? p.techStack.split(',').map(s => s.trim()) : []);
@@ -233,6 +268,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if ((viewName === 'user_profile' || viewName === 'user-profile' || viewName === 'profile') && module && module.initUserProfile) {
                     module.initUserProfile();
                 }
+
+                // Initialize Notifications view
+                if (viewName === 'notifications' && module && module.initNotifications) {
+                    module.initNotifications();
+                }
+
+                // Update notification badge on navigation
+                window.updateNotificationBadge();
 
                 // Fetch projects if on the explore page
                 if (viewName === 'explore' || viewName === 'home_explore') {

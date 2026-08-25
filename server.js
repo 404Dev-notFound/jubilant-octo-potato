@@ -145,7 +145,98 @@ async function syncUsersToPrisma() {
   }
 }
 
-syncUsersToPrisma();
+// Sync initial notifications from notifications.json into Prisma Notification table on startup
+async function syncNotificationsToPrisma() {
+  try {
+    const filePath = getFilePath('notifications');
+    let notifs = [];
+    try {
+      const data = await fs.readFile(filePath, 'utf-8');
+      notifs = JSON.parse(data);
+    } catch {}
+
+    for (const n of notifs) {
+      if (!n.id || !n.userId) continue;
+      const strId = String(n.id);
+      const strUserId = String(n.userId);
+      const existing = await prisma.notification.findUnique({
+        where: { id: strId }
+      });
+      if (!existing) {
+        const userExists = await prisma.user.findUnique({ where: { id: strUserId } });
+        if (userExists) {
+          await prisma.notification.create({
+            data: {
+              id: strId,
+              userId: strUserId,
+              type: n.type || 'SYSTEM',
+              title: n.title || 'Notification',
+              message: n.content || n.message || '',
+              read: Boolean(n.read),
+              createdAt: n.createdAt ? new Date(n.createdAt) : new Date()
+            }
+          });
+        }
+      }
+    }
+    console.log('✅ Notifications synchronized to PostgreSQL via Prisma');
+  } catch (err) {
+    console.error('Error syncing notifications to Prisma:', err);
+  }
+}
+
+// Reusable helper to send and persist notifications in PostgreSQL via Prisma
+async function sendNotification({ userId, actorId, projectId, type, title, message, data = {} }) {
+  if (!userId) return null;
+  try {
+    const targetUserId = String(userId);
+    let userExists = await prisma.user.findUnique({ where: { id: targetUserId } });
+    if (!userExists) {
+      let fileUsers = [];
+      try { fileUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8')); } catch {}
+      const u = fileUsers.find(x => String(x.id) === targetUserId);
+      if (u) {
+        userExists = await prisma.user.create({
+          data: {
+            id: targetUserId,
+            email: u.email || `user_${targetUserId}@example.com`,
+            passwordHash: u.password || null,
+            isVerified: true,
+            status: 'active',
+            profile: {
+              create: {
+                firstName: u.name || 'Developer',
+                lastName: '',
+                avatarUrl: u.avatarUrl || ''
+              }
+            }
+          }
+        });
+      }
+    }
+
+    if (!userExists) return null;
+
+    const notif = await prisma.notification.create({
+      data: {
+        userId: targetUserId,
+        actorId: actorId ? String(actorId) : null,
+        projectId: projectId ? String(projectId) : null,
+        type: type || 'SYSTEM',
+        title: String(title || 'Notification'),
+        message: String(message || ''),
+        data: data || {},
+        read: false
+      }
+    });
+    return notif;
+  } catch (err) {
+    console.error('Error creating notification in DB:', err);
+    return null;
+  }
+}
+
+syncUsersToPrisma().then(() => syncNotificationsToPrisma());
 
 // Load stats, create if missing
 async function loadStats() {
@@ -995,6 +1086,22 @@ app.post('/api/users/:id/upvote', authMiddleware, async (req, res) => {
         } else {
             user.upvoters.push(currentUserId);
             user.upvotes += 1;
+
+            // Notify user of upvote
+            if (targetUserId !== currentUserId) {
+                const voter = users.find(u => String(u.id) === currentUserId);
+                const voterName = voter?.name || 'A developer';
+                try {
+                    await sendNotification({
+                        userId: targetUserId,
+                        actorId: currentUserId,
+                        type: 'USER_UPVOTED',
+                        title: 'Profile Upvoted! 🚀',
+                        message: `${voterName} upvoted your developer profile!`,
+                        data: { actorId: currentUserId, actorName: voterName }
+                    });
+                } catch (e) {}
+            }
         }
 
         await fs.writeFile(filePath, JSON.stringify(users, null, 2));
@@ -1033,6 +1140,22 @@ app.post('/api/users/:id/follow', authMiddleware, async (req, res) => {
             user.followers = user.followers.filter(id => id !== currentUserId);
         } else {
             user.followers.push(currentUserId);
+
+            // Notify user of follow
+            if (targetUserId !== currentUserId) {
+                const follower = users.find(u => String(u.id) === currentUserId);
+                const followerName = follower?.name || 'A developer';
+                try {
+                    await sendNotification({
+                        userId: targetUserId,
+                        actorId: currentUserId,
+                        type: 'USER_FOLLOWED',
+                        title: 'New Follower! 👤',
+                        message: `${followerName} started following you!`,
+                        data: { actorId: currentUserId, actorName: followerName }
+                    });
+                } catch (e) {}
+            }
         }
 
         await fs.writeFile(filePath, JSON.stringify(users, null, 2));
@@ -1885,6 +2008,27 @@ app.post('/api/projects/:projectId/issues', authMiddleware, async (req, res) => 
             }
         });
         
+        // Notify assigned user if assigned to someone other than the creator
+        if (validAssigneeId && String(validAssigneeId) !== creatorId) {
+            try {
+                await sendNotification({
+                    userId: validAssigneeId,
+                    actorId: creatorId,
+                    projectId: projectId,
+                    type: 'ISSUE_ASSIGNED',
+                    title: 'New Issue Assignment 📋',
+                    message: `You were assigned to issue "${issue.title}" in "${project.title}"`,
+                    data: {
+                        issueId: issue.id,
+                        projectId: projectId,
+                        projectTitle: project.title
+                    }
+                });
+            } catch (notifErr) {
+                console.error('Error sending issue assignment notification:', notifErr);
+            }
+        }
+
         // Increment cumulative issues counter
         const stats = await loadStats();
         stats.cumulativeIssues += 1;
@@ -1924,7 +2068,8 @@ async function handleUpdateIssue(req, res) {
         const userId = String(req.user.id);
 
         const existing = await prisma.issue.findUnique({
-            where: { id: issueId }
+            where: { id: issueId },
+            include: { project: true }
         });
         if (!existing) {
             return res.status(404).json({ error: 'Issue not found' });
@@ -1984,6 +2129,44 @@ async function handleUpdateIssue(req, res) {
                 project: { select: { id: true, title: true } }
             }
         });
+
+        // If newly assigned, notify assignee
+        if (updateData.assigneeId && updateData.assigneeId !== existing.assigneeId && updateData.assigneeId !== userId) {
+            try {
+                await sendNotification({
+                    userId: updateData.assigneeId,
+                    actorId: userId,
+                    projectId: existing.projectId,
+                    type: 'ISSUE_ASSIGNED',
+                    title: 'Assigned to Issue 📋',
+                    message: `You were assigned to issue "${updatedIssue.title}" in "${updatedIssue.project?.title || 'the project'}"`,
+                    data: {
+                        issueId: updatedIssue.id,
+                        projectId: existing.projectId,
+                        projectTitle: updatedIssue.project?.title
+                    }
+                });
+            } catch (e) {}
+        }
+
+        // If status marked as DONE and updated by someone other than creator, notify creator
+        if (updateData.status === 'DONE' && existing.status !== 'DONE' && existing.creatorId && existing.creatorId !== userId) {
+            try {
+                await sendNotification({
+                    userId: existing.creatorId,
+                    actorId: userId,
+                    projectId: existing.projectId,
+                    type: 'ISSUE_RESOLVED',
+                    title: 'Issue Resolved ✅',
+                    message: `Issue "${updatedIssue.title}" was marked as DONE in "${updatedIssue.project?.title || 'the project'}"`,
+                    data: {
+                        issueId: updatedIssue.id,
+                        projectId: existing.projectId,
+                        projectTitle: updatedIssue.project?.title
+                    }
+                });
+            } catch (e) {}
+        }
 
         let fileUsersMap = new Map();
         try {
@@ -2106,9 +2289,10 @@ function sanitizeNotification(n) {
         title: n.title,
         message: n.message,
         data: n.data || {},
-        read: n.read,
+        read: Boolean(n.read),
         createdAt: n.createdAt,
         projectId: n.projectId,
+        project: n.project ? { id: n.project.id, title: n.project.title } : undefined,
         actor: actorObj
     };
 }
@@ -2693,19 +2877,21 @@ app.patch('/api/meetings/:id', authMiddleware, async (req, res) => {
 });
 
 // ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Notification Endpoints
 // ----------------------------------------------------------------------------
 
-// Get notifications for authenticated user
+// Get notifications for authenticated user (Strict User Isolation)
 app.get('/api/notifications', authMiddleware, async (req, res) => {
     try {
         const userId = String(req.user.id);
         const notifications = await prisma.notification.findMany({
             where: { userId },
             orderBy: { createdAt: 'desc' },
-            take: 50,
+            take: 100,
             include: {
-                actor: { include: { profile: true } }
+                actor: { include: { profile: true } },
+                project: { select: { id: true, title: true } }
             }
         });
         res.json(notifications.map(sanitizeNotification));
@@ -2715,19 +2901,43 @@ app.get('/api/notifications', authMiddleware, async (req, res) => {
     }
 });
 
-// Mark single notification as read
+// Get unread notification count & status for authenticated user
+app.get('/api/notifications/unread', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        const unreadCount = await prisma.notification.count({
+            where: { userId, read: false }
+        });
+        res.json({
+            count: unreadCount,
+            unreadCount: unreadCount,
+            hasUnread: unreadCount > 0
+        });
+    } catch (error) {
+        console.error('Error checking unread notifications:', error);
+        res.status(500).json({ error: 'Failed to check unread notification count' });
+    }
+});
+
+// Mark single notification as read (Strict Ownership Verification)
 app.patch('/api/notifications/:id/read', authMiddleware, async (req, res) => {
     try {
         const id = req.params.id;
         const userId = String(req.user.id);
         const existing = await prisma.notification.findUnique({ where: { id } });
-        if (!existing || existing.userId !== userId) {
+        if (!existing) {
             return res.status(404).json({ error: 'Notification not found' });
+        }
+        if (existing.userId !== userId) {
+            return res.status(403).json({ error: 'You are not authorized to modify this notification' });
         }
         const updated = await prisma.notification.update({
             where: { id },
             data: { read: true },
-            include: { actor: { include: { profile: true } } }
+            include: {
+                actor: { include: { profile: true } },
+                project: { select: { id: true, title: true } }
+            }
         });
         res.json(sanitizeNotification(updated));
     } catch (error) {
@@ -2736,8 +2946,8 @@ app.patch('/api/notifications/:id/read', authMiddleware, async (req, res) => {
     }
 });
 
-// Mark all notifications as read
-app.post('/api/notifications/read-all', authMiddleware, async (req, res) => {
+// Mark all notifications as read for current user
+const handleMarkAllNotificationsRead = async (req, res) => {
     try {
         const userId = String(req.user.id);
         await prisma.notification.updateMany({
@@ -2748,6 +2958,29 @@ app.post('/api/notifications/read-all', authMiddleware, async (req, res) => {
     } catch (error) {
         console.error('Error marking all notifications as read:', error);
         res.status(500).json({ error: 'Failed to update notifications' });
+    }
+};
+
+app.post('/api/notifications/read-all', authMiddleware, handleMarkAllNotificationsRead);
+app.patch('/api/notifications/read-all', authMiddleware, handleMarkAllNotificationsRead);
+
+// Delete a notification (Strict Ownership Verification)
+app.delete('/api/notifications/:id', authMiddleware, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const userId = String(req.user.id);
+        const existing = await prisma.notification.findUnique({ where: { id } });
+        if (!existing) {
+            return res.status(404).json({ error: 'Notification not found' });
+        }
+        if (existing.userId !== userId) {
+            return res.status(403).json({ error: 'You are not authorized to delete this notification' });
+        }
+        await prisma.notification.delete({ where: { id } });
+        res.json({ success: true, message: 'Notification deleted' });
+    } catch (error) {
+        console.error('Error deleting notification:', error);
+        res.status(500).json({ error: 'Failed to delete notification' });
     }
 });
 

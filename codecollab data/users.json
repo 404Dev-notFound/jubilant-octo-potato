@@ -365,5 +365,29 @@
     "followers": [
       "2"
     ]
+  },
+  {
+    "id": "1787355731659",
+    "createdAt": "2026-08-21T23:42:11.659Z",
+    "name": "Alice Developer",
+    "email": "alice_notif_test@example.com",
+    "password": "$2b$10$F1Vc6ppool.au1/fSLhnwuYpHLR2wbRHrlmvXMK7znVb.8H6RAASO",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1787355758873",
+    "createdAt": "2026-08-21T23:42:38.873Z",
+    "name": "Bob Developer",
+    "email": "bob_notif_test@example.com",
+    "password": "$2b$10$ySPTWkgAMGz6TscAbpwBUeX4ELPO4Tdv4qtBVxqcQojR1zQtczvgS",
+    "role": "user",
+    "progress": 0,
+    "potion": 0,
+    "upvoters": [
+      "1787355731659"
+    ],
+    "upvotes": 1
   }
 ]

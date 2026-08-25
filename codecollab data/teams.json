@@ -1,5 +1,28 @@
 [
   {
+    "id": "team_1787356341898",
+    "teamName": "test team name",
+    "description": "this",
+    "leadId": "1785998502411",
+    "members": [
+      "1785998502411"
+    ],
+    "assignedProjects": [],
+    "skills": [
+      "this"
+    ],
+    "upvotes": 0,
+    "upvoters": [],
+    "lookingFor": "this",
+    "openPositions": [
+      "Collaborator"
+    ],
+    "availability": "Active · 10-15 hrs/wk",
+    "rating": 5,
+    "createdAt": "2026-08-21T23:52:21.898Z",
+    "updatedAt": "2026-08-21T23:52:21.898Z"
+  },
+  {
     "id": "team_1787258375278",
     "teamName": "Automated Test Guild",
     "description": "A cutting-edge team built for automated verification",

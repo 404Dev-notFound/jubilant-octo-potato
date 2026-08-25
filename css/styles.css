@@ -173,3 +173,215 @@ body {
     background: rgba(26, 28, 48, 0.85);
 }
 
+/* ==========================================================================
+   CodeCollab MagicBento Interactive System (Inspired by React Bits MagicBento)
+   ========================================================================== */
+
+/* Base MagicBento Card - CLEARLY VISIBLE BASE BORDER IN NORMAL STATE */
+.magic-bento-card {
+    --glow-x: 50%;
+    --glow-y: 50%;
+    --glow-intensity: 0;
+    --glow-radius: 300px;
+    --glow-color: rgba(174, 198, 255, 0.95);
+    --glow-color-mid: rgba(174, 198, 255, 0.45);
+    --glow-color-soft: rgba(174, 198, 255, 0.12);
+    --tilt-x: 0deg;
+    --tilt-y: 0deg;
+    --mag-x: 0px;
+    --mag-y: 0px;
+
+    position: relative;
+    border-radius: 1.25rem; /* 20px */
+    background: rgba(25, 28, 34, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.13); /* ALWAYS clearly visible base border */
+    overflow: hidden;
+    transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translate3d(var(--mag-x), var(--mag-y), 0px);
+    transform-origin: center center;
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    will-change: transform;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Layer 1: Ambient Inner Spotlight (Soft glow that follows cursor inside the card) */
+.magic-bento-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+        var(--glow-radius, 300px) circle at var(--glow-x, 50%) var(--glow-y, 50%),
+        var(--glow-color-soft, rgba(174, 198, 255, 0.12)) 0%,
+        rgba(255, 255, 255, 0.02) 40%,
+        transparent 65%
+    );
+    opacity: var(--glow-intensity, 0);
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Layer 2: Reactive Border Glow (Masked 1.5px glowing rim that tracks cursor) */
+.magic-bento-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: radial-gradient(
+        var(--glow-radius, 300px) circle at var(--glow-x, 50%) var(--glow-y, 50%),
+        var(--glow-color, rgba(174, 198, 255, 0.95)) 0%,
+        var(--glow-color-mid, rgba(174, 198, 255, 0.45)) 30%,
+        rgba(255, 255, 255, 0.18) 50%,
+        transparent 70%
+    );
+    -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    -webkit-mask-clip: content-box, border-box;
+    -webkit-mask-composite: xor;
+    mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    mask-clip: content-box, border-box;
+    mask-composite: exclude;
+    opacity: var(--glow-intensity, 0);
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Layer 3: Card Content (Always above spotlight and border glow) */
+.magic-bento-card > * {
+    position: relative;
+    z-index: 3;
+}
+
+/* Hover Elevation & Accent Shadow */
+.magic-bento-card:hover {
+    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.6), 0 0 24px -4px var(--glow-color-soft);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* Domain Color Variations */
+/* 1. Team Cards (Primary / Ice Blue-Cyan Glow) */
+.magic-bento-card-team {
+    --glow-color: rgba(174, 198, 255, 0.95);
+    --glow-color-mid: rgba(174, 198, 255, 0.45);
+    --glow-color-soft: rgba(174, 198, 255, 0.12);
+}
+.magic-bento-card-team:hover {
+    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(174, 198, 255, 0.2);
+}
+
+/* 2. Looking-For / Matchmaking Cards (Tertiary / Emerald-Mint Glow) */
+.magic-bento-card-looking-for {
+    --glow-color: rgba(72, 221, 188, 0.95);
+    --glow-color-mid: rgba(72, 221, 188, 0.45);
+    --glow-color-soft: rgba(72, 221, 188, 0.12);
+}
+.magic-bento-card-looking-for:hover {
+    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(72, 221, 188, 0.2);
+}
+
+/* 3. Developer Cards (Secondary / Lavender-Purple Glow) */
+.magic-bento-card-dev {
+    --glow-color: rgba(219, 184, 255, 0.95);
+    --glow-color-mid: rgba(219, 184, 255, 0.45);
+    --glow-color-soft: rgba(219, 184, 255, 0.12);
+}
+.magic-bento-card-dev:hover {
+    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(219, 184, 255, 0.2);
+}
+
+/* Section Containers - Calmer MagicBento Border Glow */
+.magic-bento-section {
+    --glow-x: 50%;
+    --glow-y: 50%;
+    --glow-intensity: 0;
+    --glow-radius: 460px;
+    --glow-color: rgba(255, 255, 255, 0.35);
+    --glow-color-soft: rgba(255, 255, 255, 0.03);
+
+    position: relative;
+    border-radius: 1.5rem; /* 24px */
+    background: rgba(16, 19, 26, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.10); /* Clearly visible base border */
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.magic-bento-section::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: radial-gradient(
+        var(--glow-radius, 460px) circle at var(--glow-x, 50%) var(--glow-y, 50%),
+        var(--glow-color, rgba(255, 255, 255, 0.35)) 0%,
+        rgba(255, 255, 255, 0.12) 35%,
+        transparent 70%
+    );
+    -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    -webkit-mask-clip: content-box, border-box;
+    -webkit-mask-composite: xor;
+    mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    mask-clip: content-box, border-box;
+    mask-composite: exclude;
+    opacity: var(--glow-intensity, 0);
+    transition: opacity 0.35s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Subtle Click Ripple */
+.magic-bento-ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: bentoRipple 0.65s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 80%);
+    pointer-events: none;
+    z-index: 4;
+}
+
+@keyframes bentoRipple {
+    0% {
+        transform: scale(0);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+/* Expansion transition enhancements */
+.team-expanded-details,
+.dev-expanded-details {
+    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, padding 0.35s ease;
+    will-change: max-height, opacity;
+}
+
+/* Mobile & Touch Optimizations */
+@media (hover: none) or (pointer: coarse) {
+    .magic-bento-card {
+        transform: none !important;
+        will-change: auto;
+    }
+    .magic-bento-card::before,
+    .magic-bento-card::after,
+    .magic-bento-section::before {
+        display: none !important;
+    }
+    .magic-bento-card:active {
+        transform: scale(0.99) !important;
+    }
+}
+

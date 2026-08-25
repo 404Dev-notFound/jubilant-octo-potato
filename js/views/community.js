@@ -9,7 +9,7 @@ export function render_community() {
     <main class="w-full max-w-[1440px] mx-auto px-4 lg:px-8 py-6 pb-24 text-on-surface">
         
         <!-- Hero Header -->
-        <section class="relative rounded-3xl p-6 md:p-10 mb-8 overflow-hidden bg-gradient-to-br from-surface-container-high/80 via-surface-container/60 to-surface-container-lowest/90 border border-white/10 backdrop-blur-xl shadow-2xl">
+        <section class="magic-bento-section relative rounded-3xl p-6 md:p-10 mb-8 overflow-hidden bg-gradient-to-br from-surface-container-high/80 via-surface-container/60 to-surface-container-lowest/90 border border-white/10 backdrop-blur-xl shadow-2xl">
             <div class="absolute -right-20 -top-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -left-20 -bottom-20 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
             
@@ -172,11 +172,11 @@ export function render_community() {
         <div id="community-sections-container" class="space-y-12">
             
             <!-- SECTION 1: TEAMS & GUILDS -->
-            <section id="section-teams" class="space-y-4">
+            <section id="section-teams" class="magic-bento-section p-6 md:p-8 rounded-3xl bg-surface-container-lowest/40 border border-white/5 space-y-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="text-2xl font-bold font-display text-on-surface flex items-center gap-2.5">
-                            <span class="w-3 h-3 rounded-full bg-primary"></span>
+                            <span class="w-3 h-3 rounded-full bg-primary shadow-[0_0_10px_rgba(174,198,255,0.6)]"></span>
                             Discoverable Teams & Guilds
                         </h2>
                         <p class="text-sm text-on-surface-variant mt-0.5">Explore active teams building open-source projects and looking for collaborators.</p>
@@ -197,11 +197,11 @@ export function render_community() {
             </section>
 
             <!-- SECTION 2: LOOKING FOR A CODING MATE (Matchmaking Feed) -->
-            <section id="section-looking-for" class="space-y-4">
+            <section id="section-looking-for" class="magic-bento-section p-6 md:p-8 rounded-3xl bg-surface-container-lowest/40 border border-white/5 space-y-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="text-2xl font-bold font-display text-on-surface flex items-center gap-2.5">
-                            <span class="w-3 h-3 rounded-full bg-tertiary"></span>
+                            <span class="w-3 h-3 rounded-full bg-tertiary shadow-[0_0_10px_rgba(72,221,188,0.6)]"></span>
                             Looking for a Coding Mate
                         </h2>
                         <p class="text-sm text-on-surface-variant mt-0.5">Direct matchmaking requests from developers actively seeking partners for specific repos & sprints.</p>
@@ -222,11 +222,11 @@ export function render_community() {
             </section>
 
             <!-- SECTION 3: DEVELOPERS & CODING MATES -->
-            <section id="section-developers" class="space-y-4">
+            <section id="section-developers" class="magic-bento-section p-6 md:p-8 rounded-3xl bg-surface-container-lowest/40 border border-white/5 space-y-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="text-2xl font-bold font-display text-on-surface flex items-center gap-2.5">
-                            <span class="w-3 h-3 rounded-full bg-secondary"></span>
+                            <span class="w-3 h-3 rounded-full bg-secondary shadow-[0_0_10px_rgba(219,184,255,0.6)]"></span>
                             Developers & Coding Mates
                         </h2>
                         <p class="text-sm text-on-surface-variant mt-0.5">Discover verified engineers, follow inspiring builders, and expand your coding circle.</p>
@@ -418,7 +418,7 @@ export async function initCommunity() {
             `).join('');
 
             return `
-            <div class="glass-card bg-surface-container-low/70 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 hover:border-primary/40 hover:shadow-2xl flex flex-col group" id="team-card-${team.id}">
+            <div class="magic-bento-card magic-bento-card-team rounded-2xl flex flex-col group cursor-pointer" data-bento-card id="team-card-${team.id}">
                 <!-- Header / Top Bar -->
                 <div class="p-6 pb-4 flex flex-col flex-1">
                     <div class="flex items-start justify-between gap-4 mb-3">
@@ -581,7 +581,7 @@ export async function initCommunity() {
             `).join('');
 
             return `
-            <div class="glass-card bg-gradient-to-br from-surface-container-low/80 via-surface-container/50 to-surface-container-lowest/80 border border-white/10 rounded-2xl p-6 transition-all duration-300 hover:border-tertiary/40 hover:shadow-xl flex flex-col justify-between group relative overflow-hidden">
+            <div class="magic-bento-card magic-bento-card-looking-for rounded-2xl p-6 flex flex-col justify-between group relative overflow-hidden cursor-pointer" data-bento-card id="looking-for-card-${post.id}">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-tertiary/5 rounded-full blur-2xl pointer-events-none"></div>
                 
                 <div>
@@ -684,7 +684,7 @@ export async function initCommunity() {
                 </div>`;
 
             return `
-            <div class="glass-card bg-surface-container-low/70 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 hover:border-secondary/40 hover:shadow-2xl flex flex-col group" id="dev-card-${dev.id}">
+            <div class="magic-bento-card magic-bento-card-dev rounded-2xl flex flex-col group cursor-pointer" data-bento-card id="dev-card-${dev.id}">
                 <!-- Top Card Info -->
                 <div class="p-6 pb-4 flex flex-col flex-1">
                     <div class="flex items-start justify-between gap-4 mb-4">
@@ -934,6 +934,9 @@ export async function initCommunity() {
         renderDevelopers(filteredDevs);
         renderLookingFor(filteredMatch);
 
+        // Bind/re-bind MagicBento dynamic border glows and interactions
+        initMagicBentoInteractions();
+
         const totalResults = filteredTeams.length + filteredDevs.length + filteredMatch.length;
         if (emptyState) {
             if (totalResults === 0) {
@@ -942,6 +945,170 @@ export async function initCommunity() {
                 emptyState.classList.add('hidden');
             }
         }
+    }
+
+    // ----------------------------------------------------------------------------
+    // MagicBento Interaction Controller (Border Glow, Spotlight, 3D Tilt, Magnetism, Ripple)
+    // ----------------------------------------------------------------------------
+    let activeBentoCleanups = [];
+
+    function initMagicBentoInteractions() {
+        // Clean up previous event listeners to avoid memory leaks / multiple attachments
+        activeBentoCleanups.forEach(cleanup => {
+            try { cleanup(); } catch (_) {}
+        });
+        activeBentoCleanups = [];
+
+        // Check if device supports fine pointer (Desktop / Mouse)
+        const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        if (!isFinePointer) return;
+
+        // 1. Cards: Border Glow + Ambient Spotlight + 3D Tilt + Magnetism + Surface Click Ripple
+        const cards = document.querySelectorAll('[data-bento-card]');
+        cards.forEach(card => {
+            let rafId = null;
+            let currentX = 0, currentY = 0;
+            let targetTiltX = 0, targetTiltY = 0;
+            let targetMagX = 0, targetMagY = 0;
+
+            const onMouseEnter = (e) => {
+                const rect = card.getBoundingClientRect();
+                const relX = e.clientX - rect.left;
+                const relY = e.clientY - rect.top;
+                card.style.setProperty('--glow-x', `${relX}px`);
+                card.style.setProperty('--glow-y', `${relY}px`);
+                card.style.setProperty('--glow-intensity', '1');
+            };
+
+            const onMouseMove = (e) => {
+                const rect = card.getBoundingClientRect();
+                const relX = e.clientX - rect.left;
+                const relY = e.clientY - rect.top;
+
+                // Normalized coordinate from -1 to 1
+                const normX = Math.max(-1, Math.min(1, (relX / rect.width) * 2 - 1));
+                const normY = Math.max(-1, Math.min(1, (relY / rect.height) * 2 - 1));
+
+                currentX = relX;
+                currentY = relY;
+
+                // Subtle physics: tilt angle max 3.5 degrees, magnetic shift max 2.5px
+                targetTiltX = -normY * 3.5;
+                targetTiltY = normX * 3.5;
+                targetMagX = normX * 2.5;
+                targetMagY = normY * 2.5;
+
+                if (!rafId) {
+                    rafId = requestAnimationFrame(() => {
+                        card.style.setProperty('--glow-x', `${currentX}px`);
+                        card.style.setProperty('--glow-y', `${currentY}px`);
+                        card.style.setProperty('--glow-intensity', '1');
+                        card.style.setProperty('--tilt-x', `${targetTiltX.toFixed(2)}deg`);
+                        card.style.setProperty('--tilt-y', `${targetTiltY.toFixed(2)}deg`);
+                        card.style.setProperty('--mag-x', `${targetMagX.toFixed(2)}px`);
+                        card.style.setProperty('--mag-y', `${targetMagY.toFixed(2)}px`);
+                        rafId = null;
+                    });
+                }
+            };
+
+            const onMouseLeave = () => {
+                if (rafId) {
+                    cancelAnimationFrame(rafId);
+                    rafId = null;
+                }
+                card.style.setProperty('--glow-intensity', '0');
+                card.style.setProperty('--tilt-x', '0deg');
+                card.style.setProperty('--tilt-y', '0deg');
+                card.style.setProperty('--mag-x', '0px');
+                card.style.setProperty('--mag-y', '0px');
+            };
+
+            const onCardClick = (e) => {
+                // Ignore interactive controls, buttons, forms, links, or text selections
+                if (e.target.closest('button, a, input, select, textarea, [data-form], [data-action], .upvote-btn, svg, label')) {
+                    return;
+                }
+                const selection = window.getSelection();
+                if (selection && selection.toString().length > 0) return;
+
+                const rect = card.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickY = e.clientY - rect.top;
+                const size = Math.max(rect.width, rect.height) * 1.4;
+
+                const ripple = document.createElement('span');
+                ripple.className = 'magic-bento-ripple';
+                ripple.style.width = `${size}px`;
+                ripple.style.height = `${size}px`;
+                ripple.style.left = `${clickX - size / 2}px`;
+                ripple.style.top = `${clickY - size / 2}px`;
+
+                card.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 700);
+            };
+
+            card.addEventListener('mouseenter', onMouseEnter, { passive: true });
+            card.addEventListener('mousemove', onMouseMove, { passive: true });
+            card.addEventListener('mouseleave', onMouseLeave, { passive: true });
+            card.addEventListener('click', onCardClick);
+
+            activeBentoCleanups.push(() => {
+                card.removeEventListener('mouseenter', onMouseEnter);
+                card.removeEventListener('mousemove', onMouseMove);
+                card.removeEventListener('mouseleave', onMouseLeave);
+                card.removeEventListener('click', onCardClick);
+                if (rafId) cancelAnimationFrame(rafId);
+            });
+        });
+
+        // 2. Section Containers: Subtle, calm border illumination only (no tilt/magnetism)
+        const sections = document.querySelectorAll('.magic-bento-section');
+        sections.forEach(sec => {
+            let sRafId = null;
+            let sX = 0, sY = 0;
+
+            const onSecMouseEnter = (e) => {
+                const rect = sec.getBoundingClientRect();
+                sec.style.setProperty('--glow-x', `${e.clientX - rect.left}px`);
+                sec.style.setProperty('--glow-y', `${e.clientY - rect.top}px`);
+                sec.style.setProperty('--glow-intensity', '1');
+            };
+
+            const onSecMouseMove = (e) => {
+                const rect = sec.getBoundingClientRect();
+                sX = e.clientX - rect.left;
+                sY = e.clientY - rect.top;
+
+                if (!sRafId) {
+                    sRafId = requestAnimationFrame(() => {
+                        sec.style.setProperty('--glow-x', `${sX}px`);
+                        sec.style.setProperty('--glow-y', `${sY}px`);
+                        sec.style.setProperty('--glow-intensity', '1');
+                        sRafId = null;
+                    });
+                }
+            };
+
+            const onSecMouseLeave = () => {
+                if (sRafId) {
+                    cancelAnimationFrame(sRafId);
+                    sRafId = null;
+                }
+                sec.style.setProperty('--glow-intensity', '0');
+            };
+
+            sec.addEventListener('mouseenter', onSecMouseEnter, { passive: true });
+            sec.addEventListener('mousemove', onSecMouseMove, { passive: true });
+            sec.addEventListener('mouseleave', onSecMouseLeave, { passive: true });
+
+            activeBentoCleanups.push(() => {
+                sec.removeEventListener('mouseenter', onSecMouseEnter);
+                sec.removeEventListener('mousemove', onSecMouseMove);
+                sec.removeEventListener('mouseleave', onSecMouseLeave);
+                if (sRafId) cancelAnimationFrame(sRafId);
+            });
+        });
     }
 
     // Setup Event Listeners
@@ -1055,6 +1222,7 @@ export async function initCommunity() {
                 }
                 const { filteredTeams } = filterAndSortData();
                 renderTeams(filteredTeams);
+                initMagicBentoInteractions();
                 return;
             }
 
@@ -1069,6 +1237,7 @@ export async function initCommunity() {
                 }
                 const { filteredDevs } = filterAndSortData();
                 renderDevelopers(filteredDevs);
+                initMagicBentoInteractions();
                 return;
             }
 
@@ -1091,6 +1260,7 @@ export async function initCommunity() {
                         }
                         const { filteredTeams } = filterAndSortData();
                         renderTeams(filteredTeams);
+                        initMagicBentoInteractions();
                         if (window.UI?.showToast) window.UI.showToast(data.hasUpvoted ? 'Upvoted team!' : 'Upvote removed', 'success');
                     }
                 } catch (err) {
@@ -1118,6 +1288,7 @@ export async function initCommunity() {
                         }
                         const { filteredDevs } = filterAndSortData();
                         renderDevelopers(filteredDevs);
+                        initMagicBentoInteractions();
                         if (window.UI?.showToast) window.UI.showToast(data.hasUpvoted ? 'Upvoted developer profile!' : 'Upvote removed', 'success');
                     }
                 } catch (err) {
@@ -1144,6 +1315,7 @@ export async function initCommunity() {
                         }
                         const { filteredDevs } = filterAndSortData();
                         renderDevelopers(filteredDevs);
+                        initMagicBentoInteractions();
                         if (window.UI?.showToast) window.UI.showToast(data.hasFollowed ? `Now following ${dev?.name || 'developer'}!` : 'Unfollowed developer', 'info');
                     }
                 } catch (err) {
@@ -1165,6 +1337,7 @@ export async function initCommunity() {
                         if (tabMatchCount) tabMatchCount.textContent = lookingForData.length;
                         const { filteredMatch } = filterAndSortData();
                         renderLookingFor(filteredMatch);
+                        initMagicBentoInteractions();
                         if (window.UI?.showToast) window.UI.showToast('Matchmaking request removed', 'info');
                     }
                 } catch (err) {
@@ -1189,3 +1362,4 @@ export async function initCommunity() {
     await loadCommunityData();
     setupEventListeners();
 }
+

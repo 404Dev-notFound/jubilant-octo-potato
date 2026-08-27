@@ -1,6 +1,8 @@
 const path = require('path');
 const fs = require('fs');
 const { spawnSync } = require('child_process');
+const { loadEnv } = require('../load-env.js');
+
 const args = process.argv.slice(2);
 const dbCommands = ['db', 'migrate', 'studio'];
 const requiresDb = args.some(arg => dbCommands.includes(arg));

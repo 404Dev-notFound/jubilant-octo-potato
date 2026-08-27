@@ -7,13 +7,20 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies including devDependencies for Prisma generate
+# Copy dependency manifests and files required by lifecycle scripts (postinstall)
 COPY package*.json ./
+COPY load-env.js ./
+COPY scripts ./scripts
+COPY prisma ./prisma
+
+# Install dependencies including devDependencies (triggers postinstall prisma generate)
 RUN npm ci
 
-# Copy application source & generate Prisma client
+# Copy full application source code
 COPY . .
-RUN if [ -f "./prisma/schema.prisma" ]; then npx prisma generate; fi
+
+# Ensure Prisma client is generated for container architecture
+RUN node scripts/run-prisma.js generate
 
 # Prune devDependencies for production
 RUN npm prune --production
@@ -32,11 +39,18 @@ ENV PORT=3000
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 codecollab
 
-# Copy production artifacts
+# Copy production artifacts from builder stage
 COPY --from=builder --chown=codecollab:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=codecollab:nodejs /app/package*.json ./
 COPY --from=builder --chown=codecollab:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=codecollab:nodejs /app/scripts ./scripts
+COPY --from=builder --chown=codecollab:nodejs /app/load-env.js ./load-env.js
+COPY --from=builder --chown=codecollab:nodejs /app/server.js ./server.js
 COPY --from=builder --chown=codecollab:nodejs /app/codecollab\ data ./codecollab\ data
-COPY --from=builder --chown=codecollab:nodejs /app ./
+COPY --from=builder --chown=codecollab:nodejs /app/css ./css
+COPY --from=builder --chown=codecollab:nodejs /app/js ./js
+COPY --from=builder --chown=codecollab:nodejs /app/index.html ./index.html
+COPY --from=builder --chown=codecollab:nodejs /app/pre_deploy.md ./pre_deploy.md
 
 USER codecollab
 

@@ -5,10 +5,13 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "build": "node scripts/run-prisma.js generate",
+    "postinstall": "node scripts/run-prisma.js generate",
     "db:push": "node scripts/run-prisma.js db push",
+    "db:migrate-data": "node scripts/migrate-data-to-postgres.js",
     "db:seed": "node prisma/seed.js",
     "db:studio": "node scripts/run-prisma.js studio",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/production-verification.test.js"
   },
   "repository": {
     "type": "git",

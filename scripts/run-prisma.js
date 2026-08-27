@@ -1,20 +1,30 @@
-/*
- * Script to run Prisma commands via npx.
- * This script ensures all required environment variables, specifically
- * the DATABASE_URL, are loaded before invoking Prisma commands.
- */
 const path = require('path');
+const fs = require('fs');
 const { spawnSync } = require('child_process');
-const { loadEnv } = require('../load-env.js');
+const args = process.argv.slice(2);
+const dbCommands = ['db', 'migrate', 'studio'];
+const requiresDb = args.some(arg => dbCommands.includes(arg));
 
-loadEnv({ required: ['DATABASE_URL'] });
+loadEnv({ required: requiresDb ? ['DATABASE_URL'] : [] });
 
-const args = ['prisma', ...process.argv.slice(2)];
-const result = spawnSync('npx', args, {
-  stdio: 'inherit',
-  shell: true,
-  env: process.env,
-  cwd: path.join(__dirname, '..'),
-});
+const prismaCliPath = path.join(__dirname, '..', 'node_modules', 'prisma', 'build', 'index.js');
+let result;
+
+if (fs.existsSync(prismaCliPath)) {
+  result = spawnSync(process.execPath, [prismaCliPath, ...process.argv.slice(2)], {
+    stdio: 'inherit',
+    env: process.env,
+    cwd: path.join(__dirname, '..'),
+  });
+} else {
+  const args = ['prisma', ...process.argv.slice(2)];
+  result = spawnSync('npx', args, {
+    stdio: 'inherit',
+    shell: true,
+    env: process.env,
+    cwd: path.join(__dirname, '..'),
+  });
+}
 
 process.exit(result.status ?? 1);
+

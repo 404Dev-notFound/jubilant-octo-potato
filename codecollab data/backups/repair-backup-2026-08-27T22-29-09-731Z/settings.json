@@ -1,0 +1,18 @@
+[
+  {
+    "id": "setting_001",
+    "key": "maintenanceMode",
+    "value": false,
+    "description": "Enable maintenance mode for the whole platform.",
+    "createdAt": "2026-08-01T00:00:00.000Z",
+    "updatedAt": "2026-08-01T00:00:00.000Z"
+  },
+  {
+    "id": "setting_002",
+    "key": "maxUploadSize",
+    "value": "10MB",
+    "description": "Maximum allowed upload size for files.",
+    "createdAt": "2026-08-01T00:00:00.000Z",
+    "updatedAt": "2026-08-01T00:00:00.000Z"
+  }
+]

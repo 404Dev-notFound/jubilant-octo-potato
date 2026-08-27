@@ -1,0 +1,873 @@
+[
+  {
+    "id": "1785998502411",
+    "createdAt": "2026-08-06T06:41:42.411Z",
+    "name": "Dev Goel",
+    "title": "Principal Systems Architect & Core Contributor",
+    "email": "dev@gmail.com",
+    "password": "$2b$10$920Vh1NdC10pCD6tADiCmOPD6WWi4tVz7c2jsVUK1myP0gHenM0.u",
+    "role": "Lead Architect",
+    "bio": "Building memory-safe distributed runtimes and high-concurrency systems.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "Rust",
+      "Tokio",
+      "WebAssembly",
+      "Distributed Systems"
+    ],
+    "skills": [
+      "Rust",
+      "Go",
+      "Kubernetes",
+      "WebAssembly",
+      "Distributed Systems"
+    ],
+    "rating": 4.9,
+    "upvotes": 313,
+    "upvoters": [
+      "1786746884946",
+      "1786747907456",
+      "1786978624580",
+      "1786990429294",
+      "1785998502411"
+    ],
+    "followers": [
+      "1786746884946",
+      "1786747907456",
+      "1786978624580"
+    ],
+    "availability": "Busy / Focused on Sprints",
+    "lookingFor": "Looking for: Tokio Async Specialist & Frontend Partner",
+    "socialLinks": {
+      "github": "https://github.com",
+      "twitter": "https://twitter.com",
+      "linkedin": "https://linkedin.com",
+      "website": "https://codecollab.dev"
+    },
+    "projects": [
+      "Distributed Cache Engine",
+      "Zero-Copy RPC Gateway",
+      "CodeCollab CLI"
+    ],
+    "progress": 0,
+    "potion": 0,
+    "username": "devgoel06",
+    "location": "delhi, india",
+    "education": "M.S. Computer Science, Stanford University",
+    "experience": "8+ years in Systems Engineering",
+    "interests": [
+      "Distributed Systems",
+      "Compilers",
+      "Async I/O",
+      "Performance"
+    ],
+    "updatedAt": "2026-08-21T19:02:00.616Z",
+    "hoursPerWeek": "10-20 hrs/wk",
+    "collaborationType": "Fullstack Developer",
+    "timezone": "UTC+5:30"
+  },
+  {
+    "id": "1786746884946",
+    "createdAt": "2026-08-14T22:34:44.946Z",
+    "name": "Alice Wonder",
+    "title": "AI/ML Engineer & PyTorch Specialist",
+    "email": "alice_1786746884843@example.com",
+    "password": "$2b$10$Sj2AT5QyHOvcliHrCL9NU..r9GMvLc.TgfavQN1UdqzVdwT0VnMTG",
+    "role": "AI Researcher",
+    "bio": "Specialized in LLM fine-tuning, embeddings ranking, and multi-agent coordination frameworks. Passionate about bringing intelligent code analysis to open-source.",
+    "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "Python",
+      "PyTorch",
+      "FastAPI",
+      "LangChain"
+    ],
+    "skills": [
+      "Python",
+      "PyTorch",
+      "FastAPI",
+      "LangChain",
+      "HuggingFace",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "rating": 4.9,
+    "upvotes": 274,
+    "upvoters": [
+      "1786747907456",
+      "1786990429294",
+      "1785998502411"
+    ],
+    "followers": [
+      "1786990429294"
+    ],
+    "availability": "Available Now · 10-15 hrs/wk",
+    "lookingFor": "Looking for: Rust WASM Optimizer for Browser AI",
+    "socialLinks": {
+      "github": "https://github.com/alicewonder-ai",
+      "linkedin": "https://linkedin.com/in/alicewonder-ml",
+      "twitter": "https://x.com/alicewonder_ai",
+      "website": "https://alicewonder.dev"
+    },
+    "projects": [
+      "CodeCollab AI Reviewer",
+      "Prompt Orchestration Framework"
+    ],
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786747907456",
+    "createdAt": "2026-08-14T22:51:47.456Z",
+    "name": "Bob Smith",
+    "title": "Creative Frontend Engineer & WebGL Dev",
+    "email": "bob_1786747907286@example.com",
+    "password": "$2b$10$/kbO/zNKt2J.RJp7413tEOK3fT8g2IiEIF7m7NmrpG1ERQPXvZx9u",
+    "role": "Frontend Specialist",
+    "bio": "Designing buttery-smooth interfaces, particle physics scenes, and high-performance interactive components with React and Three.js.",
+    "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "React",
+      "TypeScript",
+      "Three.js",
+      "TailwindCSS"
+    ],
+    "skills": [
+      "React",
+      "TypeScript",
+      "Three.js",
+      "TailwindCSS",
+      "WebGL",
+      "Next.js",
+      "Figma"
+    ],
+    "rating": 4.8,
+    "upvotes": 218,
+    "upvoters": [
+      "1785998502411",
+      "1786978624580"
+    ],
+    "followers": [
+      "1785998502411",
+      "1786828340958"
+    ],
+    "availability": "Weekends · Open for Collab",
+    "lookingFor": "Looking for: Fullstack Next.js Partner for Devtools",
+    "socialLinks": {
+      "github": "https://github.com/bobsmith-creative",
+      "linkedin": "https://linkedin.com/in/bobsmith-ui",
+      "twitter": "https://x.com/bobsmith_design",
+      "website": "https://bobsmith.design"
+    },
+    "projects": [
+      "Rose Nebula Canvas",
+      "Modern Design Tokens CLI"
+    ],
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786978624580",
+    "createdAt": "2026-08-17T14:57:04.580Z",
+    "name": "Mehak Patel",
+    "title": "Cloud Native & DevOps Engineer",
+    "email": "mehak@gmail.com",
+    "password": "$2b$10$U9l3JNR5QBY0DAkPln1xgufI1KWw3Z9fG.nINzYMB771Ev31FG.cm",
+    "role": "DevOps Architect",
+    "bio": "Automating Kubernetes deployments, infrastructure-as-code, and continuous benchmarking pipelines. Core maintainer of CloudMesh DevOps Guild.",
+    "avatarUrl": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "Kubernetes",
+      "Go",
+      "Terraform",
+      "GitHub Actions"
+    ],
+    "skills": [
+      "Kubernetes",
+      "Go",
+      "Terraform",
+      "GitHub Actions",
+      "Docker",
+      "Prometheus",
+      "Helm"
+    ],
+    "rating": 4.9,
+    "upvotes": 189,
+    "upvoters": [
+      "1785998502411",
+      "1786746884946"
+    ],
+    "followers": [
+      "1786990429294",
+      "1785998502411"
+    ],
+    "availability": "Available · Part-time",
+    "lookingFor": "Looking for: Go Backend Developer for K8s Operators",
+    "socialLinks": {
+      "github": "https://github.com/mehakpatel-cloud",
+      "linkedin": "https://linkedin.com/in/mehakpatel-devops",
+      "twitter": "https://x.com/mehak_cloud",
+      "website": "https://mehakpatel.dev"
+    },
+    "projects": [
+      "K8s Edge Controller",
+      "Prometheus Metrics Exporter"
+    ],
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786990429294",
+    "createdAt": "2026-08-17T18:13:49.294Z",
+    "name": "Adarsh Gupta",
+    "title": "Fullstack Engineer & OSS Evangelist",
+    "email": "sandeepguptadeep@gmail.com",
+    "password": "$2b$10$umXKXLJqS4DW53TUDCC8bOBLCz99v6RwgxGmaFoSQzNg5SpmowiKe",
+    "role": "Fullstack Developer",
+    "bio": "Building developer tools, GraphQL APIs, and collaborative real-time editors. Eager to connect with fellow builders and contribute to cutting-edge web projects.",
+    "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "Node.js",
+      "TypeScript",
+      "GraphQL",
+      "React"
+    ],
+    "skills": [
+      "Node.js",
+      "TypeScript",
+      "GraphQL",
+      "React",
+      "PostgreSQL",
+      "TailwindCSS",
+      "Redis"
+    ],
+    "rating": 4.8,
+    "upvotes": 156,
+    "upvoters": [
+      "1785998502411",
+      "1786746884946"
+    ],
+    "followers": [],
+    "availability": "Active · Open for Collab",
+    "lookingFor": "Looking for: AI / Prompt Evaluation Specialist",
+    "socialLinks": {
+      "github": "https://github.com/adarshgupta-oss",
+      "linkedin": "https://linkedin.com/in/adarshgupta-dev",
+      "twitter": "https://x.com/adarsh_codes",
+      "website": "https://adarshgupta.io"
+    },
+    "projects": [
+      "CodeCollab AI Reviewer",
+      "GraphQL Federation Gateway"
+    ],
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786828340958",
+    "createdAt": "2026-08-15T21:12:20.958Z",
+    "name": "Dev Engineer",
+    "title": "Backend & Database Optimization Specialist",
+    "email": "devuser_1786828340661@example.com",
+    "password": "$2b$10$JSIa1bS1o2icHUooaInAMOci17CrdqOV3HRdAQps5X5gUd.LwO4B2",
+    "role": "user",
+    "bio": "Focused on query tuning, caching architectures, and data consistency models in high-load distributed databases.",
+    "avatarUrl": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "PostgreSQL",
+      "Redis",
+      "Node.js",
+      "Docker"
+    ],
+    "skills": [
+      "PostgreSQL",
+      "Redis",
+      "Node.js",
+      "Docker",
+      "Prisma",
+      "Express"
+    ],
+    "rating": 4.7,
+    "upvotes": 114,
+    "upvoters": [
+      "1785998502411"
+    ],
+    "followers": [
+      "1786747907456"
+    ],
+    "availability": "Part-time · Weekends",
+    "lookingFor": "Looking for: Rust Systems Engineer to benchmark storage engines",
+    "socialLinks": {
+      "github": "https://github.com/devuser-db",
+      "linkedin": "https://linkedin.com/in/devuser-db",
+      "website": "https://devuser.tech"
+    },
+    "projects": [
+      "Rose Nebula Canvas"
+    ],
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1786377283959",
+    "createdAt": "2026-08-10T15:54:43.959Z",
+    "name": "Elena Rostova",
+    "title": "Security Researcher & Code Auditor",
+    "email": "test1786377283729@example.com",
+    "password": "$2b$10$Hz7GX9rQCuRVp2XwbbZSfenN5SvpGVaBpqEodj.XCmZbCo/Fzao4i",
+    "role": "Security Engineer",
+    "bio": "Auditing smart contracts, static analysis tools, and dependency pipelines. Helping open-source teams harden their security posture.",
+    "avatarUrl": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "Cybersecurity",
+      "Python",
+      "Rust",
+      "Static Analysis"
+    ],
+    "skills": [
+      "Cybersecurity",
+      "Python",
+      "Rust",
+      "Static Analysis",
+      "Cryptography",
+      "Linux"
+    ],
+    "rating": 4.8,
+    "upvotes": 98,
+    "upvoters": [
+      "1785998502411"
+    ],
+    "followers": [
+      "1786978624580"
+    ],
+    "availability": "Available · Part-time",
+    "lookingFor": "Looking for: Open-Source maintainers wanting free automated security audits",
+    "socialLinks": {
+      "github": "https://github.com/elenarostova-sec",
+      "linkedin": "https://linkedin.com/in/elenarostova-sec"
+    },
+    "projects": [
+      "K8s Edge Controller"
+    ],
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1",
+    "name": "dev",
+    "email": "dev@codecollab.io",
+    "availability": "Available Now",
+    "lookingFor": "Building distributed systems in Rust and Go",
+    "timezone": "UTC+5:30",
+    "hoursPerWeek": "15-20 hrs/wk",
+    "collaborationType": "Systems & Rust Specialist",
+    "updatedAt": "2026-08-20T20:39:35.297Z",
+    "followers": [
+      "2"
+    ]
+  },
+  {
+    "id": "1787355731659",
+    "createdAt": "2026-08-21T23:42:11.659Z",
+    "name": "Alice Developer",
+    "email": "alice_notif_test@example.com",
+    "password": "$2b$10$F1Vc6ppool.au1/fSLhnwuYpHLR2wbRHrlmvXMK7znVb.8H6RAASO",
+    "role": "user",
+    "progress": 0,
+    "potion": 0
+  },
+  {
+    "id": "1787355758873",
+    "createdAt": "2026-08-21T23:42:38.873Z",
+    "name": "Bob Developer",
+    "email": "bob_notif_test@example.com",
+    "password": "$2b$10$ySPTWkgAMGz6TscAbpwBUeX4ELPO4Tdv4qtBVxqcQojR1zQtczvgS",
+    "role": "user",
+    "progress": 0,
+    "potion": 0,
+    "upvoters": [
+      "1787355731659"
+    ],
+    "upvotes": 1
+  },
+  {
+    "id": "1787865817408",
+    "name": "Alice Developer",
+    "email": "test_alice_1787865816775@example.com",
+    "password": "$2b$10$jVLlHCJ/YQcx/vxvde7zUui2XcoFbE9.9WDQ7Fra/ukLqTZuUDutW",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T21:23:37.408Z"
+  },
+  {
+    "id": "1787865817851",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1787865816775@example.com",
+    "password": "$2b$10$0eBxAIoRD4sEzUjX9Li/8uoCgvh5E/1pp/ME6Nn.Gx.XICdbm0uPu",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T21:23:37.851Z"
+  },
+  {
+    "id": "1787865818166",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1787865816775@example.com",
+    "password": "$2b$10$SrLigQr4iSvGl9F.EtWbT.78BU/hS9DeCoXsWAm0irK2sl7Ce9A1i",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T21:23:38.167Z"
+  },
+  {
+    "id": "1787865836833",
+    "name": "Alice Developer",
+    "email": "test_alice_1787865836666@example.com",
+    "password": "$2b$10$H7SynJLGJ7b17yDZaHdVGuyMcoOf6wPfklGNbO0trz2fK7FVKMyC6",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T21:23:56.833Z"
+  },
+  {
+    "id": "1787865836984",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1787865836666@example.com",
+    "password": "$2b$10$t5QfrJSiItA7QoTHk8KrQOsC1yngq4M5FgJMOBLirGA2wItew5c9W",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T21:23:56.984Z"
+  },
+  {
+    "id": "1787865837126",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1787865836666@example.com",
+    "password": "$2b$10$lJP6dPES/b2q161mX7gSX.3fuXhwAd7zGMOQDajn6pLQuBDi5HB1S",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T21:23:57.126Z"
+  },
+  {
+    "id": "1787867523661",
+    "name": "Alice Developer",
+    "email": "test_alice_1787867523523@example.com",
+    "password": "$2b$10$.sdHr7e.tKoVLtQXJ2IhtOFVA70IharjUwll86QjVcgekQopAKfDi",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T21:52:03.661Z"
+  },
+  {
+    "id": "1787867523764",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1787867523523@example.com",
+    "password": "$2b$10$fHO453Ja2H2uuYj4HbIiYucmX/o1hSG54WU8oLqV47LkKoukuaXx6",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T21:52:03.764Z"
+  },
+  {
+    "id": "1787867523863",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1787867523523@example.com",
+    "password": "$2b$10$bTdWVWHMQNcExZVGBWXsz.qjrcQ.v4oTQNKgGSozkFqcGQ76e.Hmy",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T21:52:03.863Z"
+  },
+  {
+    "id": "1787867749150",
+    "name": "Alice Developer",
+    "email": "test_alice_1787867749034@example.com",
+    "password": "$2b$10$tERKjnsnxNOdKXvYRuDGFesWFz3K3MCMW2G0jP719vU/zs7i8iKEW",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T21:55:49.150Z"
+  },
+  {
+    "id": "1787867749249",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1787867749034@example.com",
+    "password": "$2b$10$GLM/v8HSWa/8TDJs2t8soukpjiOoz92BYdqk3/7wiS9SCuCp695lu",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T21:55:49.249Z"
+  },
+  {
+    "id": "1787867749339",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1787867749034@example.com",
+    "password": "$2b$10$SR35mJEa97P2Ua7V8ts74Oj5Dqh2VHmsXhyhdSHlq7.LdiN1Ozj3u",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T21:55:49.339Z"
+  },
+  {
+    "id": "1787868717039",
+    "name": "Alice Developer",
+    "email": "test_alice_1787868716921@example.com",
+    "password": "$2b$10$Pxf6JIwBq.IpEEh.xs6YJOTsCk9.ol/62hYEfjST/u9jRoNYAFREW",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T22:11:57.039Z"
+  },
+  {
+    "id": "1787868717144",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1787868716921@example.com",
+    "password": "$2b$10$cl1JwFtUBH2u2YXTd4j8BeVO5mKPutnYW88AMTOWCJ.FgRdQ3/azq",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T22:11:57.144Z"
+  },
+  {
+    "id": "1787868717239",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1787868716921@example.com",
+    "password": "$2b$10$rLQA8hrYRj4JHE.H28ZYA.XTdPiGkRjqLwcQ7BA7ewB.IwT/5mXbG",
+    "role": "user",
+    "title": "Fullstack Developer",
+    "bio": "Passionate developer building and collaborating on open-source code.",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "verifiedSkills": [
+      "JavaScript",
+      "React"
+    ],
+    "skills": [
+      "JavaScript",
+      "React",
+      "Node.js"
+    ],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration on exciting projects",
+    "socialLinks": {
+      "github": "https://github.com"
+    },
+    "projects": [
+      "CodeCollab"
+    ],
+    "createdAt": "2026-08-27T22:11:57.239Z"
+  }
+]

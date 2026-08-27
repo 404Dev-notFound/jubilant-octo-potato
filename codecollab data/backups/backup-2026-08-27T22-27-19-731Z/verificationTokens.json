@@ -1,0 +1,20 @@
+[
+  {
+    "id": "verif_001",
+    "userId": "1785007805649",
+    "token": "a1b2c3d4e5f6...",
+    "type": "email_verify",
+    "isUsed": false,
+    "expiresAt": "2026-08-03T00:00:00.000Z",
+    "createdAt": "2026-08-01T11:00:00.000Z"
+  },
+  {
+    "id": "verif_002",
+    "userId": "1785007805649",
+    "token": "z9y8x7w6v5u4...",
+    "type": "password_reset",
+    "isUsed": false,
+    "expiresAt": "2026-08-04T00:00:00.000Z",
+    "createdAt": "2026-08-01T12:00:00.000Z"
+  }
+]

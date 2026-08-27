@@ -1,0 +1,12 @@
+[
+  {
+    "id": "session_001",
+    "userId": "1785007805649",
+    "refreshTokenHash": "sha256:abc123def456...",
+    "ipAddress": "198.51.100.23",
+    "userAgent": "Chrome/124.0",
+    "expiresAt": "2026-09-01T10:00:00.000Z",
+    "createdAt": "2026-08-01T09:00:00.000Z",
+    "lastUsedAt": "2026-08-02T15:20:00.000Z"
+  }
+]

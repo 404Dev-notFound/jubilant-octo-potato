@@ -4,12 +4,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewCache = {};
 
     window.apiFetch = async function (endpoint, options = {}) {
-        const url = endpoint.startsWith('http') ? endpoint : `http://localhost:3000${endpoint}`;
+        let metaApiUrl = '';
+        if (typeof document !== 'undefined') {
+            const metaTag = document.querySelector('meta[name="api-base-url"]');
+            if (metaTag) metaApiUrl = (metaTag.getAttribute('content') || '').trim();
+        }
+        const customStorageUrl = (typeof localStorage !== 'undefined') ? (localStorage.getItem('CODECOLLAB_API_BASE_URL') || '').trim() : '';
+        const runtimeUrl = (typeof window !== 'undefined') ? ((window.__ENV__ && window.__ENV__.API_BASE_URL) || window.API_BASE_URL || '').trim() : '';
+        const originUrl = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null') ? window.location.origin : '';
+
+        const rawBase = runtimeUrl || metaApiUrl || customStorageUrl || originUrl;
+        const baseUrl = rawBase.replace(/\/+$/, '');
+        const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+        const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${cleanEndpoint}`;
 
         const headers = { ...options.headers };
         if (!headers['Content-Type'] && !(options.body instanceof FormData) && options.method && options.method.toUpperCase() !== 'GET') {
             headers['Content-Type'] = 'application/json';
         }
+
 
         // Attach Authorization header if user is logged in
         const currentUserStr = localStorage.getItem('currentUser');
@@ -164,9 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // SPA navigation: parse hash, load appropriate view, display skeleton loader, and fetch dynamic data
         window.updateAuthUI();
         let hash = window.location.hash.substring(1) || 'home';
-        const viewName = hash.split('?')[0].toLowerCase();
+        const rawViewName = hash.split('?')[0].toLowerCase().replace(/-/g, '_');
+        const viewName = rawViewName || 'home';
         const urlParams = new URLSearchParams(hash.split('?')[1] || '');
-        const projectId = urlParams.get('projectId');
+        const projectId = urlParams.get('projectId') || urlParams.get('id');
+
 
         // AI Chat feature disabled as per request
         if (viewName === 'ai_chat') {

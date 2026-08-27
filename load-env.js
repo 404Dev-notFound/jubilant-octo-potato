@@ -1,39 +1,44 @@
 /*
- * Utility module to load environment variables from a .env file.
- * Ensures the required .env file exists and validates required keys.
+ * Utility module to load environment variables.
+ * Supports local .env file as well as direct container/cloud environment injection.
  */
 const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
 
-// Load environment variables, ensuring required variables are set
-const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
 const envPath = path.join(__dirname, '.env');
 
 /*
- * Load environment variables, optionally checking for required keys.
- * Exits the process with an error message if .env is missing or required keys are absent.
+ * Load environment variables, checking for required keys.
+ * In containerized/cloud environments, variables are often passed directly via process.env.
  */
-function loadEnv({ required = [] } = {}) {
-  if (!fs.existsSync(envPath)) {
-    console.error(`❌ .env file not found at: ${envPath}`);
-    console.error('   Copy .env.example to .env and restart the server.');
-    process.exit(1);
+function loadEnv({ required = ['JWT_SECRET', 'DATABASE_URL'] } = {}) {
+  if (fs.existsSync(envPath)) {
+    const result = dotenv.config({ path: envPath });
+    if (result.error) {
+      console.warn('⚠️  Warning: Failed to parse .env file:', result.error.message);
+    }
   }
 
-  const result = dotenv.config({ path: envPath });
-  if (result.error) {
-    console.error('❌ Failed to load .env:', result.error.message);
-    process.exit(1);
-  }
-
+  const missing = [];
   for (const key of required) {
     if (!process.env[key]) {
-      console.error(`❌ Prisma Error: ${key} not found.`);
-      console.error(`   Add ${key} to your .env file and restart the server.`);
+      missing.push(key);
+    }
+  }
+
+  if (missing.length > 0) {
+    console.error(`❌ Environment Configuration Error: Missing required variable(s): ${missing.join(', ')}`);
+    if (!fs.existsSync(envPath)) {
+      console.error(`   No .env file found at: ${envPath}`);
+      console.error('   Please provide required variables via .env or container environment variables.');
+    }
+    // In production, exit if critical secrets are missing
+    if (process.env.NODE_ENV === 'production' || missing.includes('JWT_SECRET')) {
       process.exit(1);
     }
   }
 }
 
 module.exports = { loadEnv, envPath };
+

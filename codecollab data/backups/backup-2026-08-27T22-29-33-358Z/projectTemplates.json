@@ -1,0 +1,13 @@
+[
+  {
+    "id": "tmpl_001",
+    "ownerId": "1785007805649",
+    "title": "Standard Web App",
+    "description": "Template with backlog, sprint board, CI pipeline.",
+    "defaultTechStack": ["React", "Node.js", "PostgreSQL"],
+    "defaultTasks": ["task_tpl_001", "task_tpl_002"],
+    "visibility": "public",
+    "createdAt": "2026-08-01T13:00:00.000Z",
+    "updatedAt": "2026-08-01T13:00:00.000Z"
+  }
+]

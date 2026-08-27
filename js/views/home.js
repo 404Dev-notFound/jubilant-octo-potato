@@ -54,8 +54,9 @@ export function render_home() {
 
 export async function initHome() {
     try {
-        const res = await (window.apiFetch ? window.apiFetch('/api/stats') : fetch('http://localhost:3000/api/stats'));
+        const res = await (window.apiFetch ? window.apiFetch('/api/stats') : fetch('/api/stats'));
         if (res.ok) {
+
             const data = await res.json();
             const devEl = document.getElementById('stat-developers');
             const projEl = document.getElementById('stat-projects');

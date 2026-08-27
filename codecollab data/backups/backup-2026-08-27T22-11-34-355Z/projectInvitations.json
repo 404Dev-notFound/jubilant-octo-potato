@@ -1,0 +1,22 @@
+[
+  {
+    "id": "join_001",
+    "userId": "1786747907456",
+    "projectId": "proj_001",
+    "ownerId": "1785998502411",
+    "status": "PENDING",
+    "message": "I would love to contribute to Tokio async benchmarks and memory profiling.",
+    "createdAt": "2026-08-08T14:30:00.000Z",
+    "updatedAt": "2026-08-08T14:30:00.000Z"
+  },
+  {
+    "id": "join_002",
+    "userId": "1786978624580",
+    "projectId": "1786828341033",
+    "ownerId": "1786828340958",
+    "status": "ACCEPTED",
+    "message": "Experienced in PyTorch distributed training and eager to help with cluster communications.",
+    "createdAt": "2026-08-16T11:00:00.000Z",
+    "updatedAt": "2026-08-16T11:30:00.000Z"
+  }
+]

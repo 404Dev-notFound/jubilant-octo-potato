@@ -1,0 +1,14 @@
+[
+  {
+    "id": "setting_001",
+    "key": "maintenanceMode",
+    "value": false,
+    "description": "Enable maintenance mode for the application"
+  },
+  {
+    "id": "setting_002",
+    "key": "maxUploadSize",
+    "value": "5MB",
+    "description": "Maximum allowed upload size"
+  }
+]

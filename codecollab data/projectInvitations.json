@@ -1,13 +1,32 @@
 [
   {
-    "id": "proj_inv_001",
+    "id": "join_001",
+    "userId": "1786747907456",
     "projectId": "proj_001",
-    "inviterId": "1785007805649",
-    "inviteeId": "1784903103220",
-    "role": "editor",
-    "status": "pending",
-    "expiresAt": "2026-08-10T00:00:00.000Z",
-    "createdAt": "2026-08-02T09:00:00.000Z",
-    "updatedAt": "2026-08-02T09:00:00.000Z"
+    "ownerId": "1785998502411",
+    "status": "PENDING",
+    "message": "I would love to contribute to Tokio async benchmarks and memory profiling.",
+    "createdAt": "2026-08-08T14:30:00.000Z",
+    "updatedAt": "2026-08-08T14:30:00.000Z"
+  },
+  {
+    "id": "join_002",
+    "userId": "1786978624580",
+    "projectId": "1786828341033",
+    "ownerId": "1786828340958",
+    "status": "ACCEPTED",
+    "message": "Experienced in PyTorch distributed training and eager to help with cluster communications.",
+    "createdAt": "2026-08-16T11:00:00.000Z",
+    "updatedAt": "2026-08-16T11:30:00.000Z"
+  },
+  {
+    "id": "req_1787869980202_6bdc4e",
+    "userId": "1787869979814",
+    "projectId": "proj_1787869980131_c00b7c",
+    "ownerId": "1787869979709",
+    "status": "ACCEPTED",
+    "message": "I want to contribute to backend performance!",
+    "createdAt": "2026-08-27T22:33:00.202Z",
+    "updatedAt": "2026-08-27T22:33:00.216Z"
   }
 ]

@@ -1,0 +1,13 @@
+[
+  {
+    "id": "audit_001",
+    "entityId": "proj_001",
+    "entityType": "Project",
+    "action": "UPDATE",
+    "performedBy": "1785007805649",
+    "ipAddress": "203.0.113.42",
+    "userAgent": "Mozilla/5.0",
+    "metadata": {"changedFields": ["title", "description"]},
+    "createdAt": "2026-08-02T12:30:00.000Z"
+  }
+]

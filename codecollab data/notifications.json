@@ -1,11 +1,103 @@
 [
-  // Add notification objects here
+  {
+    "id": "notif_1787869980218_a15df364",
+    "userId": "1787869979814",
+    "actorId": "1787869979709",
+    "projectId": "proj_1787869980131_c00b7c",
+    "type": "JOIN_REQUEST_ACCEPTED",
+    "title": "Join Request Accepted! 🎉",
+    "message": "Your request to join the project was accepted!",
+    "data": {
+      "requestId": "req_1787869980202_6bdc4e",
+      "projectId": "proj_1787869980131_c00b7c"
+    },
+    "read": true,
+    "createdAt": "2026-08-27T22:33:00.218Z"
+  },
+  {
+    "id": "notif_1787869980205_cb2b1f89",
+    "userId": "1787869979709",
+    "actorId": "1787869979814",
+    "projectId": "proj_1787869980131_c00b7c",
+    "type": "JOIN_REQUEST_RECEIVED",
+    "title": "New Join Request 🚀",
+    "message": "Bob Maintainer requested to join \"Production Hardened Engine\"",
+    "data": {
+      "requestId": "req_1787869980202_6bdc4e",
+      "projectId": "proj_1787869980131_c00b7c"
+    },
+    "read": false,
+    "createdAt": "2026-08-27T22:33:00.205Z"
+  },
+  {
+    "id": "notif_1787868717513_4073896a",
+    "userId": "1787868717144",
+    "actorId": "1787868717039",
+    "projectId": null,
+    "type": "JOIN_REQUEST_ACCEPTED",
+    "title": "Join Request Accepted! 🎉",
+    "message": "Your request to join the project was accepted!",
+    "data": {
+      "requestId": "req_1787868717498_47e15c"
+    },
+    "read": true,
+    "createdAt": "2026-08-27T22:11:57.513Z"
+  },
+  {
+    "id": "notif_1787868717502_6d52c692",
+    "userId": "1787868717039",
+    "actorId": "1787868717144",
+    "projectId": null,
+    "type": "JOIN_REQUEST_RECEIVED",
+    "title": "New Join Request 🚀",
+    "message": "Bob Maintainer requested to join \"Production Hardened Engine\"",
+    "data": {
+      "requestId": "req_1787868717498_47e15c"
+    },
+    "read": false,
+    "createdAt": "2026-08-27T22:11:57.502Z"
+  },
   {
     "id": "notif_001",
-    "userId": "1785007805649",
-    "type": "message",
-    "content": "You have a new message from user 1784903103220.",
+    "userId": "1785998502411",
+    "actorId": null,
+    "projectId": "proj_001",
+    "type": "SYSTEM",
+    "title": "Welcome to CodeCollab! 🚀",
+    "message": "Your developer workspace is ready for real-time collaboration.",
+    "data": {
+      "projectId": "proj_001"
+    },
+    "read": true,
+    "createdAt": "2026-08-06T06:41:42.411Z"
+  },
+  {
+    "id": "notif_002",
+    "userId": "1786746884946",
+    "actorId": "1785998502411",
+    "projectId": "proj_001",
+    "type": "ISSUE_ASSIGNED",
+    "title": "New Issue Assignment 📋",
+    "message": "You were assigned to issue 'Setup CI/CD pipeline'",
+    "data": {
+      "issueId": "task_001",
+      "projectId": "proj_001"
+    },
     "read": false,
-    "createdAt": "2026-08-02T12:00:00.000Z"
+    "createdAt": "2026-08-07T09:00:00.000Z"
+  },
+  {
+    "id": "notif_003",
+    "userId": "1786828340958",
+    "actorId": null,
+    "projectId": "1786828341033",
+    "type": "SYSTEM",
+    "title": "Project Initialized",
+    "message": "Distributed Neural Engine repository is active.",
+    "data": {
+      "projectId": "1786828341033"
+    },
+    "read": true,
+    "createdAt": "2026-08-15T21:12:21.033Z"
   }
 ]

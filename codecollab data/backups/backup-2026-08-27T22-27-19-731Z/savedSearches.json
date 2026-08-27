@@ -1,0 +1,11 @@
+[
+  {
+    "id": "search_001",
+    "userId": "1785007805649",
+    "name": "My open tasks",
+    "query": "status:open",
+    "filters": {"priority": ["high","medium"]},
+    "createdAt": "2026-08-01T12:00:00.000Z",
+    "updatedAt": "2026-08-01T12:00:00.000Z"
+  }
+]

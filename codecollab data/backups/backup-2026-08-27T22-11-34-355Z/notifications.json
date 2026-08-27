@@ -1,0 +1,45 @@
+[
+  {
+    "id": "notif_001",
+    "userId": "1785998502411",
+    "actorId": null,
+    "projectId": "proj_001",
+    "type": "SYSTEM",
+    "title": "Welcome to CodeCollab! 🚀",
+    "message": "Your developer workspace is ready for real-time collaboration.",
+    "data": {
+      "projectId": "proj_001"
+    },
+    "read": true,
+    "createdAt": "2026-08-06T06:41:42.411Z"
+  },
+  {
+    "id": "notif_002",
+    "userId": "1786746884946",
+    "actorId": "1785998502411",
+    "projectId": "proj_001",
+    "type": "ISSUE_ASSIGNED",
+    "title": "New Issue Assignment 📋",
+    "message": "You were assigned to issue 'Setup CI/CD pipeline'",
+    "data": {
+      "issueId": "task_001",
+      "projectId": "proj_001"
+    },
+    "read": false,
+    "createdAt": "2026-08-07T09:00:00.000Z"
+  },
+  {
+    "id": "notif_003",
+    "userId": "1786828340958",
+    "actorId": null,
+    "projectId": "1786828341033",
+    "type": "SYSTEM",
+    "title": "Project Initialized",
+    "message": "Distributed Neural Engine repository is active.",
+    "data": {
+      "projectId": "1786828341033"
+    },
+    "read": true,
+    "createdAt": "2026-08-15T21:12:21.033Z"
+  }
+]

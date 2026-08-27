@@ -1,0 +1,10 @@
+[
+  {
+    "id": "refresh_001",
+    "userId": "1785007805649",
+    "tokenHash": "sha256:refresh123...",
+    "expiresAt": "2026-09-01T10:00:00.000Z",
+    "createdAt": "2026-08-01T09:00:00.000Z",
+    "lastUsedAt": "2026-08-02T15:20:00.000Z"
+  }
+]

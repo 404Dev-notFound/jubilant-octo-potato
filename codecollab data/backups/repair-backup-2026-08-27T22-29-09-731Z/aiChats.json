@@ -1,0 +1,14 @@
+[
+  {
+    "id": "aichat_001",
+    "userId": "1785007805649",
+    "sessionId": "session_abc123",
+    "model": "gpt-4o",
+    "messages": [
+      {"role": "user", "content": "How do I add a new task?", "timestamp": "2026-08-02T14:00:00.000Z"},
+      {"role": "assistant", "content": "You can POST to /api/tasks...", "timestamp": "2026-08-02T14:00:01.000Z"}
+    ],
+    "createdAt": "2026-08-02T14:00:00.000Z",
+    "updatedAt": "2026-08-02T14:00:01.000Z"
+  }
+]

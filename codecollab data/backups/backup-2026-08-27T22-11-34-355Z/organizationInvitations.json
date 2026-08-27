@@ -1,0 +1,13 @@
+[
+  {
+    "id": "org_inv_001",
+    "organizationId": "org_001",
+    "inviterId": "1785007805649",
+    "inviteeId": "1784903103220",
+    "role": "member",
+    "status": "pending",
+    "expiresAt": "2026-08-12T00:00:00.000Z",
+    "createdAt": "2026-08-02T10:15:00.000Z",
+    "updatedAt": "2026-08-02T10:15:00.000Z"
+  }
+]

@@ -7,8 +7,9 @@
  * Strict authorization, relational integrity, zero sensitive data exposure.
  */
 
+const NODE_ENV = process.env.NODE_ENV || 'development';
 const { loadEnv } = require('./load-env.js');
-loadEnv({ required: ['JWT_SECRET'] });
+loadEnv({ required: NODE_ENV === 'production' ? ['JWT_SECRET', 'DATABASE_URL'] : ['JWT_SECRET'] });
 
 const express = require('express');
 const cors = require('cors');
@@ -21,9 +22,16 @@ const rateLimit = require('express-rate-limit');
 const fs = require('fs/promises');
 const path = require('path');
 
-const NODE_ENV = process.env.NODE_ENV || 'development';
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'codecollab-dev-jwt-secret-key-replace-in-prod';
+let JWT_SECRET = (process.env.JWT_SECRET || '').trim();
+if (NODE_ENV === 'production') {
+    if (!JWT_SECRET || JWT_SECRET.length < 32 || JWT_SECRET === 'codecollab-dev-jwt-secret-key-replace-in-prod') {
+        console.error('❌ FATAL: JWT_SECRET must be set to a cryptographically secure string of at least 32 characters in production.');
+        process.exit(1);
+    }
+} else {
+    JWT_SECRET = JWT_SECRET || 'codecollab-dev-jwt-secret-key-replace-in-prod';
+}
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
 const DATA_DIR = path.join(__dirname, 'codecollab data');

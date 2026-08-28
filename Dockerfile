@@ -46,7 +46,6 @@ COPY --from=builder --chown=codecollab:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=codecollab:nodejs /app/scripts ./scripts
 COPY --from=builder --chown=codecollab:nodejs /app/load-env.js ./load-env.js
 COPY --from=builder --chown=codecollab:nodejs /app/server.js ./server.js
-COPY --from=builder --chown=codecollab:nodejs /app/codecollab\ data ./codecollab\ data
 COPY --from=builder --chown=codecollab:nodejs /app/css ./css
 COPY --from=builder --chown=codecollab:nodejs /app/js ./js
 COPY --from=builder --chown=codecollab:nodejs /app/index.html ./index.html

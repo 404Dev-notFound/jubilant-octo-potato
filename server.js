@@ -3336,7 +3336,7 @@ let serverInstance = null;
 if (require.main === module) {
     (async () => {
         await verifyDatabaseConnectivity();
-        serverInstance = app.listen(PORT, () => {
+        serverInstance = app.listen(PORT, '0.0.0.0', () => {
             console.log(`=======================================================`);
             console.log(`🚀 CodeCollab API Server running on port ${PORT}`);
             console.log(`🔧 Environment: ${NODE_ENV}`);

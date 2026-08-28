@@ -24,7 +24,7 @@ Thumbs.db
 logs
 *.log
 scratch
-codecollab data/backups
+codecollab data
 
 # Generated prisma client on host machine (will be generated inside container for target architecture)
 prisma/generated

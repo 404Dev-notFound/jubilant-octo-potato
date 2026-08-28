@@ -624,7 +624,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'PUT',
                     body: JSON.stringify(data)
                 });
-                
+
                 if (response.ok) {
                     const updatedUser = await response.json();
                     const curUserStr = localStorage.getItem('currentUser');
@@ -644,7 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.updateAuthUI();
                     window.UI.closeModal();
                     window.UI.showToast('Profile updated successfully!', 'success');
-                    
+
                     if (window.location.hash.includes('user_profile') || window.location.hash.includes('profile') || window.location.hash.includes('settings')) {
                         window.dispatchEvent(new HashChangeEvent('hashchange'));
                     }

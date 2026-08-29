@@ -42,7 +42,7 @@ function getNotificationConfig(n) {
             icon: 'how_to_reg',
             badge: 'Join Accepted',
             color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-            actionUrl: n.projectId ? `#project-details?id=${n.projectId}` : '#dashboard',
+            actionUrl: n.projectId ? `#project_details?id=${n.projectId}` : '#dashboard',
             actionText: 'Open Project'
         };
     }

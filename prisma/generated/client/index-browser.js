@@ -283,6 +283,74 @@ exports.Prisma.NotificationScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.LookingForScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  lookingFor: 'lookingFor',
+  forProject: 'forProject',
+  requiredSkills: 'requiredSkills',
+  commitment: 'commitment',
+  availability: 'availability',
+  context: 'context',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TeamScalarFieldEnum = {
+  id: 'id',
+  teamName: 'teamName',
+  description: 'description',
+  leadId: 'leadId',
+  assignedProjects: 'assignedProjects',
+  skills: 'skills',
+  upvotes: 'upvotes',
+  upvoters: 'upvoters',
+  lookingFor: 'lookingFor',
+  openPositions: 'openPositions',
+  availability: 'availability',
+  rating: 'rating',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TeamMemberScalarFieldEnum = {
+  teamId: 'teamId',
+  userId: 'userId',
+  role: 'role',
+  joinedAt: 'joinedAt'
+};
+
+exports.Prisma.TeamApplicationScalarFieldEnum = {
+  id: 'id',
+  teamId: 'teamId',
+  userId: 'userId',
+  position: 'position',
+  message: 'message',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OrganizationScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  logo: 'logo',
+  website: 'website',
+  githubUrl: 'githubUrl',
+  ownerId: 'ownerId',
+  tags: 'tags',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OrganizationMemberScalarFieldEnum = {
+  organizationId: 'organizationId',
+  userId: 'userId',
+  role: 'role',
+  joinedAt: 'joinedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -344,7 +412,13 @@ exports.Prisma.ModelName = {
   Issue: 'Issue',
   JoinRequest: 'JoinRequest',
   MeetingRequest: 'MeetingRequest',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  LookingFor: 'LookingFor',
+  Team: 'Team',
+  TeamMember: 'TeamMember',
+  TeamApplication: 'TeamApplication',
+  Organization: 'Organization',
+  OrganizationMember: 'OrganizationMember'
 };
 
 /**

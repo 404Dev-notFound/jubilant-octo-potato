@@ -1,5 +1,65 @@
 [
   {
+    "id": "notif_1788022782489_86c28e15",
+    "userId": "1788022782059",
+    "actorId": "1788022781878",
+    "projectId": "proj_1788022782417_0bef8b",
+    "type": "JOIN_REQUEST_ACCEPTED",
+    "title": "Join Request Accepted! 🎉",
+    "message": "Your request to join the project was accepted!",
+    "data": {
+      "requestId": "req_1788022782472_30e322",
+      "projectId": "proj_1788022782417_0bef8b"
+    },
+    "read": true,
+    "createdAt": "2026-08-29T16:59:42.489Z"
+  },
+  {
+    "id": "notif_1788022782476_a45c2d5d",
+    "userId": "1788022781878",
+    "actorId": "1788022782059",
+    "projectId": "proj_1788022782417_0bef8b",
+    "type": "JOIN_REQUEST_RECEIVED",
+    "title": "New Join Request 🚀",
+    "message": "Bob Maintainer requested to join \"Production Hardened Engine\"",
+    "data": {
+      "requestId": "req_1788022782472_30e322",
+      "projectId": "proj_1788022782417_0bef8b"
+    },
+    "read": false,
+    "createdAt": "2026-08-29T16:59:42.476Z"
+  },
+  {
+    "id": "notif_1788022765759_f874b6c9",
+    "userId": "1788022765386",
+    "actorId": "1788022765204",
+    "projectId": "proj_1788022765683_3d6a1c",
+    "type": "JOIN_REQUEST_ACCEPTED",
+    "title": "Join Request Accepted! 🎉",
+    "message": "Your request to join the project was accepted!",
+    "data": {
+      "requestId": "req_1788022765742_6cd1cc",
+      "projectId": "proj_1788022765683_3d6a1c"
+    },
+    "read": true,
+    "createdAt": "2026-08-29T16:59:25.759Z"
+  },
+  {
+    "id": "notif_1788022765746_258a0416",
+    "userId": "1788022765204",
+    "actorId": "1788022765386",
+    "projectId": "proj_1788022765683_3d6a1c",
+    "type": "JOIN_REQUEST_RECEIVED",
+    "title": "New Join Request 🚀",
+    "message": "Bob Maintainer requested to join \"Production Hardened Engine\"",
+    "data": {
+      "requestId": "req_1788022765742_6cd1cc",
+      "projectId": "proj_1788022765683_3d6a1c"
+    },
+    "read": false,
+    "createdAt": "2026-08-29T16:59:25.746Z"
+  },
+  {
     "id": "notif_1787869980218_a15df364",
     "userId": "1787869979814",
     "actorId": "1787869979709",

@@ -51,6 +51,9 @@ COPY --from=builder --chown=codecollab:nodejs /app/js ./js
 COPY --from=builder --chown=codecollab:nodejs /app/index.html ./index.html
 COPY --from=builder --chown=codecollab:nodejs /app/pre_deploy.md ./pre_deploy.md
 
+# Ensure data directory exists with write permissions for resilience
+RUN mkdir -p "/app/codecollab data" && chown -R codecollab:nodejs "/app/codecollab data"
+
 USER codecollab
 
 EXPOSE 3000

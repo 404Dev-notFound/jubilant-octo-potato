@@ -176,8 +176,8 @@ export async function initProjectDetails(projectId) {
                     </h3>
                     <div class="flex items-center justify-between flex-wrap gap-3">
                         <div class="flex items-center gap-md">
-                            <div class="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold text-lg shadow-md">
-                                ${ownerInitial}
+                            <div class="w-12 h-12 rounded-2xl bg-secondary/20 text-secondary flex items-center justify-center font-bold text-lg shadow-md overflow-hidden border border-secondary/30">
+                                ${owner?.avatarUrl ? `<img src="${owner.avatarUrl}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none;" class="w-full h-full flex items-center justify-center font-bold text-lg text-secondary">${ownerInitial}</span>` : ownerInitial}
                             </div>
                             <div>
                                 <h4 class="font-bold text-on-surface text-sm">${escapeHtml(ownerName)}</h4>
@@ -212,8 +212,8 @@ export async function initProjectDetails(projectId) {
                                 return `
                                     <div class="p-3 bg-surface-container/60 border border-white/5 rounded-xl flex items-center justify-between gap-2">
                                         <div class="flex items-center gap-2.5 min-w-0">
-                                            <div class="w-9 h-9 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs flex-shrink-0">
-                                                ${mInitial}
+                                            <div class="w-9 h-9 rounded-xl bg-primary/20 text-primary flex items-center justify-center font-bold text-xs flex-shrink-0 overflow-hidden border border-white/5">
+                                                ${mUser?.avatarUrl ? `<img src="${mUser.avatarUrl}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none;" class="w-full h-full flex items-center justify-center font-bold text-xs text-primary">${mInitial}</span>` : mInitial}
                                             </div>
                                             <div class="min-w-0">
                                                 <div class="font-bold text-on-surface text-xs truncate">${escapeHtml(mName)}</div>

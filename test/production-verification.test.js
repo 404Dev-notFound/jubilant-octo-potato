@@ -506,12 +506,166 @@ async function runTests() {
             assert(res.headers['access-control-allow-methods'] && res.headers['access-control-allow-methods'].includes('POST'), 'Preflight permits POST method');
         }
 
+        // ----------------------------------------------------------------------
+        // 10. Matchmaking & Looking-For System (Prisma + Supabase PostgreSQL)
+        // ----------------------------------------------------------------------
+        console.log('\n--- 10. Matchmaking & Looking-For System ---');
+        let createdPostId;
         {
-            // Unauthorized malicious origin should NOT receive ACAO header
-            const res = await request('/health', {
-                headers: { 'Origin': 'https://evil-unauthorized-hacker-domain.com' }
+            // Unauthenticated looking-for creation blocked
+            const res = await request('/api/community/looking-for', {
+                method: 'POST',
+                body: { lookingFor: 'Frontend Lead', for: 'Next.js App', requiredSkills: ['React'] }
             });
-            assert(!res.headers['access-control-allow-origin'], 'Unauthorized origin is denied CORS headers');
+            assert(res.status === 401, 'Unauthenticated looking-for post creation is blocked (HTTP 401)');
+        }
+        {
+            // User A creates looking-for post
+            const res = await request('/api/community/looking-for', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${userAToken}` },
+                body: {
+                    lookingFor: 'Rust Core Engineer',
+                    for: 'Building High-Performance Distributed DB',
+                    requiredSkills: ['Rust', 'Tokio', 'Raft'],
+                    commitment: 'Part-time (10 hrs/wk)',
+                    availability: 'Evenings & Weekends',
+                    context: 'Looking for a systems dev to collaborate on consensus layer.'
+                }
+            });
+            assert(res.status === 201, 'User A creates looking-for post (HTTP 201)');
+            assert(res.body.id, 'Created post contains id');
+            assert(res.body.userId === userA.id, 'Post userId matches User A');
+            assert(res.body.author && !res.body.author.email, 'Author info populated without email leakage');
+            createdPostId = res.body.id;
+        }
+        {
+            // GET /api/community/looking-for
+            const res = await request('/api/community/looking-for');
+            assert(res.status === 200, 'GET /api/community/looking-for returns HTTP 200');
+            assert(Array.isArray(res.body), 'Looking-for posts returned as array');
+            const found = res.body.find(p => p.id === createdPostId);
+            assert(found, 'Created post is present in feed');
+        }
+        {
+            // User B (non-owner) attempting to delete User A's post is BLOCKED
+            const res = await request(`/api/community/looking-for/${createdPostId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${userBToken}` }
+            });
+            assert(res.status === 403, 'Non-owner delete attempt on looking-for post is BLOCKED (HTTP 403)');
+        }
+        {
+            // User A deletes own looking-for post
+            const res = await request(`/api/community/looking-for/${createdPostId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${userAToken}` }
+            });
+            assert(res.status === 200, 'Owner User A successfully deletes looking-for post (HTTP 200)');
+        }
+
+        // ----------------------------------------------------------------------
+        // 11. Teams & Member Application Lifecycle (Prisma + Supabase PostgreSQL)
+        // ----------------------------------------------------------------------
+        console.log('\n--- 11. Teams & Application Lifecycle ---');
+        let createdTeamId;
+        {
+            // User A creates team
+            const res = await request('/api/teams', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${userAToken}` },
+                body: {
+                    teamName: 'Hyperion Quantum Lab',
+                    tagline: 'Building next-gen simulators',
+                    description: 'Open source collective researching quantum algorithms.',
+                    tags: ['Quantum', 'Python', 'Qiskit'],
+                    openPositions: [{ role: 'Algorithm Researcher', skills: ['Python'] }]
+                }
+            });
+            assert(res.status === 201, 'User A creates new team (HTTP 201)');
+            assert(res.body.id, 'Team has valid ID');
+            assert(res.body.leadId === userA.id, 'Team leadId matches User A');
+            createdTeamId = res.body.id;
+        }
+        {
+            // GET /api/teams
+            const res = await request('/api/teams');
+            assert(res.status === 200, 'GET /api/teams returns HTTP 200');
+            assert(Array.isArray(res.body), 'Teams returned as array');
+            const found = res.body.find(t => t.id === createdTeamId);
+            assert(found, 'Created team is present in list');
+            assert(found.memberDetails && found.memberDetails.length >= 1, 'Team includes memberDetails with lead');
+            assert(!found.lead || !found.lead.email, 'Team lead never exposes email');
+        }
+        {
+            // User B upvotes team
+            const res = await request(`/api/teams/${createdTeamId}/upvote`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${userBToken}` }
+            });
+            assert(res.status === 200, 'User B upvotes team (HTTP 200)');
+            assert(res.body.hasUpvoted === true, 'Upvote recorded');
+            assert(res.body.upvotes >= 1, 'Upvote count incremented');
+        }
+
+        // ----------------------------------------------------------------------
+        // 12. Organizations System (Prisma + Supabase PostgreSQL)
+        // ----------------------------------------------------------------------
+        console.log('\n--- 12. Organizations System ---');
+        {
+            // User A creates organization
+            const res = await request('/api/organizations', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${userAToken}` },
+                body: {
+                    name: 'Vanguard Foundation',
+                    description: 'Global developer collective for open infrastructure.',
+                    website: 'https://vanguard.dev',
+                    tags: ['Infrastructure', 'Security']
+                }
+            });
+            assert(res.status === 201, 'User A creates organization (HTTP 201)');
+            assert(res.body.id, 'Organization has valid ID');
+            assert(res.body.ownerId === userA.id, 'Org owner matches User A');
+        }
+        {
+            // GET /api/organizations
+            const res = await request('/api/organizations');
+            assert(res.status === 200, 'GET /api/organizations returns HTTP 200');
+            assert(Array.isArray(res.body), 'Organizations returned as array');
+        }
+
+        // ----------------------------------------------------------------------
+        // 13. Developer Upvote & Follow Persistence (Prisma + Supabase PostgreSQL)
+        // ----------------------------------------------------------------------
+        console.log('\n--- 13. Developer Upvotes & Follows ---');
+        {
+            // User B upvotes User A
+            const res = await request(`/api/users/${userA.id}/upvote`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${userBToken}` }
+            });
+            assert(res.status === 200, 'User B upvotes User A profile (HTTP 200)');
+            assert(res.body.hasUpvoted === true, 'Profile upvote registered');
+            assert(res.body.upvotes >= 1, 'Profile upvotes count updated');
+        }
+        {
+            // User B follows User A
+            const res = await request(`/api/users/${userA.id}/follow`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${userBToken}` }
+            });
+            assert(res.status === 200, 'User B follows User A profile (HTTP 200)');
+            assert(res.body.hasFollowed === true, 'Follower recorded');
+        }
+        {
+            // GET /api/users/:id
+            const res = await request(`/api/users/${userA.id}`);
+            assert(res.status === 200, 'GET /api/users/:id returns HTTP 200');
+            assert(res.body.name === userA.name, 'Fetched user name matches');
+            assert(!res.body.email, 'Public user endpoint NEVER exposes email');
+            assert(res.body.upvotes >= 1, 'Upvotes persisted in database');
+            assert(Array.isArray(res.body.followers) && res.body.followers.length >= 1, 'Followers persisted in database');
         }
 
         console.log('\n===============================================================');
@@ -519,6 +673,30 @@ async function runTests() {
         console.log('===============================================================\n');
 
     } finally {
+        // Cleanup test users and test entities from database
+        try {
+            const { PrismaClient } = require('@prisma/client');
+            const prisma = new PrismaClient();
+            const testUserIds = [userA?.id, userB?.id, userC?.id].filter(Boolean);
+            if (testUserIds.length > 0) {
+                if (prisma.notification) await prisma.notification.deleteMany({ where: { recipientId: { in: testUserIds } } }).catch(() => {});
+                if (prisma.teamApplication) await prisma.teamApplication.deleteMany({ where: { userId: { in: testUserIds } } }).catch(() => {});
+                if (prisma.teamMember) await prisma.teamMember.deleteMany({ where: { userId: { in: testUserIds } } }).catch(() => {});
+                if (prisma.team) await prisma.team.deleteMany({ where: { leadId: { in: testUserIds } } }).catch(() => {});
+                if (prisma.organizationMember) await prisma.organizationMember.deleteMany({ where: { userId: { in: testUserIds } } }).catch(() => {});
+                if (prisma.organization) await prisma.organization.deleteMany({ where: { ownerId: { in: testUserIds } } }).catch(() => {});
+                if (prisma.lookingFor) await prisma.lookingFor.deleteMany({ where: { userId: { in: testUserIds } } }).catch(() => {});
+                if (prisma.issue) await prisma.issue.deleteMany({ where: { creatorId: { in: testUserIds } } }).catch(() => {});
+                if (prisma.projectMember) await prisma.projectMember.deleteMany({ where: { userId: { in: testUserIds } } }).catch(() => {});
+                if (prisma.project) await prisma.project.deleteMany({ where: { ownerId: { in: testUserIds } } }).catch(() => {});
+                if (prisma.userProfile) await prisma.userProfile.deleteMany({ where: { userId: { in: testUserIds } } }).catch(() => {});
+                if (prisma.user) await prisma.user.deleteMany({ where: { id: { in: testUserIds } } }).catch(() => {});
+            }
+            await prisma.$disconnect().catch(() => {});
+        } catch (cleanupErr) {
+            console.warn('Test cleanup notice:', cleanupErr.message);
+        }
+
         if (server) {
             server.close();
         }

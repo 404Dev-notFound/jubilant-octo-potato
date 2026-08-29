@@ -349,6 +349,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     module.initHome();
                 }
 
+                // Initialize Explore view
+                if ((viewName === 'explore' || viewName === 'home_explore') && module && module.initExplore) {
+                    module.initExplore();
+                }
+
+                // Initialize Organizations view
+                if (viewName === 'organizations' && module && module.initOrganizations) {
+                    module.initOrganizations();
+                }
+
                 // Initialize Issues view
                 if (viewName === 'issues' && module && module.initIssues) {
                     module.initIssues(projectId);
@@ -380,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Initialize User Profile view
                 if ((viewName === 'user_profile' || viewName === 'user-profile' || viewName === 'profile') && module && module.initUserProfile) {
-                    module.initUserProfile();
+                    module.initUserProfile(urlParams.get('id') || urlParams.get('userId') || projectId);
                 }
 
                 // Initialize Notifications view
@@ -390,36 +400,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Update notification badge on navigation
                 window.updateNotificationBadge();
-
-                // Fetch projects if on the explore page
-                if (viewName === 'explore' || viewName === 'home_explore') {
-                    const gridElement = document.getElementById('project-grid') || document.getElementById('explore-projects-container');
-                    if (gridElement) {
-                        try {
-                            const res = await window.apiFetch('/api/projects');
-                            if (!res.ok) throw new Error('API Error');
-                            const projects = await res.json();
-
-                            let cardsHtml = '';
-                            projects.forEach(p => {
-                                cardsHtml += window.renderProjectCard(p);
-                            });
-                            gridElement.innerHTML = cardsHtml;
-
-                            // Also hide the old hardcoded content if it exists
-                            const realContent = document.getElementById('real-content');
-                            if (realContent) realContent.remove();
-                        } catch (err) {
-                            console.error("Failed to load dynamic projects", err);
-                            // Fallback to static content
-                            const realContent = document.getElementById('real-content');
-                            if (realContent) {
-                                realContent.classList.remove('hidden');
-                                gridElement.remove();
-                            }
-                        }
-                    }
-                }
 
                 // Execute inline scripts if any
                 appContent.querySelectorAll('script').forEach(script => {

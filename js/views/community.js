@@ -524,7 +524,7 @@ export async function initCommunity() {
                                 ${(team.memberDetails || []).map(m => `
                                     <div class="flex items-center gap-2 p-2 bg-surface-container rounded-xl border border-white/5">
                                         <div class="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center font-bold text-xs text-primary overflow-hidden shrink-0">
-                                            ${m.avatarUrl ? `<img src="${m.avatarUrl}" class="w-full h-full object-cover">` : (m.name ? m.name.charAt(0).toUpperCase() : 'M')}
+                                            ${m.avatarUrl ? `<img src="${m.avatarUrl}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none;" class="w-full h-full flex items-center justify-center font-bold text-xs text-primary">${m.name ? m.name.charAt(0).toUpperCase() : 'M'}</span>` : (m.name ? m.name.charAt(0).toUpperCase() : 'M')}
                                         </div>
                                         <div class="truncate">
                                             <span class="text-xs font-semibold text-on-surface block truncate">${m.name}</span>
@@ -625,7 +625,7 @@ export async function initCommunity() {
                 <div class="pt-4 border-t border-white/5 flex items-center justify-between gap-3 mt-4">
                     <div class="flex items-center gap-2.5">
                         <div class="w-9 h-9 rounded-xl bg-secondary/20 overflow-hidden border border-white/10 flex items-center justify-center font-bold text-sm text-secondary shrink-0">
-                            ${author.avatarUrl ? `<img src="${author.avatarUrl}" class="w-full h-full object-cover">` : (author.name ? author.name.charAt(0).toUpperCase() : 'D')}
+                            ${author.avatarUrl ? `<img src="${author.avatarUrl}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none;" class="w-full h-full flex items-center justify-center font-bold text-sm text-secondary">${author.name ? author.name.charAt(0).toUpperCase() : 'D'}</span>` : (author.name ? author.name.charAt(0).toUpperCase() : 'D')}
                         </div>
                         <div>
                             <div class="text-xs font-bold text-on-surface flex items-center gap-1">
@@ -691,7 +691,7 @@ export async function initCommunity() {
                         <div class="flex items-center gap-3.5">
                             <div class="relative">
                                 <div class="w-14 h-14 rounded-2xl overflow-hidden border border-white/10 bg-surface-container flex items-center justify-center font-bold text-lg text-secondary shrink-0">
-                                    ${dev.avatarUrl ? `<img src="${dev.avatarUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">` : (dev.name ? dev.name.charAt(0).toUpperCase() : 'D')}
+                                    ${dev.avatarUrl ? `<img src="${dev.avatarUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none;" class="w-full h-full flex items-center justify-center font-bold text-lg text-secondary">${dev.name ? dev.name.charAt(0).toUpperCase() : 'D'}</span>` : (dev.name ? dev.name.charAt(0).toUpperCase() : 'D')}
                                 </div>
                                 <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-tertiary border-2 border-surface-container-lowest" title="Available"></span>
                             </div>
@@ -1196,167 +1196,174 @@ export async function initCommunity() {
             });
         });
 
-        // Quick Links to Tabs
-        document.addEventListener('click', (e) => {
-            const filterLink = e.target.closest('[data-action="filter-tab"]');
-            if (filterLink) {
-                const target = filterLink.dataset.target;
-                const tabButton = document.querySelector(`.community-tab-btn[data-tab="${target}"]`);
-                if (tabButton) tabButton.click();
-            }
-        });
+        // Delegate Dynamic Card Actions (idempotent setup)
+        if (!window.__communityCardActionDelegated) {
+            window.__communityCardActionDelegated = true;
 
-        // Delegate Dynamic Card Actions (Upvotes, Expansions, Follow, Delete Looking-For, Connect)
-        document.addEventListener('click', async (e) => {
-            const currentUser = getCurrentUser();
-            const currentUserId = currentUser ? String(currentUser.id) : null;
-
-            // 1. Toggle Expand Team
-            const expandTeamBtn = e.target.closest('[data-action="toggle-expand-team"]');
-            if (expandTeamBtn) {
-                const teamId = expandTeamBtn.dataset.teamId;
-                if (expandedTeamIds.has(teamId)) {
-                    expandedTeamIds.delete(teamId);
-                } else {
-                    expandedTeamIds.add(teamId);
+            // Quick Links to Tabs
+            document.addEventListener('click', (e) => {
+                const filterLink = e.target.closest('[data-action="filter-tab"]');
+                if (filterLink) {
+                    const target = filterLink.dataset.target;
+                    const tabButton = document.querySelector(`.community-tab-btn[data-tab="${target}"]`);
+                    if (tabButton) tabButton.click();
                 }
-                const { filteredTeams } = filterAndSortData();
-                renderTeams(filteredTeams);
-                initMagicBentoInteractions();
-                return;
-            }
+            });
 
-            // 2. Toggle Expand Developer
-            const expandDevBtn = e.target.closest('[data-action="toggle-expand-dev"]');
-            if (expandDevBtn) {
-                const devId = expandDevBtn.dataset.userId;
-                if (expandedDevIds.has(devId)) {
-                    expandedDevIds.delete(devId);
-                } else {
-                    expandedDevIds.add(devId);
-                }
-                const { filteredDevs } = filterAndSortData();
-                renderDevelopers(filteredDevs);
-                initMagicBentoInteractions();
-                return;
-            }
+            document.addEventListener('click', async (e) => {
+                const currentUser = getCurrentUser();
+                const currentUserId = currentUser ? String(currentUser.id) : null;
 
-            // 3. Upvote Team
-            const upvoteTeamBtn = e.target.closest('[data-action="upvote-team"]');
-            if (upvoteTeamBtn) {
-                if (!currentUserId) {
-                    if (window.UI?.showToast) window.UI.showToast('Please log in to upvote teams', 'error');
+                // 1. Toggle Expand Team
+                const expandTeamBtn = e.target.closest('[data-action="toggle-expand-team"]');
+                if (expandTeamBtn) {
+                    const teamId = expandTeamBtn.dataset.teamId;
+                    if (expandedTeamIds.has(teamId)) {
+                        expandedTeamIds.delete(teamId);
+                    } else {
+                        expandedTeamIds.add(teamId);
+                    }
+                    const { filteredTeams } = filterAndSortData();
+                    renderTeams(filteredTeams);
+                    initMagicBentoInteractions();
                     return;
                 }
-                const teamId = upvoteTeamBtn.dataset.teamId;
-                try {
-                    const res = await window.apiFetch(`/api/teams/${teamId}/upvote`, { method: 'POST' });
-                    if (res.ok) {
-                        const data = await res.json();
-                        const team = teamsData.find(t => t.id === teamId);
-                        if (team) {
-                            team.upvotes = data.upvotes;
-                            team.upvoters = data.upvoters;
-                        }
-                        const { filteredTeams } = filterAndSortData();
-                        renderTeams(filteredTeams);
-                        initMagicBentoInteractions();
-                        if (window.UI?.showToast) window.UI.showToast(data.hasUpvoted ? 'Upvoted team!' : 'Upvote removed', 'success');
-                    }
-                } catch (err) {
-                    console.error('Failed to upvote team:', err);
-                }
-                return;
-            }
 
-            // 4. Upvote Developer
-            const upvoteDevBtn = e.target.closest('[data-action="upvote-dev"]');
-            if (upvoteDevBtn) {
-                if (!currentUserId) {
-                    if (window.UI?.showToast) window.UI.showToast('Please log in to upvote developers', 'error');
+                // 2. Toggle Expand Developer
+                const expandDevBtn = e.target.closest('[data-action="toggle-expand-dev"]');
+                if (expandDevBtn) {
+                    const devId = expandDevBtn.dataset.userId;
+                    if (expandedDevIds.has(devId)) {
+                        expandedDevIds.delete(devId);
+                    } else {
+                        expandedDevIds.add(devId);
+                    }
+                    const { filteredDevs } = filterAndSortData();
+                    renderDevelopers(filteredDevs);
+                    initMagicBentoInteractions();
                     return;
                 }
-                const devId = upvoteDevBtn.dataset.userId;
-                try {
-                    const res = await window.apiFetch(`/api/users/${devId}/upvote`, { method: 'POST' });
-                    if (res.ok) {
-                        const data = await res.json();
-                        const dev = developersData.find(d => d.id === devId);
-                        if (dev) {
-                            dev.upvotes = data.upvotes;
-                            dev.upvoters = data.upvoters;
-                        }
-                        const { filteredDevs } = filterAndSortData();
-                        renderDevelopers(filteredDevs);
-                        initMagicBentoInteractions();
-                        if (window.UI?.showToast) window.UI.showToast(data.hasUpvoted ? 'Upvoted developer profile!' : 'Upvote removed', 'success');
-                    }
-                } catch (err) {
-                    console.error('Failed to upvote dev:', err);
-                }
-                return;
-            }
 
-            // 5. Follow Developer
-            const followDevBtn = e.target.closest('[data-action="follow-dev"]');
-            if (followDevBtn) {
-                if (!currentUserId) {
-                    if (window.UI?.showToast) window.UI.showToast('Please log in to follow developers', 'error');
+                // 3. Upvote Team
+                const upvoteTeamBtn = e.target.closest('[data-action="upvote-team"]');
+                if (upvoteTeamBtn) {
+                    if (!currentUserId) {
+                        if (window.UI?.showToast) window.UI.showToast('Please log in to upvote teams', 'error');
+                        return;
+                    }
+                    const teamId = upvoteTeamBtn.dataset.teamId;
+                    try {
+                        const res = await window.apiFetch(`/api/teams/${teamId}/upvote`, { method: 'POST' });
+                        if (res.ok) {
+                            const data = await res.json();
+                            const team = teamsData.find(t => t.id === teamId);
+                            if (team) {
+                                team.upvotes = data.upvotes;
+                                team.upvoters = data.upvoters;
+                            }
+                            const { filteredTeams } = filterAndSortData();
+                            renderTeams(filteredTeams);
+                            initMagicBentoInteractions();
+                            if (window.UI?.showToast) window.UI.showToast(data.hasUpvoted ? 'Upvoted team!' : 'Upvote removed', 'success');
+                        }
+                    } catch (err) {
+                        console.error('Failed to upvote team:', err);
+                    }
                     return;
                 }
-                const devId = followDevBtn.dataset.userId;
-                try {
-                    const res = await window.apiFetch(`/api/users/${devId}/follow`, { method: 'POST' });
-                    if (res.ok) {
-                        const data = await res.json();
-                        const dev = developersData.find(d => d.id === devId);
-                        if (dev) {
-                            dev.followers = data.followers;
+
+                // 4. Upvote Developer
+                const upvoteDevBtn = e.target.closest('[data-action="upvote-dev"]');
+                if (upvoteDevBtn) {
+                    if (!currentUserId) {
+                        if (window.UI?.showToast) window.UI.showToast('Please log in to upvote developers', 'error');
+                        return;
+                    }
+                    const devId = upvoteDevBtn.dataset.userId;
+                    try {
+                        const res = await window.apiFetch(`/api/users/${devId}/upvote`, { method: 'POST' });
+                        if (res.ok) {
+                            const data = await res.json();
+                            const dev = developersData.find(d => d.id === devId);
+                            if (dev) {
+                                dev.upvotes = data.upvotes;
+                                dev.upvoters = data.upvoters;
+                            }
+                            const { filteredDevs } = filterAndSortData();
+                            renderDevelopers(filteredDevs);
+                            initMagicBentoInteractions();
+                            if (window.UI?.showToast) window.UI.showToast(data.hasUpvoted ? 'Upvoted developer profile!' : 'Upvote removed', 'success');
                         }
-                        const { filteredDevs } = filterAndSortData();
-                        renderDevelopers(filteredDevs);
-                        initMagicBentoInteractions();
-                        if (window.UI?.showToast) window.UI.showToast(data.hasFollowed ? `Now following ${dev?.name || 'developer'}!` : 'Unfollowed developer', 'info');
+                    } catch (err) {
+                        console.error('Failed to upvote dev:', err);
                     }
-                } catch (err) {
-                    console.error('Failed to follow dev:', err);
+                    return;
                 }
-                return;
-            }
 
-            // 6. Delete Looking-For Post
-            const deleteMatchBtn = e.target.closest('[data-action="delete-looking-for"]');
-            if (deleteMatchBtn) {
-                const postId = deleteMatchBtn.dataset.postId;
-                if (!confirm('Are you sure you want to delete this matchmaking request?')) return;
-                try {
-                    const res = await window.apiFetch(`/api/community/looking-for/${postId}`, { method: 'DELETE' });
-                    if (res.ok) {
-                        lookingForData = lookingForData.filter(p => p.id !== postId);
-                        const tabMatchCount = document.getElementById('tab-count-match');
-                        if (tabMatchCount) tabMatchCount.textContent = lookingForData.length;
-                        const { filteredMatch } = filterAndSortData();
-                        renderLookingFor(filteredMatch);
-                        initMagicBentoInteractions();
-                        if (window.UI?.showToast) window.UI.showToast('Matchmaking request removed', 'info');
+                // 5. Follow Developer
+                const followDevBtn = e.target.closest('[data-action="follow-dev"]');
+                if (followDevBtn) {
+                    if (!currentUserId) {
+                        if (window.UI?.showToast) window.UI.showToast('Please log in to follow developers', 'error');
+                        return;
                     }
-                } catch (err) {
-                    console.error('Error deleting matchmaking request:', err);
+                    const devId = followDevBtn.dataset.userId;
+                    try {
+                        const res = await window.apiFetch(`/api/users/${devId}/follow`, { method: 'POST' });
+                        if (res.ok) {
+                            const data = await res.json();
+                            const dev = developersData.find(d => d.id === devId);
+                            if (dev) {
+                                dev.followers = data.followers;
+                            }
+                            const { filteredDevs } = filterAndSortData();
+                            renderDevelopers(filteredDevs);
+                            initMagicBentoInteractions();
+                            if (window.UI?.showToast) window.UI.showToast(data.hasFollowed ? `Now following ${dev?.name || 'developer'}!` : 'Unfollowed developer', 'info');
+                        }
+                    } catch (err) {
+                        console.error('Failed to follow dev:', err);
+                    }
+                    return;
                 }
-                return;
-            }
 
-            // 7. Connect with Mate / Chat
-            const connectMateBtn = e.target.closest('[data-action="connect-mate"]') || e.target.closest('[data-action="connect-dev"]');
-            if (connectMateBtn) {
-                const targetName = connectMateBtn.dataset.userName || 'Developer';
-                if (window.UI?.showToast) {
-                    window.UI.showToast(`Collaboration channel opened with ${targetName}!`, 'info');
+                // 6. Delete Looking-For Post
+                const deleteMatchBtn = e.target.closest('[data-action="delete-looking-for"]');
+                if (deleteMatchBtn) {
+                    const postId = deleteMatchBtn.dataset.postId;
+                    if (!confirm('Are you sure you want to delete this matchmaking request?')) return;
+                    try {
+                        const res = await window.apiFetch(`/api/community/looking-for/${postId}`, { method: 'DELETE' });
+                        if (res.ok) {
+                            lookingForData = lookingForData.filter(p => p.id !== postId);
+                            const tabMatchCount = document.getElementById('tab-count-match');
+                            if (tabMatchCount) tabMatchCount.textContent = lookingForData.length;
+                            const { filteredMatch } = filterAndSortData();
+                            renderLookingFor(filteredMatch);
+                            initMagicBentoInteractions();
+                            if (window.UI?.showToast) window.UI.showToast('Matchmaking request removed', 'info');
+                        }
+                    } catch (err) {
+                        console.error('Error deleting matchmaking request:', err);
+                    }
+                    return;
                 }
-                return;
-            }
-        });
+
+                // 7. Connect with Mate / Chat
+                const connectMateBtn = e.target.closest('[data-action="connect-mate"]') || e.target.closest('[data-action="connect-dev"]');
+                if (connectMateBtn) {
+                    const targetName = connectMateBtn.dataset.userName || 'Developer';
+                    if (window.UI?.showToast) {
+                        window.UI.showToast(`Collaboration channel opened with ${targetName}!`, 'info');
+                    }
+                    return;
+                }
+            });
+        }
     }
+
+    // Expose live refresh helper to window
+    window.refreshCommunityData = loadCommunityData;
 
     // Initialize
     await loadCommunityData();

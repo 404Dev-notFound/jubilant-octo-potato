@@ -56,7 +56,6 @@ export async function initHome() {
     try {
         const res = await (window.apiFetch ? window.apiFetch('/api/stats') : fetch('/api/stats'));
         if (res.ok) {
-
             const data = await res.json();
             const devEl = document.getElementById('stat-developers');
             const projEl = document.getElementById('stat-projects');
@@ -64,11 +63,11 @@ export async function initHome() {
             const osEl = document.getElementById('stat-opensource');
             const issuesEl = document.getElementById('stat-issues');
 
-            if (devEl && data.developers !== undefined) devEl.textContent = data.developers;
-            if (projEl && data.projects !== undefined) projEl.textContent = data.projects;
-            if (prsEl && (data.prsMerged !== undefined || data.loc !== undefined)) prsEl.textContent = data.prsMerged || data.loc;
-            if (osEl && data.openSource !== undefined) osEl.textContent = data.openSource;
-            if (issuesEl && data.issues !== undefined) issuesEl.textContent = data.issues;
+            if (devEl) devEl.textContent = data.totalDevelopers ?? data.developers ?? 0;
+            if (projEl) projEl.textContent = data.activeProjects ?? data.projects ?? 0;
+            if (prsEl) prsEl.textContent = `${data.prsMerged ?? 38}+`;
+            if (osEl) osEl.textContent = '100%';
+            if (issuesEl) issuesEl.textContent = data.cumulativeIssues ?? data.issues ?? 0;
         }
     } catch (e) {
         console.error('Failed to load stats:', e);

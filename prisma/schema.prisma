@@ -36,6 +36,13 @@ model User {
   meetingsReceived     MeetingRequest[] @relation("OwnerMeetingRequests")
   notifications        Notification[]   @relation("UserNotifications")
   actorNotifications   Notification[]   @relation("ActorNotifications")
+
+  lookingForPosts         LookingFor[]
+  ledTeams                Team[]               @relation("TeamLead")
+  teamMemberships         TeamMember[]
+  teamApplications        TeamApplication[]
+  ownedOrganizations      Organization[]       @relation("OrgOwner")
+  organizationMemberships OrganizationMember[]
 }
 
 model UserProfile {
@@ -271,4 +278,92 @@ model Notification {
   data      Json?    @default("{}")
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model LookingFor {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lookingFor     String
+  forProject     String   @map("for")
+  requiredSkills String[]
+  commitment     String   @default("Part-time (8-10 hrs/wk)")
+  availability   String   @default("Available Now")
+  context        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Team {
+  id               String   @id @default(uuid())
+  teamName         String
+  description      String?
+  leadId           String
+  lead             User     @relation("TeamLead", fields: [leadId], references: [id], onDelete: Cascade)
+  assignedProjects String[]
+  skills           String[]
+  upvotes          Int      @default(0)
+  upvoters         String[] @default([])
+  lookingFor       String?  @default("Looking for passionate developers")
+  openPositions    String[] @default(["Collaborator"])
+  availability     String   @default("Active · Open for Collaboration")
+  rating           Float    @default(5.0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  members          TeamMember[]
+  applications     TeamApplication[]
+}
+
+model TeamMember {
+  teamId   String
+  userId   String
+  role     String   @default("member")
+  joinedAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, userId])
+}
+
+model TeamApplication {
+  id        String        @id @default(uuid())
+  teamId    String
+  team      Team          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position  String        @default("Collaborator")
+  message   String?
+  status    RequestStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Organization {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  logo        String?
+  website     String?
+  githubUrl   String?
+  ownerId     String
+  owner       User     @relation("OrgOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  tags        String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members OrganizationMember[]
+}
+
+model OrganizationMember {
+  organizationId String
+  userId         String
+  role           String   @default("member")
+  joinedAt       DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([organizationId, userId])
 }

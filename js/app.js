@@ -3,18 +3,96 @@ document.addEventListener('DOMContentLoaded', () => {
     const nebulaBg = document.getElementById('nebula-bg');
     const viewCache = {};
 
-    window.apiFetch = async function (endpoint, options = {}) {
-        let metaApiUrl = '';
+    // --------------------------------------------------------------------------
+    // API URL Discovery & Production-Ready Request Client
+    // --------------------------------------------------------------------------
+    window.getApiBaseUrl = function () {
+        // Priority 1: Explicit LocalStorage override (for local testing/staging overrides)
+        const customStorageUrl = (typeof localStorage !== 'undefined') ? (localStorage.getItem('CODECOLLAB_API_BASE_URL') || '').trim() : '';
+        if (customStorageUrl) return customStorageUrl.replace(/\/+$/, '');
+
+        // Priority 2: Runtime injected environment configuration
+        const runtimeUrl = (typeof window !== 'undefined') ? ((window.__ENV__ && window.__ENV__.API_BASE_URL) || window.API_BASE_URL || '').trim() : '';
+        if (runtimeUrl) return runtimeUrl.replace(/\/+$/, '');
+
+        // Priority 3: HTML Meta Tag (<meta name="api-base-url" content="...">)
         if (typeof document !== 'undefined') {
             const metaTag = document.querySelector('meta[name="api-base-url"]');
-            if (metaTag) metaApiUrl = (metaTag.getAttribute('content') || '').trim();
+            if (metaTag) {
+                const metaUrl = (metaTag.getAttribute('content') || '').trim();
+                if (metaUrl) return metaUrl.replace(/\/+$/, '');
+            }
         }
-        const customStorageUrl = (typeof localStorage !== 'undefined') ? (localStorage.getItem('CODECOLLAB_API_BASE_URL') || '').trim() : '';
-        const runtimeUrl = (typeof window !== 'undefined') ? ((window.__ENV__ && window.__ENV__.API_BASE_URL) || window.API_BASE_URL || '').trim() : '';
-        const originUrl = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null') ? window.location.origin : '';
 
-        const rawBase = runtimeUrl || metaApiUrl || customStorageUrl || originUrl;
-        const baseUrl = rawBase.replace(/\/+$/, '');
+        // Priority 4: Production Netlify Domain Detection
+        if (typeof window !== 'undefined' && window.location && window.location.hostname) {
+            const host = window.location.hostname.toLowerCase();
+            if (host === 'opensource-projects.netlify.app' || host.endsWith('.netlify.app')) {
+                return 'https://jubilant-octo-potato-production.up.railway.app';
+            }
+        }
+
+        // Priority 5: Current Origin fallback
+        const originUrl = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null') ? window.location.origin : '';
+        return (originUrl || 'https://jubilant-octo-potato-production.up.railway.app').replace(/\/+$/, '');
+    };
+
+    // Safe Production Diagnostic Probe Utility
+    window.diagnoseBackendConnection = async function (customUrl = null) {
+        const baseUrl = customUrl || window.getApiBaseUrl();
+        const healthUrl = `${baseUrl.replace(/\/+$/, '')}/health`;
+        const diagnostic = {
+            timestamp: new Date().toISOString(),
+            online: typeof navigator !== 'undefined' ? navigator.onLine : true,
+            apiBaseUrl: baseUrl,
+            healthUrl: healthUrl,
+            status: 'UNKNOWN',
+            httpStatus: null,
+            latencyMs: null,
+            details: ''
+        };
+
+        const startTime = Date.now();
+        try {
+            if (!diagnostic.online) {
+                diagnostic.status = 'ERR_OFFLINE';
+                diagnostic.details = 'Browser is offline. No internet connection detected.';
+                console.warn('[CodeCollab Connection Diagnostics]', diagnostic);
+                return diagnostic;
+            }
+
+            const response = await fetch(healthUrl, { method: 'GET', cache: 'no-store' });
+            diagnostic.latencyMs = Date.now() - startTime;
+            diagnostic.httpStatus = response.status;
+
+            if (response.ok) {
+                diagnostic.status = 'CONNECTED';
+                diagnostic.backendData = await response.json().catch(() => null);
+                diagnostic.details = 'Backend is healthy, online, and responding normally.';
+            } else {
+                diagnostic.status = 'ERR_HTTP_STATUS';
+                diagnostic.details = `Backend returned HTTP status ${response.status} (${response.statusText})`;
+            }
+        } catch (err) {
+            diagnostic.latencyMs = Date.now() - startTime;
+            if (err.name === 'AbortError') {
+                diagnostic.status = 'ERR_TIMEOUT';
+                diagnostic.details = 'Backend health check timed out.';
+            } else if (!diagnostic.online) {
+                diagnostic.status = 'ERR_OFFLINE';
+                diagnostic.details = 'Device went offline during connection attempt.';
+            } else {
+                diagnostic.status = 'ERR_CORS_OR_NETWORK';
+                diagnostic.details = 'Network request failed. This indicates a CORS origin mismatch, DNS failure, or unreachable server.';
+            }
+        }
+
+        console.info('[CodeCollab Connection Diagnostics]', diagnostic);
+        return diagnostic;
+    };
+
+    window.apiFetch = async function (endpoint, options = {}) {
+        const baseUrl = window.getApiBaseUrl();
         const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
         const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${cleanEndpoint}`;
 
@@ -22,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!headers['Content-Type'] && !(options.body instanceof FormData) && options.method && options.method.toUpperCase() !== 'GET') {
             headers['Content-Type'] = 'application/json';
         }
-
 
         // Attach Authorization header if user is logged in
         const currentUserStr = localStorage.getItem('currentUser');
@@ -36,7 +113,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const fetchOptions = { cache: 'no-store', ...options, headers };
-        const response = await fetch(url, fetchOptions);
+        
+        let response;
+        try {
+            response = await fetch(url, fetchOptions);
+        } catch (fetchErr) {
+            const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+            const errCategory = isOffline ? 'ERR_OFFLINE' : 'ERR_CORS_OR_NETWORK';
+            const userFriendlyMsg = isOffline
+                ? 'You are offline. Please check your internet connection.'
+                : 'Unable to reach backend server (CORS / Network restriction). Please check connection or try again.';
+
+            console.warn(`[CodeCollab API Diagnostic] Request to ${cleanEndpoint} failed. Target: ${baseUrl}. Category: ${errCategory}.`, {
+                endpoint: cleanEndpoint,
+                category: errCategory,
+                online: !isOffline,
+                error: fetchErr.message
+            });
+
+            const enrichedError = new Error(userFriendlyMsg);
+            enrichedError.code = errCategory;
+            enrichedError.originalError = fetchErr;
+            throw enrichedError;
+        }
 
         if (response.status === 401) {
             localStorage.removeItem('currentUser');
@@ -598,8 +697,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.UI.showToast(result.error || 'Authentication failed', 'error');
                 }
             } catch (error) {
-                console.error(error);
-                window.UI.showToast('Error connecting to backend.', 'error');
+                console.error('Auth submission error:', error);
+                const toastMsg = error.code === 'ERR_OFFLINE'
+                    ? 'You are offline. Please check your internet connection.'
+                    : (error.code === 'ERR_CORS_OR_NETWORK'
+                        ? 'Unable to reach backend server. Please verify network connection.'
+                        : (error.message || 'Error connecting to backend.'));
+                window.UI.showToast(toastMsg, 'error');
             }
             return;
         }
@@ -654,7 +758,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error('Error saving profile:', error);
-                window.UI.showToast('Error connecting to backend.', 'error');
+                const toastMsg = error.code === 'ERR_OFFLINE'
+                    ? 'You are offline. Please check your internet connection.'
+                    : (error.code === 'ERR_CORS_OR_NETWORK'
+                        ? 'Unable to reach backend server. Please verify network connection.'
+                        : (error.message || 'Error connecting to backend.'));
+                window.UI.showToast(toastMsg, 'error');
             }
             return;
         }
@@ -715,7 +824,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error('Error saving data:', error);
-                window.UI.showToast('Error connecting to backend.', 'error');
+                const toastMsg = error.code === 'ERR_OFFLINE'
+                    ? 'You are offline. Please check your internet connection.'
+                    : (error.code === 'ERR_CORS_OR_NETWORK'
+                        ? 'Unable to reach backend server. Please verify network connection.'
+                        : (error.message || 'Error connecting to backend.'));
+                window.UI.showToast(toastMsg, 'error');
             }
         }
     });

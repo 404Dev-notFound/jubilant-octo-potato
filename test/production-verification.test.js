@@ -460,6 +460,60 @@ async function runTests() {
             assert(res.status === 404, 'Deleted project returns HTTP 404 Not Found');
         }
 
+        // ----------------------------------------------------------------------
+        // 9. Production CORS, Preflight & Header Security
+        // ----------------------------------------------------------------------
+        console.log('\n--- 9. Production CORS, Preflight & Security Headers ---');
+        {
+            // Standard Netlify Origin
+            const res = await request('/health', {
+                headers: { 'Origin': 'https://opensource-projects.netlify.app' }
+            });
+            assert(res.status === 200, '/health returns HTTP 200 for Netlify origin');
+            assert(res.headers['access-control-allow-origin'] === 'https://opensource-projects.netlify.app', 'CORS allows https://opensource-projects.netlify.app');
+            assert(res.headers['access-control-allow-credentials'] === 'true', 'CORS credentials enabled');
+            assert(res.headers['cross-origin-resource-policy'] === 'cross-origin', 'CORP header configured for cross-origin access');
+        }
+
+        {
+            // Trailing slash origin normalization
+            const res = await request('/health', {
+                headers: { 'Origin': 'https://opensource-projects.netlify.app/' }
+            });
+            assert(res.headers['access-control-allow-origin'] === 'https://opensource-projects.netlify.app/', 'CORS gracefully handles trailing slash in Origin header');
+        }
+
+        {
+            // Netlify Deploy Preview Subdomain
+            const res = await request('/health', {
+                headers: { 'Origin': 'https://deploy-preview-101--opensource-projects.netlify.app' }
+            });
+            assert(res.headers['access-control-allow-origin'] === 'https://deploy-preview-101--opensource-projects.netlify.app', 'CORS allows Netlify preview subdomains');
+        }
+
+        {
+            // Preflight OPTIONS for /api/projects
+            const res = await request('/api/projects', {
+                method: 'OPTIONS',
+                headers: {
+                    'Origin': 'https://opensource-projects.netlify.app',
+                    'Access-Control-Request-Method': 'POST',
+                    'Access-Control-Request-Headers': 'authorization, content-type'
+                }
+            });
+            assert(res.status === 204 || res.status === 200, 'OPTIONS preflight returns 204/200');
+            assert(res.headers['access-control-allow-origin'] === 'https://opensource-projects.netlify.app', 'Preflight allows Netlify origin');
+            assert(res.headers['access-control-allow-methods'] && res.headers['access-control-allow-methods'].includes('POST'), 'Preflight permits POST method');
+        }
+
+        {
+            // Unauthorized malicious origin should NOT receive ACAO header
+            const res = await request('/health', {
+                headers: { 'Origin': 'https://evil-unauthorized-hacker-domain.com' }
+            });
+            assert(!res.headers['access-control-allow-origin'], 'Unauthorized origin is denied CORS headers');
+        }
+
         console.log('\n===============================================================');
         console.log('🎉 ALL PRODUCTION VERIFICATION TESTS PASSED SUCCESSFULLY!');
         console.log('===============================================================\n');

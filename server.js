@@ -69,26 +69,73 @@ if (NODE_ENV === 'production') {
     app.set('trust proxy', 1);
 }
 
-// Security headers with Helmet
+// Security headers with Helmet (configured for cross-origin API accessibility)
 app.use(helmet({
     contentSecurityPolicy: false, // Allows dynamic styles and SPA scripts while keeping XSS/Sniff protections
-    crossOriginEmbedderPolicy: false
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: false
 }));
 
-// CORS Configuration (Production-Grade Dynamic Origin Matching)
-const allowedOrigins = CORS_ORIGIN === '*' ? [] : CORS_ORIGIN.split(',').map(s => s.trim().toLowerCase());
+// ------------------------------------------------------------------------------
+// Production-Grade CORS Configuration (With Robust Origin Normalization)
+// ------------------------------------------------------------------------------
+// Default explicitly trusted production, staging, and development origins
+const DEFAULT_ALLOWED_ORIGINS = [
+    'https://opensource-projects.netlify.app',
+    'https://jubilant-octo-potato-production.up.railway.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:8080',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5500'
+];
+
+// Helper to normalize origins (strips trailing slashes, trims whitespace, lowercases)
+const normalizeOrigin = (urlStr) => {
+    if (!urlStr || typeof urlStr !== 'string') return '';
+    return urlStr.trim().replace(/\/+$/, '').toLowerCase();
+};
+
+// Parse CORS_ORIGIN environment variable robustly (splits comma-separated list, trims, strips slashes)
+const configuredOrigins = (CORS_ORIGIN === '*' ? ['*'] : CORS_ORIGIN.split(','))
+    .map(normalizeOrigin)
+    .filter(Boolean);
+
+const allowedOrigins = Array.from(new Set([
+    ...DEFAULT_ALLOWED_ORIGINS.map(normalizeOrigin),
+    ...configuredOrigins
+]));
+
+// Safe origin validator: supports exact normalized match, wildcard, and Netlify preview subdomains
+const isOriginAllowed = (origin) => {
+    if (!origin) return true; // Allow same-origin / server-to-server / curl / mobile apps
+    const normalized = normalizeOrigin(origin);
+    if (configuredOrigins.includes('*')) return true;
+    if (allowedOrigins.includes(normalized)) return true;
+
+    // Safely allow Netlify branch & deploy preview subdomains (e.g., https://deploy-preview-12--opensource-projects.netlify.app)
+    if (/^https:\/\/[a-z0-9-]+(\-\-[a-z0-9-]+)?\.netlify\.app$/.test(normalized)) {
+        return true;
+    }
+    return false;
+};
+
 const corsOptions = {
     origin: (origin, callback) => {
-        if (!origin) return callback(null, true); // Allow same-origin / server-to-server / curl
-        if (CORS_ORIGIN === '*' || allowedOrigins.includes(origin.toLowerCase())) {
+        if (isOriginAllowed(origin)) {
             return callback(null, true);
         }
         return callback(null, false);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    maxAge: 86400 // Cache preflight response for 24 hours
 };
+
 app.use(cors(corsOptions));
 
 // Body parsers

@@ -1,0 +1,10 @@
+# ==============================================================================
+# Netlify Production Redirects & Backend Reverse Proxy
+# ==============================================================================
+# Proxies /api and /health directly to the Railway backend
+/api/*   https://jubilant-octo-potato-production.up.railway.app/api/:splat   200!
+/health  https://jubilant-octo-potato-production.up.railway.app/health       200!
+/healthz https://jubilant-octo-potato-production.up.railway.app/healthz      200!
+
+# SPA Routing Fallback
+/*       /index.html                                                         200

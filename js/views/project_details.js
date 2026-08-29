@@ -346,7 +346,7 @@ cd ${escapeHtml(project.title.toLowerCase().replace(/\\s+/g, '-'))}</code></pre>
                     }
                 } catch (err) {
                     console.error('Error submitting join request:', err);
-                    window.UI.showToast('Error connecting to backend server', 'error');
+                    window.UI.showToast(err.message || 'Error connecting to backend server', 'error');
                     joinBtn.disabled = false;
                     joinBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">person_add</span> Join Project';
                 }

@@ -163,7 +163,7 @@ window.handleScheduleMeeting = async function(e) {
         }
     } catch (err) {
         console.error('Error submitting meeting request:', err);
-        window.UI.showToast('Error connecting to backend server', 'error');
+        window.UI.showToast(err.message || 'Error connecting to backend server', 'error');
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">send</span> Send Meeting Request';

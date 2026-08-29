@@ -3,6 +3,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const nebulaBg = document.getElementById('nebula-bg');
     const viewCache = {};
 
+    // Canonical HTML escape helper in app scope
+    const escapeHtml = window.escapeHtml = window.UI?.escapeHtml || function (str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
+
     // --------------------------------------------------------------------------
     // API URL Discovery & Production-Ready Request Client
     // --------------------------------------------------------------------------

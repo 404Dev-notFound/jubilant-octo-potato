@@ -1,7 +1,6 @@
-/*
- * User Profile View for CodeCollab
- * Renders verified developer profile, skills, social links, activity, and collaborative repositories.
- */
+const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml) 
+    ? window.escapeHtml 
+    : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
 
 export function render_user_profile() {
     const curStr = localStorage.getItem('currentUser');
@@ -216,10 +215,10 @@ export async function initUserProfile(targetUserId = null) {
                     } else {
                         projContainer.innerHTML = userProjects.map(p => `
                         <div class="glass-panel p-4 rounded-xl border-l-4 border-l-primary cursor-pointer hover:bg-surface-variant transition-colors" onclick="window.location.hash='project_details?projectId=${p.id}'">
-                            <div class="font-bold text-sm text-on-surface">${p.title}</div>
-                            <p class="text-xs text-on-surface-variant line-clamp-2 my-1">${p.description || ''}</p>
+                            <div class="font-bold text-sm text-on-surface">${escapeHtml(p.title || 'Untitled Project')}</div>
+                            <p class="text-xs text-on-surface-variant line-clamp-2 my-1">${escapeHtml(p.description || '')}</p>
                             <div class="flex flex-wrap gap-1 mt-2">
-                                ${(Array.isArray(p.techStack) ? p.techStack : []).slice(0, 3).map(t => `<span class="px-2 py-0.5 rounded-md bg-surface-container text-[10px] text-on-surface-variant">${t}</span>`).join('')}
+                                ${(Array.isArray(p.techStack) ? p.techStack : []).slice(0, 3).map(t => `<span class="px-2 py-0.5 rounded-md bg-surface-container text-[10px] text-on-surface-variant">${escapeHtml(t)}</span>`).join('')}
                             </div>
                         </div>`).join('');
                     }

@@ -1,3 +1,7 @@
+const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml) 
+    ? window.escapeHtml 
+    : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
+
 export function render_project_details() {
     return `
 <main id="project-details-container" class="relative w-full max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8 flex flex-col min-h-screen pt-4 space-y-6">

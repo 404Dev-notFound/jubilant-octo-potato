@@ -1,3 +1,7 @@
+const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml) 
+    ? window.escapeHtml 
+    : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
+
 export function render_add_project_form() {
     const currentUserStr = localStorage.getItem('currentUser');
     const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
@@ -25,7 +29,7 @@ export function render_add_project_form() {
                         <label class="flex items-center gap-2 p-2 bg-surface-container rounded-lg border border-white/5 hover:border-secondary/40 cursor-pointer transition-colors text-xs text-on-surface">
                             <input type="checkbox" name="memberIds" value="${u.id}" class="rounded bg-surface-container border-white/20 text-secondary focus:ring-secondary">
                             <span class="w-5 h-5 rounded-full bg-secondary/20 text-secondary flex items-center justify-center font-bold text-[10px]">${initial}</span>
-                            <span class="truncate font-medium">${uName}</span>
+                            <span class="truncate font-medium">${escapeHtml(uName)}</span>
                         </label>
                     `;
                 });

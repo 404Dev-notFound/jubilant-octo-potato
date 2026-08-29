@@ -1,3 +1,7 @@
+const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml) 
+    ? window.escapeHtml 
+    : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
+
 export function render_issues() {
     return `
 <main class="relative w-full max-w-[1400px] mx-auto p-xl flex flex-col min-h-screen pt-4">
@@ -298,8 +302,8 @@ export async function initIssues(initialProjectId) {
                 </div>
             </div>
             
-            <h4 class="font-bold mb-1.5 text-sm leading-snug ${titleClass}">${issue.title}</h4>
-            ${issue.description ? `<p class="text-xs text-on-surface-variant line-clamp-2 mb-3 leading-relaxed">${issue.description}</p>` : ''}
+            <h4 class="font-bold mb-1.5 text-sm leading-snug ${titleClass}">${escapeHtml(issue.title || 'Untitled Issue')}</h4>
+            ${issue.description ? `<p class="text-xs text-on-surface-variant line-clamp-2 mb-3 leading-relaxed">${escapeHtml(issue.description)}</p>` : ''}
             
             <div class="flex items-center justify-between mt-auto pt-2 border-t border-white/5 gap-2">
                 <div class="flex items-center gap-1.5">

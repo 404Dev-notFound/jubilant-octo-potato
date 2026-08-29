@@ -1,3 +1,7 @@
+const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml) 
+    ? window.escapeHtml 
+    : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
+
 export function render_edit_profile_form(user = {}) {
     const name = user.name || '';
     const username = user.username || '';

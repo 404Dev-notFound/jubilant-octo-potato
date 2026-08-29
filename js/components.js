@@ -36,8 +36,21 @@ window.UI = {
     
     createSkeleton: (width='w-full', height='h-24') => {
         return `<div class="${width} ${height} rounded-xl bg-surface-container-high animate-pulse border border-white/5"></div>`;
+    },
+
+    escapeHtml: (str) => {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 };
+
+// Expose escapeHtml directly on window object as global utility
+window.escapeHtml = window.UI.escapeHtml;
 
 // Global Listeners for Modal
 document.addEventListener('click', (e) => {

@@ -3,6 +3,10 @@
  * Allows developers to send a formal join request or position application to a team lead
  */
 
+const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml) 
+    ? window.escapeHtml 
+    : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
+
 export function render_join_team_form(options = {}) {
     const teamId = options.teamId || '';
     const teamName = options.teamName || 'Team';
@@ -19,7 +23,7 @@ export function render_join_team_form(options = {}) {
         <div class="flex justify-between items-center px-6 py-4 border-b border-white/5 bg-surface-container sticky top-0 z-20 backdrop-blur-md">
             <h3 class="font-bold text-xl text-on-surface flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary">group_add</span>
-                Join ${teamName}
+                Join ${escapeHtml(teamName)}
             </h3>
             <button data-close-modal class="text-on-surface-variant hover:text-error transition-colors p-1 rounded-lg hover:bg-white/5">
                 <span class="material-symbols-outlined">close</span>
@@ -32,8 +36,8 @@ export function render_join_team_form(options = {}) {
             <div class="p-4 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-between">
                 <div>
                     <div class="text-[11px] font-bold uppercase tracking-wider text-primary">Target Team</div>
-                    <div class="text-sm font-bold text-on-surface">${teamName}</div>
-                    <div class="text-xs text-on-surface-variant mt-0.5">Team Lead: <span class="text-on-surface font-semibold">${leadName}</span></div>
+                    <div class="text-sm font-bold text-on-surface">${escapeHtml(teamName)}</div>
+                    <div class="text-xs text-on-surface-variant mt-0.5">Team Lead: <span class="text-on-surface font-semibold">${escapeHtml(leadName)}</span></div>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-primary/20 text-primary flex items-center justify-center font-bold">
                     <span class="material-symbols-outlined text-[22px]">diversity_3</span>

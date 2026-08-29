@@ -3,6 +3,10 @@
  * Allows developers to update their live availability, collaboration preferences, and matchmaking status
  */
 
+const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml) 
+    ? window.escapeHtml 
+    : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
+
 export function render_update_availability_form(user = {}) {
     const currentUserStr = localStorage.getItem('currentUser');
     const currentUser = currentUserStr ? JSON.parse(currentUserStr) : {};

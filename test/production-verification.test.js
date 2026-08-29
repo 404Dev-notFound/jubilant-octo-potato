@@ -668,6 +668,95 @@ async function runTests() {
             assert(Array.isArray(res.body.followers) && res.body.followers.length >= 1, 'Followers persisted in database');
         }
 
+        // ----------------------------------------------------------------------
+        // 14. HTML Sanitization & Project Card Rendering Integrity
+        // ----------------------------------------------------------------------
+        console.log('\n--- 14. HTML Sanitization & Project Card Rendering ---');
+        {
+            // Test escapeHtml implementation
+            const escapeHtml = (str) => {
+                if (str === null || str === undefined) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            };
+
+            assert(escapeHtml('<script>alert("xss")</script>') === '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;', 'escapeHtml correctly escapes <, >, and "');
+            assert(escapeHtml("Tom & Jerry's") === 'Tom &amp; Jerry&#039;s', 'escapeHtml correctly escapes & and \'');
+            assert(escapeHtml(null) === '', 'escapeHtml safely handles null');
+            assert(escapeHtml(undefined) === '', 'escapeHtml safely handles undefined');
+            assert(escapeHtml('') === '', 'escapeHtml handles empty string');
+            assert(escapeHtml(12345) === '12345', 'escapeHtml converts numeric input to string safely');
+
+            // Test renderProjectCard simulation
+            const renderProjectCard = function (p) {
+                const safeTechStack = Array.isArray(p.techStack) ? p.techStack : (typeof p.techStack === 'string' ? p.techStack.split(',').map(s => s.trim()) : []);
+                const techBadges = safeTechStack.map(tech =>
+                    `<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5">${escapeHtml(tech)}</span>`
+                ).join('');
+                const demoBadge = p.isDemo ? `<span class="ml-2 px-2 py-0.5 bg-primary/15 text-primary border border-primary/30 rounded-md text-[10px] font-bold uppercase tracking-wider">Demo</span>` : '';
+                const ownerName = p.owner?.name || (p.ownerId ? `Developer #${p.ownerId}` : 'Open Source');
+                const ownerInitial = ownerName.charAt(0).toUpperCase();
+                const ownerDisplay = `<div class="flex items-center gap-2 text-xs text-on-surface-variant mb-3"><div class="w-5 h-5 rounded-full bg-secondary/20 text-secondary text-[11px] font-bold flex items-center justify-center border border-secondary/30">${ownerInitial}</div><span class="truncate font-medium">By ${escapeHtml(ownerName)}</span></div>`;
+
+                return `
+                <div class="glass-card bg-surface-container-low/50 backdrop-blur-md rounded-[22px] border border-white/10 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:-translate-y-1.5 p-6" data-project-id="${p.id || ''}">
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                ${escapeHtml(p.category || 'Engineering')}
+                            </span>
+                            <span class="px-2 py-0.5 bg-secondary/10 text-secondary border border-secondary/20 rounded-md text-[10px] font-semibold uppercase">
+                                ${escapeHtml(p.difficulty || 'Intermediate')}
+                            </span>
+                        </div>
+                        ${p.isPinned ? `<span class="px-2 py-0.5 bg-tertiary/20 text-tertiary border border-tertiary/30 rounded text-[10px] font-bold uppercase tracking-wider">Pinned</span>` : ''}
+                    </div>
+
+                    <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-[22px]">terminal</span>
+                        <span class="truncate">${escapeHtml(p.title || 'Untitled Project')}</span>${demoBadge}
+                    </h4>
+                    ${ownerDisplay}
+                    <p class="text-sm text-on-surface-variant line-clamp-3 mb-5 flex-1 leading-relaxed">${escapeHtml(p.description || 'Collaborative open-source software project on CodeCollab.')}</p>
+                    
+                    <div class="flex flex-wrap gap-1.5 mb-6">${techBadges}</div>
+
+                    <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-2">
+                        ${p.githubUrl ? `
+                            <a href="${escapeHtml(p.githubUrl)}" target="_blank" rel="noopener noreferrer" class="flex-1 flex justify-center items-center gap-1.5 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors">
+                                <span>Code</span>
+                            </a>
+                        ` : ''}
+                        <a href="#issues?projectId=${p.id}" class="flex-1 flex justify-center items-center gap-1 px-3 py-2.5 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-xs font-bold hover:bg-secondary hover:text-on-secondary transition-all active:scale-95">
+                            Issues
+                        </a>
+                        <a href="#project_details?projectId=${p.id}" class="flex-1 flex justify-center items-center gap-1 px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                            View
+                        </a>
+                    </div>
+                </div>`;
+            };
+
+            // Fetch live projects from backend API
+            const projectsRes = await request('/api/projects');
+            assert(projectsRes.status === 200, 'GET /api/projects returns HTTP 200 for Explore pipeline');
+            assert(Array.isArray(projectsRes.body), 'GET /api/projects returns array of projects');
+
+            // Render each project through renderProjectCard
+            for (const proj of projectsRes.body) {
+                const renderedHtml = renderProjectCard(proj);
+                assert(typeof renderedHtml === 'string', `Project ${proj.id} rendered valid HTML string`);
+                assert(renderedHtml.includes(`data-project-id="${proj.id}"`), `Rendered card contains project ID attribute`);
+                assert(!renderedHtml.includes('undefined'), `Rendered card does NOT contain raw "undefined" strings`);
+                assert(!renderedHtml.includes('<img'), `Rendered card contains ZERO img tags`);
+            }
+            console.log(`  ✅ PASS: Successfully rendered ${projectsRes.body.length} live project cards without errors`);
+        }
+
         console.log('\n===============================================================');
         console.log('🎉 ALL PRODUCTION VERIFICATION TESTS PASSED SUCCESSFULLY!');
         console.log('===============================================================\n');

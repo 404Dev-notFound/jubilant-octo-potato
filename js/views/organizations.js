@@ -1,7 +1,6 @@
-/*
- * Organizations View for CodeCollab
- * Explore developer organizations, guilds, and collective labs.
- */
+const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml) 
+    ? window.escapeHtml 
+    : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
 
 export function render_organizations() {
     return `
@@ -21,14 +20,14 @@ export function render_organizations() {
             </p>
         </div>
 
-        <button data-form="create_org_form" class="px-5 py-3 bg-secondary text-on-secondary rounded-xl font-bold hover:scale-105 transition-all shadow-lg shadow-secondary/25 flex items-center gap-2 text-sm">
-            <span class="material-symbols-outlined text-[18px]">domain_add</span> Create Organization
+        <button data-form="create_org_form" class="px-5 py-3 bg-secondary text-on-secondary rounded-xl font-bold hover:scale-105 transition-all shadow-lg shadow-secondary/20 flex items-center gap-2 text-sm shrink-0">
+            <span class="material-symbols-outlined text-[18px]">add_circle</span> Create Organization
         </button>
     </div>
 
-    <!-- Organizations Grid Container -->
-    <div id="orgs-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Skeleton Slices -->
+    <!-- Organizations Bento Grid Container -->
+    <div id="organizations-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Skeleton Cards -->
         <div class="animate-pulse bg-surface-container-low h-64 rounded-2xl border border-white/5"></div>
         <div class="animate-pulse bg-surface-container-low h-64 rounded-2xl border border-white/5"></div>
         <div class="animate-pulse bg-surface-container-low h-64 rounded-2xl border border-white/5"></div>
@@ -38,7 +37,7 @@ export function render_organizations() {
 }
 
 export async function initOrganizations() {
-    const container = document.getElementById('orgs-grid-container');
+    const container = document.getElementById('organizations-grid');
     if (!container) return;
 
     try {
@@ -48,26 +47,21 @@ export async function initOrganizations() {
 
         if (orgs.length === 0) {
             container.innerHTML = `
-            <div class="col-span-full py-16 text-center bg-surface-container-low/30 rounded-3xl border border-white/5 space-y-4">
-                <div class="w-16 h-16 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center mx-auto">
-                    <span class="material-symbols-outlined text-[32px]">corporate_fare</span>
-                </div>
-                <div class="text-lg font-bold text-on-surface">No Organizations Registered Yet</div>
-                <p class="text-xs md:text-sm text-on-surface-variant max-w-md mx-auto">
-                    Be the first to build a guild or collective on CodeCollab.
-                </p>
-                <button data-form="create_org_form" class="px-5 py-2.5 bg-secondary text-on-secondary text-xs font-bold rounded-xl shadow-lg shadow-secondary/20 hover:scale-105 transition-all">
-                    Create First Organization
-                </button>
+            <div class="col-span-full py-16 text-center bg-surface-container-low/30 rounded-2xl border border-white/5 space-y-3">
+                <span class="material-symbols-outlined text-[48px] text-on-surface-variant">domain_disabled</span>
+                <div class="text-base font-bold text-on-surface">No Organizations Registered Yet</div>
+                <p class="text-xs text-on-surface-variant">Be the first pioneer to create a developer organization on CodeCollab.</p>
+                <button data-form="create_org_form" class="px-4 py-2 bg-secondary text-on-secondary rounded-xl font-bold text-xs">Create First Org</button>
             </div>`;
             return;
         }
 
         container.innerHTML = orgs.map(org => {
             const owner = org.owner || {};
-            const tagsBadges = (org.tags || []).map(t => `
-                <span class="px-2.5 py-1 bg-surface-container text-on-surface-variant rounded-lg text-xs font-medium border border-white/5">
-                    ${t}
+            const tags = Array.isArray(org.tags) ? org.tags : ['Open Source', 'Engineering'];
+            const tagsBadges = tags.map(t => `
+                <span class="px-2.5 py-0.5 rounded-md bg-surface-container-highest text-[10px] font-semibold text-on-surface-variant border border-white/5">
+                    ${escapeHtml(t)}
                 </span>
             `).join('');
 
@@ -82,10 +76,10 @@ export async function initOrganizations() {
                             </div>
                             <div>
                                 <h3 class="text-base font-bold text-on-surface group-hover:text-secondary transition-colors">
-                                    ${org.name}
+                                    ${escapeHtml(org.name)}
                                 </h3>
                                 <div class="text-xs text-on-surface-variant flex items-center gap-1.5 mt-0.5">
-                                    <span>Owner: <strong class="text-on-surface">${owner.name || 'Maintainer'}</strong></span>
+                                    <span>Owner: <strong class="text-on-surface">${escapeHtml(owner.name || 'Maintainer')}</strong></span>
                                 </div>
                             </div>
                         </div>
@@ -97,7 +91,7 @@ export async function initOrganizations() {
 
                     <!-- Description -->
                     <p class="text-xs md:text-sm text-on-surface-variant line-clamp-3 mb-4 leading-relaxed">
-                        ${org.description || 'Open source engineering alliance on CodeCollab.'}
+                        ${escapeHtml(org.description || 'Open source engineering alliance on CodeCollab.')}
                     </p>
 
                     <!-- Tags -->

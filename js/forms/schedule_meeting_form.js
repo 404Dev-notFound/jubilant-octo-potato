@@ -1,3 +1,7 @@
+const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml) 
+    ? window.escapeHtml 
+    : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
+
 export function render_schedule_meeting_form(projectId = '', projectTitle = '') {
     const projectBadge = projectTitle 
         ? `<span class="px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs font-mono">${escapeHtml(projectTitle)}</span>` 

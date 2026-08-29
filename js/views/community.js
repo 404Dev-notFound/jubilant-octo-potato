@@ -4,6 +4,10 @@
  * discover teams & guilds, follow peers, and collaborate on open-source projects.
  */
 
+const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml) 
+    ? window.escapeHtml 
+    : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
+
 export function render_community() {
     return `
     <main class="w-full max-w-[1440px] mx-auto px-4 lg:px-8 py-6 pb-24 text-on-surface">

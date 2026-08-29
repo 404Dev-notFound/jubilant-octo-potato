@@ -3,6 +3,10 @@
  * Discover open-source projects, search by language / tech stack, and filter by difficulty.
  */
 
+const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml) 
+    ? window.escapeHtml 
+    : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
+
 export function render_explore() {
     return `
 <main class="relative w-full max-w-[1400px] mx-auto p-4 md:p-8 flex flex-col min-h-screen pt-4 animate-fade-in-up">

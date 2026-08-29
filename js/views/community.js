@@ -393,11 +393,14 @@ export async function initCommunity() {
 
             const skillsBadges = (team.skills || []).map(s => renderVerifiedSkillBadge(s, true)).join('');
             
-            const memberAvatars = (team.memberDetails || []).map(m => `
-                <div class="w-8 h-8 rounded-full border-2 border-surface-container-high overflow-hidden bg-primary/20 flex items-center justify-center font-bold text-xs text-primary shrink-0" title="${m.name || 'Member'}">
-                    ${m.avatarUrl ? `<img src="${m.avatarUrl}" class="w-full h-full object-cover">` : (m.name ? m.name.charAt(0).toUpperCase() : 'M')}
+            const memberAvatars = (team.memberDetails || []).map(m => {
+                const mInitial = m.name ? m.name.charAt(0).toUpperCase() : 'M';
+                return `
+                <div class="w-8 h-8 rounded-full border-2 border-surface-container-high bg-primary/20 flex items-center justify-center font-bold text-xs text-primary shrink-0" title="${escapeHtml(m.name || 'Member')}">
+                    ${mInitial}
                 </div>
-            `).join('');
+            `;
+            }).join('');
 
             const projectTags = (team.assignedProjects || []).map(p => `
                 <span class="px-2.5 py-1 text-xs font-mono bg-surface-container rounded-lg text-on-surface-variant border border-white/5 flex items-center gap-1">
@@ -521,17 +524,20 @@ export async function initCommunity() {
                         <div>
                             <h4 class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-2">Team Roster</h4>
                             <div class="grid grid-cols-2 gap-2">
-                                ${(team.memberDetails || []).map(m => `
+                                ${(team.memberDetails || []).map(m => {
+                                    const mInitial = m.name ? m.name.charAt(0).toUpperCase() : 'M';
+                                    return `
                                     <div class="flex items-center gap-2 p-2 bg-surface-container rounded-xl border border-white/5">
-                                        <div class="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center font-bold text-xs text-primary overflow-hidden shrink-0">
-                                            ${m.avatarUrl ? `<img src="${m.avatarUrl}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none;" class="w-full h-full flex items-center justify-center font-bold text-xs text-primary">${m.name ? m.name.charAt(0).toUpperCase() : 'M'}</span>` : (m.name ? m.name.charAt(0).toUpperCase() : 'M')}
+                                        <div class="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center font-bold text-xs text-primary shrink-0">
+                                            ${mInitial}
                                         </div>
                                         <div class="truncate">
-                                            <span class="text-xs font-semibold text-on-surface block truncate">${m.name}</span>
-                                            <span class="text-[10px] text-on-surface-variant block truncate">${m.title || 'Member'}</span>
+                                            <span class="text-xs font-semibold text-on-surface block truncate">${escapeHtml(m.name || 'Member')}</span>
+                                            <span class="text-[10px] text-on-surface-variant block truncate">${escapeHtml(m.title || 'Member')}</span>
                                         </div>
                                     </div>
-                                `).join('')}
+                                `;
+                                }).join('')}
                             </div>
                         </div>
                     </div>
@@ -624,15 +630,15 @@ export async function initCommunity() {
                 <!-- Author Footer & Action -->
                 <div class="pt-4 border-t border-white/5 flex items-center justify-between gap-3 mt-4">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 rounded-xl bg-secondary/20 overflow-hidden border border-white/10 flex items-center justify-center font-bold text-sm text-secondary shrink-0">
-                            ${author.avatarUrl ? `<img src="${author.avatarUrl}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none;" class="w-full h-full flex items-center justify-center font-bold text-sm text-secondary">${author.name ? author.name.charAt(0).toUpperCase() : 'D'}</span>` : (author.name ? author.name.charAt(0).toUpperCase() : 'D')}
+                        <div class="w-9 h-9 rounded-xl bg-secondary/20 border border-secondary/30 flex items-center justify-center font-bold text-sm text-secondary shrink-0">
+                            ${author.name ? author.name.charAt(0).toUpperCase() : 'D'}
                         </div>
                         <div>
                             <div class="text-xs font-bold text-on-surface flex items-center gap-1">
-                                ${author.name || 'Developer'}
+                                ${escapeHtml(author.name || 'Developer')}
                                 ${(author.verifiedSkills || []).length > 0 ? `<span class="material-symbols-outlined text-[13px] text-tertiary font-bold" title="Verified Developer">verified</span>` : ''}
                             </div>
-                            <div class="text-[10px] text-on-surface-variant">${post.availability || 'Available Now'}</div>
+                            <div class="text-[10px] text-on-surface-variant">${escapeHtml(post.availability || 'Available Now')}</div>
                         </div>
                     </div>
 
@@ -690,19 +696,19 @@ export async function initCommunity() {
                     <div class="flex items-start justify-between gap-4 mb-4">
                         <div class="flex items-center gap-3.5">
                             <div class="relative">
-                                <div class="w-14 h-14 rounded-2xl overflow-hidden border border-white/10 bg-surface-container flex items-center justify-center font-bold text-lg text-secondary shrink-0">
-                                    ${dev.avatarUrl ? `<img src="${dev.avatarUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none;" class="w-full h-full flex items-center justify-center font-bold text-lg text-secondary">${dev.name ? dev.name.charAt(0).toUpperCase() : 'D'}</span>` : (dev.name ? dev.name.charAt(0).toUpperCase() : 'D')}
+                                <div class="w-14 h-14 rounded-2xl border border-secondary/30 bg-secondary/20 flex items-center justify-center font-bold text-xl text-secondary shrink-0 shadow-md">
+                                    ${dev.name ? dev.name.charAt(0).toUpperCase() : 'D'}
                                 </div>
                                 <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-tertiary border-2 border-surface-container-lowest" title="Available"></span>
                             </div>
                             <div>
                                 <h3 class="text-base font-bold text-on-surface group-hover:text-secondary transition-colors flex items-center gap-1.5">
-                                    ${dev.name}
+                                    ${escapeHtml(dev.name || 'Developer')}
                                     ${verifiedList.length > 0 ? `<span class="material-symbols-outlined text-[16px] text-tertiary" title="Verified Skills Available">verified</span>` : ''}
                                 </h3>
-                                <div class="text-xs text-on-surface-variant font-medium">${dev.title || dev.role || 'Developer'}</div>
+                                <div class="text-xs text-on-surface-variant font-medium">${escapeHtml(dev.title || dev.role || 'Developer')}</div>
                                 <div class="text-[11px] text-tertiary flex items-center gap-1 mt-0.5 font-semibold">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> ${dev.availability || 'Available Now'}
+                                    <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> ${escapeHtml(dev.availability || 'Available Now')}
                                 </div>
                             </div>
                         </div>

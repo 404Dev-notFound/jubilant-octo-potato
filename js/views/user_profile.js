@@ -166,15 +166,10 @@ export async function initUserProfile(targetUserId = null) {
         if (skillsEl && Array.isArray(profile.skills)) {
             skillsEl.innerHTML = profile.skills.map(s => `<span class="px-2.5 py-1 bg-surface-container text-on-surface-variant rounded-xl text-xs border border-white/5 font-medium">${s}</span>`).join('');
         }
-
         const avatarEl = document.getElementById('profile-page-avatar');
         if (avatarEl) {
             const initial = (profile.name ? profile.name.charAt(0) : 'U').toUpperCase();
-            if (profile.avatarUrl) {
-                avatarEl.innerHTML = `<img src="${profile.avatarUrl}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none;" class="w-full h-full flex items-center justify-center font-display text-4xl text-primary font-bold uppercase">${initial}</span>`;
-            } else {
-                avatarEl.innerHTML = initial;
-            }
+            avatarEl.innerHTML = initial;
         }
 
         const followersEl = document.getElementById('profile-followers-count');
@@ -196,32 +191,31 @@ export async function initUserProfile(targetUserId = null) {
                 </button>`;
             } else {
                 actionContainer.innerHTML = `
-                <button data-action="upvote-dev" data-user-id="${profile.id}" class="px-4 py-2 bg-secondary text-on-secondary rounded-xl font-bold flex items-center gap-1.5 text-xs shadow-md">
-                    <span class="material-symbols-outlined text-[18px]">favorite</span> Upvote
-                </button>
-                <button data-form="schedule_meeting_form" data-recipient-id="${profile.id}" data-recipient-name="${profile.name}" class="px-4 py-2 bg-primary text-on-primary rounded-xl font-bold flex items-center gap-1.5 text-xs shadow-md">
-                    <span class="material-symbols-outlined text-[18px]">calendar_add_on</span> Connect
-                </button>`;
+                <div class="flex items-center gap-2">
+                    <button id="profile-upvote-btn" class="px-4 py-2 bg-secondary/15 text-secondary rounded-xl border border-secondary/30 hover:bg-secondary hover:text-on-secondary transition-all flex items-center gap-2 text-xs md:text-sm font-bold shadow-md active:scale-95">
+                        <span class="material-symbols-outlined text-[18px]">thumb_up</span> Upvote (<span id="profile-btn-upvotes">${profile.upvotes || 0}</span>)
+                    </button>
+                    <button id="profile-follow-btn" class="px-4 py-2 bg-primary text-on-primary rounded-xl hover:scale-105 transition-transform flex items-center gap-2 text-xs md:text-sm font-bold shadow-md shadow-primary/20">
+                        <span class="material-symbols-outlined text-[18px]">person_add</span> Follow
+                    </button>
+                </div>`;
             }
         }
 
-        // Fetch User Projects
-        const projectsGrid = document.getElementById('profile-projects-grid');
-        if (projectsGrid) {
+        // Fetch User's collaborative projects
+        const projContainer = document.getElementById('profile-projects-list');
+        if (projContainer) {
             try {
-                const projRes = await window.apiFetch('/api/projects');
-                if (projRes.ok) {
-                    const allProjs = await projRes.json();
-                    const userProjs = allProjs.filter(p => String(p.ownerId) === String(profile.id) || (Array.isArray(p.members) && p.members.some(m => String(m.userId) === String(profile.id))));
-
-                    if (userProjs.length === 0) {
-                        projectsGrid.innerHTML = `
-                        <div class="col-span-full py-8 text-center text-on-surface-variant text-xs bg-surface-container-low/30 rounded-xl border border-white/5">
-                            No public projects active yet.
-                        </div>`;
+                const pRes = await window.apiFetch('/api/projects');
+                if (pRes.ok) {
+                    const allProjects = await pRes.json();
+                    const userProjects = allProjects.filter(p => String(p.ownerId) === String(targetUserId) || (Array.isArray(p.members) && p.members.some(m => String(m.userId) === String(targetUserId))));
+                    
+                    if (userProjects.length === 0) {
+                        projContainer.innerHTML = `<div class="p-6 text-center text-on-surface-variant text-xs bg-surface-container/50 rounded-xl border border-white/5">No public projects associated with this developer yet.</div>`;
                     } else {
-                        projectsGrid.innerHTML = userProjs.map(p => `
-                        <div class="glass-panel p-4 rounded-xl border-l-4 border-l-primary cursor-pointer hover:bg-surface-variant transition-colors" onclick="window.location.hash='project_details?id=${p.id}'">
+                        projContainer.innerHTML = userProjects.map(p => `
+                        <div class="glass-panel p-4 rounded-xl border-l-4 border-l-primary cursor-pointer hover:bg-surface-variant transition-colors" onclick="window.location.hash='project_details?projectId=${p.id}'">
                             <div class="font-bold text-sm text-on-surface">${p.title}</div>
                             <p class="text-xs text-on-surface-variant line-clamp-2 my-1">${p.description || ''}</p>
                             <div class="flex flex-wrap gap-1 mt-2">

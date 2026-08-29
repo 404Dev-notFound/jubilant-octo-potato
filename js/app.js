@@ -229,58 +229,59 @@ document.addEventListener('DOMContentLoaded', () => {
         const techBadges = safeTechStack.map(tech =>
             `<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5">${tech}</span>`
         ).join('');
-        const demoBadge = p.isDemo ? `<span class="ml-2 px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">Demo</span>` : '';
-        const ownerDisplay = p.owner?.name ? `<div class="flex items-center gap-1.5 text-xs text-on-surface-variant mb-3"><span class="w-4 h-4 rounded-full bg-secondary/30 text-secondary text-[10px] font-bold flex items-center justify-center">${p.owner.name.charAt(0).toUpperCase()}</span><span class="truncate">By ${p.owner.name}</span></div>` : '';
+        const demoBadge = p.isDemo ? `<span class="ml-2 px-2 py-0.5 bg-primary/15 text-primary border border-primary/30 rounded-md text-[10px] font-bold uppercase tracking-wider">Demo</span>` : '';
+        const ownerName = p.owner?.name || (p.ownerId ? `Developer #${p.ownerId}` : 'Open Source');
+        const ownerInitial = ownerName.charAt(0).toUpperCase();
+        const ownerDisplay = `<div class="flex items-center gap-2 text-xs text-on-surface-variant mb-3"><div class="w-5 h-5 rounded-full bg-secondary/20 text-secondary text-[11px] font-bold flex items-center justify-center border border-secondary/30">${ownerInitial}</div><span class="truncate font-medium">By ${escapeHtml(ownerName)}</span></div>`;
 
         return `
-        <div class="glass-card bg-surface-container-low/40 backdrop-blur-md rounded-[20px] border border-white/5 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-2" data-project-id="${p.id || ''}">
-            <div class="relative w-full aspect-video overflow-hidden bg-surface-container">
-                <div class="absolute top-3 left-3 z-10">
-                    <span class="px-2 py-1 bg-black/60 backdrop-blur-sm text-white border border-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm">
-                        ${p.category || 'Other'}
+        <div class="glass-card bg-surface-container-low/50 backdrop-blur-md rounded-[22px] border border-white/10 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:-translate-y-1.5 p-6" data-project-id="${p.id || ''}">
+            <div class="flex items-center justify-between gap-2 mb-4">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-bold uppercase tracking-wider">
+                        ${escapeHtml(p.category || 'Engineering')}
+                    </span>
+                    <span class="px-2 py-0.5 bg-secondary/10 text-secondary border border-secondary/20 rounded-md text-[10px] font-semibold uppercase">
+                        ${escapeHtml(p.difficulty || 'Intermediate')}
                     </span>
                 </div>
-                <div class="absolute top-3 right-3 z-10">
-                    <span class="px-2 py-1 bg-tertiary/10 text-tertiary border-tertiary/20 border rounded-md text-[10px] font-bold shadow-sm backdrop-blur-sm bg-opacity-80 uppercase tracking-wider">
-                        ${p.difficulty || 'Beginner'}
-                    </span>
-                </div>
-                <div class="absolute bottom-3 right-3 z-10">
-                    <span class="px-2 py-1 bg-primary text-on-primary rounded-md text-[10px] font-bold shadow-sm shadow-primary/20">
-                        Score: ${p.complexityScore || 0}
-                    </span>
-                </div>
-                <img src="${p.image && p.image !== 'undefined' ? p.image : 'https://placehold.co/600x400/1e1e24/60a5fa?text=Project'}" alt="${p.title || 'Untitled'}" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy" />
-                <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                ${p.isPinned ? `<span class="px-2 py-0.5 bg-tertiary/20 text-tertiary border border-tertiary/30 rounded text-[10px] font-bold uppercase tracking-wider">Pinned</span>` : ''}
             </div>
-            <div class="p-6 flex flex-col flex-1">
-                <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight">${p.title || 'Untitled'}${demoBadge}</h4>
-                ${ownerDisplay}
-                <p class="text-sm text-on-surface-variant line-clamp-2 mb-5 flex-1">${p.description || ''}</p>
-                <div class="flex flex-wrap gap-2 mb-6">${techBadges}</div>
-                <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
-                    <a href="${p.githubUrl || '#'}" target="_blank" class="flex-1 flex justify-center items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors group/btn">
-                        <svg class="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
+
+            <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[22px]">terminal</span>
+                <span class="truncate">${escapeHtml(p.title || 'Untitled Project')}</span>${demoBadge}
+            </h4>
+            ${ownerDisplay}
+            <p class="text-sm text-on-surface-variant line-clamp-3 mb-5 flex-1 leading-relaxed">${escapeHtml(p.description || 'Collaborative open-source software project on CodeCollab.')}</p>
+            
+            <div class="flex flex-wrap gap-1.5 mb-6">${techBadges}</div>
+
+            <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-2">
+                ${p.githubUrl ? `
+                    <a href="${escapeHtml(p.githubUrl)}" target="_blank" rel="noopener noreferrer" class="flex-1 flex justify-center items-center gap-1.5 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
                         <span>Code</span>
                     </a>
-                    <a href="#issues?projectId=${p.id}" class="flex-1 flex justify-center items-center gap-1 px-3 py-2.5 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-xs font-bold hover:bg-secondary hover:text-on-secondary transition-all active:scale-95">
-                        <span class="material-symbols-outlined text-[14px]">view_kanban</span> Issues
-                    </a>
-                    <a href="#project_details?projectId=${p.id}" class="flex-1 flex justify-center items-center px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">View Project</a>
-                </div>
+                ` : ''}
+                <a href="#issues?projectId=${p.id}" class="flex-1 flex justify-center items-center gap-1 px-3 py-2.5 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-xs font-bold hover:bg-secondary hover:text-on-secondary transition-all active:scale-95">
+                    <span class="material-symbols-outlined text-[14px]">view_kanban</span> Issues
+                </a>
+                <a href="#project_details?projectId=${p.id}" class="flex-1 flex justify-center items-center gap-1 px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                    <span class="material-symbols-outlined text-[14px]">visibility</span> View
+                </a>
             </div>
         </div>`;
     };
 
     async function navigate() {
-        // SPA navigation: parse hash, load appropriate view, display skeleton loader, and fetch dynamic data
+        // SPA navigation: parse hash, load appropriate view, and fetch dynamic data
         window.updateAuthUI();
         let hash = window.location.hash.substring(1) || 'home';
         const rawViewName = hash.split('?')[0].toLowerCase().replace(/-/g, '_');
         const viewName = rawViewName || 'home';
         const urlParams = new URLSearchParams(hash.split('?')[1] || '');
         const projectId = urlParams.get('projectId') || urlParams.get('id');
-
 
         // AI Chat feature disabled as per request
         if (viewName === 'ai_chat') {
@@ -303,18 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 nebulaBg.style.filter = 'blur(4px)';
             }
         }
-
-        // Render Skeleton Loader before fetching
-        appContent.innerHTML = `
-            <main class="w-full max-w-[1400px] mx-auto p-xl min-h-[80vh] flex flex-col gap-lg mt-8">
-                ${window.UI.createSkeleton('w-1/3', 'h-12')}
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
-                    ${window.UI.createSkeleton('w-full', 'h-64')}
-                    ${window.UI.createSkeleton('w-full', 'h-64')}
-                    ${window.UI.createSkeleton('w-full', 'h-64')}
-                </div>
-            </main>
-        `;
 
         try {
             let module;
@@ -339,76 +328,74 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (viewCache[viewName]) {
                 html = viewCache[viewName];
             }
-            // Small artificial delay to show skeleton and simulate real load
-            setTimeout(async () => {
-                appContent.innerHTML = html;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                // Initialize Home view
-                if (viewName === 'home' && module && module.initHome) {
-                    module.initHome();
+            appContent.innerHTML = html;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Initialize Home view
+            if (viewName === 'home' && module && module.initHome) {
+                await module.initHome();
+            }
+
+            // Initialize Explore view
+            if ((viewName === 'explore' || viewName === 'home_explore') && module && module.initExplore) {
+                await module.initExplore();
+            }
+
+            // Initialize Organizations view
+            if (viewName === 'organizations' && module && module.initOrganizations) {
+                await module.initOrganizations();
+            }
+
+            // Initialize Issues view
+            if (viewName === 'issues' && module && module.initIssues) {
+                await module.initIssues(projectId);
+            }
+
+            // Initialize Project Details view
+            if ((viewName === 'project_details' || viewName === 'project-details') && module && module.initProjectDetails) {
+                await module.initProjectDetails(projectId);
+            }
+
+            // Initialize Dashboard view
+            if (viewName === 'dashboard') {
+                if (module && module.initDashboard) {
+                    await module.initDashboard();
+                } else if (window.initDashboard) {
+                    await window.initDashboard();
                 }
+            }
 
-                // Initialize Explore view
-                if ((viewName === 'explore' || viewName === 'home_explore') && module && module.initExplore) {
-                    module.initExplore();
-                }
+            // Initialize Community view
+            if (viewName === 'community' && module && module.initCommunity) {
+                await module.initCommunity();
+            }
 
-                // Initialize Organizations view
-                if (viewName === 'organizations' && module && module.initOrganizations) {
-                    module.initOrganizations();
-                }
+            // Initialize Settings view
+            if (viewName === 'settings' && module && module.initSettings) {
+                await module.initSettings();
+            }
 
-                // Initialize Issues view
-                if (viewName === 'issues' && module && module.initIssues) {
-                    module.initIssues(projectId);
-                }
+            // Initialize User Profile view
+            if ((viewName === 'user_profile' || viewName === 'user-profile' || viewName === 'profile') && module && module.initUserProfile) {
+                await module.initUserProfile(urlParams.get('id') || urlParams.get('userId') || projectId);
+            }
 
-                // Initialize Project Details view
-                if ((viewName === 'project_details' || viewName === 'project-details') && module && module.initProjectDetails) {
-                    module.initProjectDetails(projectId);
-                }
+            // Initialize Notifications view
+            if (viewName === 'notifications' && module && module.initNotifications) {
+                await module.initNotifications();
+            }
 
-                // Initialize Dashboard view
-                if (viewName === 'dashboard') {
-                    if (module && module.initDashboard) {
-                        module.initDashboard();
-                    } else if (window.initDashboard) {
-                        window.initDashboard();
-                    }
-                }
+            // Update notification badge on navigation
+            window.updateNotificationBadge();
 
-                // Initialize Community view
-                if (viewName === 'community' && module && module.initCommunity) {
-                    module.initCommunity();
-                }
-
-                // Initialize Settings view
-                if (viewName === 'settings' && module && module.initSettings) {
-                    module.initSettings();
-                }
-
-                // Initialize User Profile view
-                if ((viewName === 'user_profile' || viewName === 'user-profile' || viewName === 'profile') && module && module.initUserProfile) {
-                    module.initUserProfile(urlParams.get('id') || urlParams.get('userId') || projectId);
-                }
-
-                // Initialize Notifications view
-                if (viewName === 'notifications' && module && module.initNotifications) {
-                    module.initNotifications();
-                }
-
-                // Update notification badge on navigation
-                window.updateNotificationBadge();
-
-                // Execute inline scripts if any
-                appContent.querySelectorAll('script').forEach(script => {
-                    const newScript = document.createElement('script');
-                    if (script.src) newScript.src = script.src;
-                    else newScript.textContent = script.textContent;
-                    document.body.appendChild(newScript);
-                });
-            }, 300);
+            // Execute inline scripts if any
+            appContent.querySelectorAll('script').forEach(script => {
+                const newScript = document.createElement('script');
+                if (script.src) newScript.src = script.src;
+                else newScript.textContent = script.textContent;
+                document.body.appendChild(newScript);
+            });
         } catch (error) {
             console.error(error);
             appContent.innerHTML = `

@@ -77,9 +77,8 @@ export async function initOrganizations() {
                     <!-- Top Bar -->
                     <div class="flex items-start justify-between gap-4 mb-4">
                         <div class="flex items-center gap-3.5">
-                            <div class="w-12 h-12 rounded-2xl bg-secondary/15 border border-secondary/30 flex items-center justify-center font-bold text-lg text-secondary overflow-hidden shrink-0">
-                                ${org.logo ? `<img src="${org.logo}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
-                                <span class="material-symbols-outlined text-[24px]" style="${org.logo ? 'display:none;' : ''}">domain</span>
+                            <div class="w-12 h-12 rounded-2xl bg-secondary/15 border border-secondary/30 flex items-center justify-center font-bold text-lg text-secondary shrink-0">
+                                <span class="material-symbols-outlined text-[24px]">domain</span>
                             </div>
                             <div>
                                 <h3 class="text-base font-bold text-on-surface group-hover:text-secondary transition-colors">

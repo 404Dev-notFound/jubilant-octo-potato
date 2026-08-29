@@ -90,11 +90,6 @@ export function render_add_project_form() {
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">Tech Stack (comma separated)</label>
                 <input type="text" name="techStack" required placeholder="e.g. React, Node.js, MongoDB" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
             </div>
-
-            <div>
-                <label class="block text-sm font-label-sm text-on-surface mb-xs">Image URL (Thumbnail)</label>
-                <input type="url" name="image" required placeholder="https://picsum.photos/600/400" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
-            </div>
             
             <div>
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">Short Description</label>

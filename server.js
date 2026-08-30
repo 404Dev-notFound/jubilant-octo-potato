@@ -263,10 +263,10 @@ const getFilePath = (table) => {
 };
 const getStatsPath = () => path.join(DATA_DIR, 'stats.json');
 
-// Reusable user sanitizer (Zero-Email, No Passwords)
+// Reusable user sanitizer (Zero-Email, No Passwords, Zero Mobile Leakage)
 function sanitizeUserObj(u, fallbackName = 'Developer') {
     if (!u) return null;
-    const { password, passwordHash, email, ...safeUser } = u;
+    const { password, passwordHash, email, phoneNumber, mobileNumber, phone, ...safeUser } = u;
     const prefs = (typeof u.profile?.preferences === 'object' && u.profile?.preferences !== null) ? u.profile.preferences : {};
     return {
         id: String(safeUser.id || ''),
@@ -559,12 +559,13 @@ async function saveStats(stats) {
  */
 app.post('/api/auth/signup', async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password, role, mobileNumber, phoneNumber } = req.body;
 
         if (!name || !name.trim()) return res.status(400).json({ error: 'Name is required' });
         if (!email || !email.trim() || !email.includes('@')) return res.status(400).json({ error: 'Valid email is required' });
         if (!password || password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
 
+        const rawMobile = (mobileNumber || phoneNumber || '').trim() || null;
         const normalizedEmail = email.trim().toLowerCase();
         const hashedPassword = await bcrypt.hash(password, 10);
         const userId = String(Date.now());
@@ -590,6 +591,7 @@ app.post('/api/auth/signup', async (req, res) => {
                             create: {
                                 firstName,
                                 lastName,
+                                phoneNumber: rawMobile,
                                 preferences: {
                                     title: role || 'Developer',
                                     role: role || 'Developer',
@@ -677,8 +679,16 @@ app.post('/api/auth/signup', async (req, res) => {
  */
 app.post('/api/auth/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, mobileNumber, phoneNumber } = req.body;
         if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
+
+        const rawMobile = (mobileNumber || phoneNumber || '').trim();
+        if (!rawMobile) {
+            return res.status(400).json({ error: 'Mobile number is required' });
+        }
+        if (!/^[+]?[0-9\s\-()]{7,20}$/.test(rawMobile)) {
+            return res.status(400).json({ error: 'Please provide a valid mobile number (7-20 digits)' });
+        }
 
         const normalizedEmail = email.trim().toLowerCase();
 
@@ -697,6 +707,17 @@ app.post('/api/auth/login', async (req, res) => {
                 if (!isMatch) {
                     return res.status(401).json({ error: 'Invalid email or password' });
                 }
+
+                // Persist / update mobile number on UserProfile (strictly private)
+                await prisma.userProfile.upsert({
+                    where: { userId: user.id },
+                    update: { phoneNumber: rawMobile },
+                    create: {
+                        userId: user.id,
+                        phoneNumber: rawMobile,
+                        firstName: 'Developer'
+                    }
+                });
 
                 const token = jwt.sign({ id: user.id, email: user.email, role: 'Developer' }, JWT_SECRET, { expiresIn: '7d' });
                 const refreshToken = uuidv4();
@@ -722,11 +743,16 @@ app.post('/api/auth/login', async (req, res) => {
         let users = [];
         try { users = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch { users = []; }
 
-        const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
-        if (!user) return res.status(401).json({ error: 'Invalid email or password' });
+        const userIndex = users.findIndex(u => u.email.toLowerCase() === normalizedEmail);
+        if (userIndex === -1) return res.status(401).json({ error: 'Invalid email or password' });
 
+        const user = users[userIndex];
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).json({ error: 'Invalid email or password' });
+
+        // Update mobile number in fallback record
+        users[userIndex].phoneNumber = rawMobile;
+        await fs.writeFile(filePath, JSON.stringify(users, null, 2));
 
         const token = jwt.sign({ id: user.id, email: user.email, role: user.role || 'Developer' }, JWT_SECRET, { expiresIn: '7d' });
         const refreshToken = uuidv4();

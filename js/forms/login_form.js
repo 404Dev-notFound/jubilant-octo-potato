@@ -18,11 +18,19 @@ export function render_login_form() {
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">Email Address</label>
                 <input type="email" name="email" required placeholder="dev@example.com" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-primary transition-colors">
             </div>
+
+            <div>
+                <label class="block text-sm font-label-sm text-on-surface mb-xs">Mobile Number</label>
+                <input type="tel" name="mobileNumber" required placeholder="+1 234 567 8900" pattern="[+]?[0-9\\s\\-()]{7,20}" title="Please enter a valid mobile number (7-20 digits)" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-primary transition-colors">
+            </div>
             
             <div>
                 <div class="flex justify-between mb-xs">
                     <label class="block text-sm font-label-sm text-on-surface">Password</label>
-                    <a href="#" class="text-xs text-primary hover:underline">Forgot password?</a>
+                    <a href="#" data-contact-admin="forgot-password" class="text-xs text-primary hover:underline flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-[14px]">support_agent</span>
+                        Forgot password?
+                    </a>
                 </div>
                 <input type="password" name="password" required placeholder="••••••••" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-primary transition-colors">
             </div>
@@ -35,6 +43,11 @@ export function render_login_form() {
         <div class="mt-lg text-center text-sm text-on-surface-variant">
             Don't have an account? 
             <a href="#" data-form="sign_up_form" class="text-primary font-bold hover:underline">Create one</a>
+        </div>
+        <div class="mt-md text-center">
+            <button type="button" data-contact-admin="general" class="text-xs text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">contact_support</span> Need help? Contact Administrator
+            </button>
         </div>
     </div>
 </div>

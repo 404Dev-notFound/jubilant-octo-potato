@@ -106,9 +106,16 @@ color.setHSL(hue, saturation, lightness);
 </div>
 </div>
 <div>
+<label class="block font-label-md text-on-surface-variant mb-xs">MOBILE NUMBER</label>
+<div class="relative">
+<input class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-md focus:border-primary outline-none text-on-surface auth-input transition-all placeholder:opacity-30" placeholder="+1 234 567 8900" required="" type="tel"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" data-icon="phone">phone</span>
+</div>
+</div>
+<div>
 <div class="flex justify-between items-center mb-xs">
 <label class="block font-label-md text-on-surface-variant">PASSWORD</label>
-<a class="font-label-sm text-primary hover:underline" href="#">Forgot?</a>
+<a class="font-label-sm text-primary hover:underline" data-contact-admin="forgot-password" href="#">Forgot?</a>
 </div>
 <div class="relative">
 <input class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-md focus:border-primary outline-none text-on-surface auth-input transition-all placeholder:opacity-30" placeholder="••••••••" required="" type="password"/>

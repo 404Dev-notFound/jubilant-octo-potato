@@ -8,26 +8,36 @@ export function render_login() {
             <p class="text-on-surface-variant text-sm mt-1">Sign in to continue to CodeCollab</p>
         </div>
         
-        <form class="space-y-md">
+        <form id="loginForm" class="space-y-md">
             <div>
                 <label class="block text-xs font-bold text-on-surface-variant mb-xs">EMAIL ADDRESS</label>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">mail</span>
-                    <input type="email" class="w-full bg-surface-container border border-white/10 rounded-lg pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors" placeholder="you@example.com" required>
+                    <input type="email" name="email" class="w-full bg-surface-container border border-white/10 rounded-lg pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors" placeholder="you@example.com" required>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-on-surface-variant mb-xs">MOBILE NUMBER</label>
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">phone</span>
+                    <input type="tel" name="mobileNumber" class="w-full bg-surface-container border border-white/10 rounded-lg pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors" placeholder="+1 234 567 8900" pattern="[+]?[0-9\\s\\-()]{7,20}" title="Please enter a valid mobile number (7-20 digits)" required>
                 </div>
             </div>
             <div>
                 <div class="flex justify-between items-end mb-xs">
                     <label class="block text-xs font-bold text-on-surface-variant">PASSWORD</label>
-                    <a href="#" class="text-xs text-primary hover:underline">Forgot?</a>
+                    <a href="#" data-contact-admin="forgot-password" class="text-xs text-primary hover:underline flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-[13px]">support_agent</span>
+                        Forgot?
+                    </a>
                 </div>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">lock</span>
-                    <input type="password" class="w-full bg-surface-container border border-white/10 rounded-lg pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors" placeholder="••••••••" required>
+                    <input type="password" name="password" class="w-full bg-surface-container border border-white/10 rounded-lg pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors" placeholder="••••••••" required>
                 </div>
             </div>
             
-            <button type="submit" data-action="toast" data-message="Successfully logged in!" class="w-full py-sm bg-primary text-on-primary font-bold rounded-lg shadow-lg hover:bg-primary-container transition-colors">SIGN IN</button>
+            <button type="submit" class="w-full py-sm bg-primary text-on-primary font-bold rounded-lg shadow-lg hover:bg-primary-container transition-colors">SIGN IN</button>
         </form>
         
         <div class="mt-lg flex items-center gap-sm">

@@ -46,15 +46,37 @@ window.UI = {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
+    },
+
+    openContactAdmin: async (options = {}) => {
+        try {
+            const module = await import(`./forms/contact_admin_modal.js?t=${Date.now()}`);
+            const html = module.render_contact_admin_modal(options);
+            window.UI.openModal(html);
+        } catch (err) {
+            console.error('Failed to load contact admin modal:', err);
+            window.UI.showToast('Contact administrator at scriptedbydev@gmail.com', 'info');
+        }
     }
 };
 
-// Expose escapeHtml directly on window object as global utility
+// Expose escapeHtml and openContactAdmin directly on window object as global utilities
 window.escapeHtml = window.UI.escapeHtml;
+window.openContactAdmin = window.UI.openContactAdmin;
 
-// Global Listeners for Modal
+// Global Listeners for Modal & Contact Admin
 document.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal-overlay') || e.target.closest('[data-close-modal]')) {
         window.UI.closeModal();
+        return;
+    }
+
+    const contactAdminBtn = e.target.closest('[data-contact-admin]');
+    if (contactAdminBtn) {
+        e.preventDefault();
+        const context = contactAdminBtn.getAttribute('data-contact-admin') || 'general';
+        const title = contactAdminBtn.getAttribute('data-title') || null;
+        const message = contactAdminBtn.getAttribute('data-message') || null;
+        window.UI.openContactAdmin({ context, title, message });
     }
 });

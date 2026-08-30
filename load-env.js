@@ -30,9 +30,9 @@ function loadEnv({ required = [] } = {}) {
 
   if (missing.length > 0) {
     console.error(`❌ Environment Configuration Error: Missing required variable(s): ${missing.join(', ')}`);
-    if (!fs.existsSync(envPath)) {
-      console.error(`   No local .env file found at: ${envPath}`);
-      console.error('   Please configure the required environment variable(s) in your cloud platform dashboard.');
+    console.error('   Please configure the required environment variable(s) in your Railway / cloud platform dashboard (Service Settings -> Variables).');
+    if (fs.existsSync(envPath)) {
+      console.error(`   (Checked local .env at: ${envPath})`);
     }
     // In production or when critical variables are missing, exit fail-fast
     if (process.env.NODE_ENV === 'production' || missing.includes('JWT_SECRET') || missing.includes('DATABASE_URL')) {

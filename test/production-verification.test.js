@@ -161,22 +161,42 @@ async function runTests() {
             userCToken = resC.body.token;
         }
 
-        // Login with valid credentials
+        // Login with missing mobile number rejected
         {
             const res = await request('/api/auth/login', {
                 method: 'POST',
                 body: { email: emailA, password: passwordA }
             });
-            assert(res.status === 200, 'Login with correct credentials returns HTTP 200');
+            assert(res.status === 400, 'Login without mobile number is rejected with HTTP 400');
+        }
+
+        // Login with invalid mobile number rejected
+        {
+            const res = await request('/api/auth/login', {
+                method: 'POST',
+                body: { email: emailA, password: passwordA, mobileNumber: '123' }
+            });
+            assert(res.status === 400, 'Login with invalid short mobile number is rejected with HTTP 400');
+        }
+
+        // Login with valid credentials and mobile number
+        const mobileA = '+1 234 567 8900';
+        {
+            const res = await request('/api/auth/login', {
+                method: 'POST',
+                body: { email: emailA, password: passwordA, mobileNumber: mobileA }
+            });
+            assert(res.status === 200, 'Login with correct credentials and mobile number returns HTTP 200');
             assert(res.body.token, 'Login returns JWT token');
             assert(res.body.password === undefined && res.body.passwordHash === undefined, 'Login never exposes password');
+            assert(res.body.phoneNumber === undefined && res.body.mobileNumber === undefined, 'CRITICAL PRIVACY: Login never exposes mobile number in response');
         }
 
         // Login with invalid credentials
         {
             const res = await request('/api/auth/login', {
                 method: 'POST',
-                body: { email: emailA, password: 'WrongPassword!' }
+                body: { email: emailA, password: 'WrongPassword!', mobileNumber: mobileA }
             });
             assert(res.status === 401, 'Login with incorrect password returns HTTP 401');
         }
@@ -202,9 +222,9 @@ async function runTests() {
         }
 
         // ----------------------------------------------------------------------
-        // 3. Privacy & Zero-Email Exposure Audit
+        // 3. Privacy & Zero-Email / Zero-Mobile Exposure Audit
         // ----------------------------------------------------------------------
-        console.log('\n--- 3. Privacy & Zero-Email Exposure Audit ---');
+        console.log('\n--- 3. Privacy & Zero-Email / Zero-Mobile Exposure Audit ---');
         {
             const res = await request('/api/users');
             assert(res.status === 200, 'GET /api/users returns HTTP 200');
@@ -213,12 +233,16 @@ async function runTests() {
             assert(!hasEmail, 'CRITICAL PRIVACY: GET /api/users contains ZERO email addresses');
             const hasPassword = res.body.some(u => u.password !== undefined || u.passwordHash !== undefined);
             assert(!hasPassword, 'CRITICAL PRIVACY: GET /api/users contains ZERO password fields');
+            const hasMobile = res.body.some(u => u.phoneNumber !== undefined || u.mobileNumber !== undefined || u.phone !== undefined);
+            assert(!hasMobile, 'CRITICAL PRIVACY: GET /api/users contains ZERO mobile numbers');
         }
         {
             const res = await request('/api/community/developers');
             assert(res.status === 200, 'GET /api/community/developers returns HTTP 200');
             const hasEmail = res.body.some(u => u.email !== undefined);
             assert(!hasEmail, 'CRITICAL PRIVACY: GET /api/community/developers contains ZERO email addresses');
+            const hasMobile = res.body.some(u => u.phoneNumber !== undefined || u.mobileNumber !== undefined || u.phone !== undefined);
+            assert(!hasMobile, 'CRITICAL PRIVACY: GET /api/community/developers contains ZERO mobile numbers');
         }
         {
             const res = await request('/api/users/profile', {
@@ -227,6 +251,7 @@ async function runTests() {
             assert(res.status === 200, 'GET /api/users/profile returns HTTP 200 for authenticated user');
             assert(res.body.email === emailA, 'Authenticated owner profile safely includes their own email');
             assert(res.body.password === undefined && res.body.passwordHash === undefined, 'Profile never exposes password');
+            assert(res.body.phoneNumber === undefined && res.body.mobileNumber === undefined, 'Profile never exposes mobile number');
         }
 
         // ----------------------------------------------------------------------

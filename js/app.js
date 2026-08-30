@@ -649,12 +649,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (input.name) data[input.name] = input.value;
                 else if (input.type === 'email') data['email'] = input.value;
                 else if (input.type === 'password') data['password'] = input.value;
+                else if (input.type === 'tel') data['mobileNumber'] = input.value;
             });
 
             // Name field might be required for signup
             if (form.id === 'signUpForm' && !data.name) {
                 const textInput = form.querySelector('input[type="text"]');
                 if (textInput) data.name = textInput.value;
+            }
+
+            // Mobile number field for login
+            if (form.id === 'loginForm' && !data.mobileNumber) {
+                const telInput = form.querySelector('input[type="tel"], input[name="mobileNumber"], input[name="phoneNumber"]');
+                if (telInput) data.mobileNumber = telInput.value;
             }
 
             const endpoint = form.id === 'signUpForm' ? '/api/auth/signup' : '/api/auth/login';

@@ -38,6 +38,40 @@ window.UI = {
         return `<div class="${width} ${height} rounded-xl bg-surface-container-high animate-pulse border border-white/5"></div>`;
     },
 
+    createPageSkeleton: (viewName = 'page') => {
+        return `
+            <main class="w-full max-w-[1400px] mx-auto p-xl flex flex-col pt-6 min-h-[70vh]">
+                <!-- Header Skeleton -->
+                <div class="flex justify-between items-center mb-lg">
+                    <div class="space-y-sm">
+                        <div class="w-64 h-8 rounded-xl bg-white/5 animate-pulse border border-white/5"></div>
+                        <div class="w-40 h-4 rounded-lg bg-white/5 animate-pulse border border-white/5"></div>
+                    </div>
+                    <div class="w-32 h-10 rounded-xl bg-white/5 animate-pulse border border-white/5"></div>
+                </div>
+
+                <!-- Primary Content Cards Grid Skeleton -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-xl">
+                    <div class="h-32 rounded-xl bg-white/5 animate-pulse border border-white/5 p-md"></div>
+                    <div class="h-32 rounded-xl bg-white/5 animate-pulse border border-white/5 p-md"></div>
+                    <div class="h-32 rounded-xl bg-white/5 animate-pulse border border-white/5 p-md"></div>
+                </div>
+
+                <!-- Main Layout Skeleton -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-lg">
+                    <div class="xl:col-span-2 space-y-md">
+                        <div class="h-64 rounded-xl bg-white/5 animate-pulse border border-white/5 p-lg"></div>
+                        <div class="h-48 rounded-xl bg-white/5 animate-pulse border border-white/5 p-lg"></div>
+                    </div>
+                    <div class="space-y-md">
+                        <div class="h-40 rounded-xl bg-white/5 animate-pulse border border-white/5 p-md"></div>
+                        <div class="h-64 rounded-xl bg-white/5 animate-pulse border border-white/5 p-md"></div>
+                    </div>
+                </div>
+            </main>
+        `;
+    },
+
     escapeHtml: (str) => {
         if (str === null || str === undefined) return '';
         return String(str)
@@ -63,6 +97,92 @@ window.UI = {
 // Expose escapeHtml and openContactAdmin directly on window object as global utilities
 window.escapeHtml = window.UI.escapeHtml;
 window.openContactAdmin = window.UI.openContactAdmin;
+
+// Global Page Load & Timeout Fallback Controller
+window.PageLoadState = {
+    activeTimer: null,
+    currentView: null,
+
+    startTimeout: (viewName, duration = 10000, onTimeout) => {
+        if (window.PageLoadState.activeTimer) {
+            clearTimeout(window.PageLoadState.activeTimer);
+        }
+        window.PageLoadState.currentView = viewName;
+        window.PageLoadState.activeTimer = setTimeout(() => {
+            window.PageLoadState.activeTimer = null;
+            if (onTimeout) onTimeout();
+        }, duration);
+    },
+
+    clearTimer: () => {
+        if (window.PageLoadState.activeTimer) {
+            clearTimeout(window.PageLoadState.activeTimer);
+            window.PageLoadState.activeTimer = null;
+        }
+    },
+
+    renderSkeleton: (container, viewName) => {
+        if (!container) return;
+        container.innerHTML = window.UI.createPageSkeleton(viewName);
+    },
+
+    renderFallback: (container, viewName, state = 'timeout', error = null) => {
+        window.PageLoadState.clearTimer();
+        if (!container) return;
+
+        // Non-sensitive diagnostic logging for developers
+        if (error) {
+            console.warn(`[CodeCollab PageLoadState] View '${viewName}' fallback triggered. State: ${state}. Category: ${error.code || error.message || 'UNKNOWN'}.`);
+        } else {
+            console.warn(`[CodeCollab PageLoadState] View '${viewName}' fallback triggered. State: ${state}.`);
+        }
+
+        container.innerHTML = `
+            <main class="w-full max-w-[1400px] mx-auto p-xl flex flex-col items-center justify-center min-h-[65vh] pt-12 text-center animate-fade-in">
+                <div class="glass-panel p-xl rounded-2xl border border-white/10 max-w-lg w-full shadow-2xl relative overflow-hidden my-8">
+                    <!-- Subtle Futuristic Dual-Ring Orbital Element -->
+                    <div class="relative w-24 h-24 mx-auto mb-lg flex items-center justify-center">
+                        <div class="absolute inset-0 rounded-full border-2 border-primary/20 border-t-primary animate-spin" style="animation-duration: 3s;"></div>
+                        <div class="absolute inset-2 rounded-full border-2 border-tertiary/20 border-b-tertiary animate-spin" style="animation-duration: 2s; animation-direction: reverse;"></div>
+                        <span class="material-symbols-outlined text-[36px] text-primary relative z-10">build_circle</span>
+                    </div>
+
+                    <h2 class="font-display text-headline-md font-bold text-on-surface mb-sm">We're working on it</h2>
+                    
+                    <p class="text-on-surface-variant text-sm leading-relaxed mb-md">
+                        This page is taking a little longer than expected. Our team has been notified, and we're working to get everything running smoothly.
+                    </p>
+
+                    <p class="text-xs text-on-surface-variant/70 mb-lg font-mono">
+                        Please try again in a moment.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-sm">
+                        <button onclick="window.PageLoadState.retry('${viewName}')" class="w-full sm:w-auto px-lg py-sm bg-primary text-on-primary font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-xs">
+                            <span class="material-symbols-outlined text-[18px]">refresh</span> Retry
+                        </button>
+                        <button onclick="window.location.hash='home'" class="w-full sm:w-auto px-lg py-sm bg-surface-variant hover:bg-outline-variant text-on-surface font-bold rounded-xl transition-all flex items-center justify-center gap-xs">
+                            <span class="material-symbols-outlined text-[18px]">home</span> Go Home
+                        </button>
+                    </div>
+                </div>
+            </main>
+        `;
+    },
+
+    retry: (viewName) => {
+        window.PageLoadState.clearTimer();
+        const appContent = document.getElementById('app-content');
+        if (appContent) {
+            window.PageLoadState.renderSkeleton(appContent, viewName);
+        }
+        if (window.location.hash.includes(viewName)) {
+            window.dispatchEvent(new HashChangeEvent('hashchange'));
+        } else {
+            window.location.hash = viewName || 'home';
+        }
+    }
+};
 
 // Global Listeners for Modal & Contact Admin
 document.addEventListener('click', (e) => {

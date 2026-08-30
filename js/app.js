@@ -321,6 +321,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Clear previous navigation timeout and start 10s fallback timer
+        if (window.PageLoadState) {
+            window.PageLoadState.clearTimer();
+            window.PageLoadState.startTimeout(viewName, 10000, () => {
+                if (appContent) {
+                    window.PageLoadState.renderFallback(appContent, viewName, 'timeout');
+                }
+            });
+            window.PageLoadState.renderSkeleton(appContent, viewName);
+        }
+
         try {
             let module;
             try {
@@ -329,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     module = await import(`./views/${viewName}.js`);
                 } catch (e2) {
-                    console.error(`Module import error for ${viewName}`, e2);
+                    console.warn(`Module import error for view '${viewName}'`, e2);
                 }
             }
 
@@ -343,6 +354,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else if (viewCache[viewName]) {
                 html = viewCache[viewName];
+            }
+
+            if (!html) {
+                throw new Error(`View template for '${viewName}' could not be loaded`);
             }
 
             appContent.innerHTML = html;
@@ -405,6 +420,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update notification badge on navigation
             window.updateNotificationBadge();
 
+            // Clear timer on successful load & initialization
+            if (window.PageLoadState) {
+                window.PageLoadState.clearTimer();
+            }
+
             // Execute inline scripts if any
             appContent.querySelectorAll('script').forEach(script => {
                 const newScript = document.createElement('script');
@@ -413,15 +433,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.appendChild(newScript);
             });
         } catch (error) {
-            console.error(error);
-            appContent.innerHTML = `
-                <div class="flex flex-col items-center justify-center min-h-[60vh] text-error">
-                    <span class="material-symbols-outlined text-[64px] mb-md">sentiment_dissatisfied</span>
-                    <h2 class="text-headline-lg font-display mb-sm">Page Not Found</h2>
-                    <p class="text-on-surface-variant mb-lg">The requested view '${viewName}' does not exist or has not been generated.</p>
-                    <button onclick="window.location.hash='home'" class="px-xl py-sm bg-primary text-on-primary rounded-lg font-bold shadow-lg hover:bg-primary-container transition-colors">Return Home</button>
-                </div>
-            `;
+            console.warn(`[CodeCollab Router] Error navigating to '${viewName}':`, error.message || error);
+            if (window.PageLoadState) {
+                window.PageLoadState.renderFallback(appContent, viewName, 'error', error);
+            } else {
+                appContent.innerHTML = `
+                    <div class="flex flex-col items-center justify-center min-h-[60vh] text-error">
+                        <span class="material-symbols-outlined text-[64px] mb-md">sentiment_dissatisfied</span>
+                        <h2 class="text-headline-lg font-display mb-sm">Page Not Found</h2>
+                        <p class="text-on-surface-variant mb-lg">The requested view '${viewName}' does not exist.</p>
+                        <button onclick="window.location.hash='home'" class="px-xl py-sm bg-primary text-on-primary rounded-lg font-bold shadow-lg hover:bg-primary-container transition-colors">Return Home</button>
+                    </div>
+                `;
+            }
         }
     }
 

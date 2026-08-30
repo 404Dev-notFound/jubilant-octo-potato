@@ -565,7 +565,14 @@ app.post('/api/auth/signup', async (req, res) => {
         if (!email || !email.trim() || !email.includes('@')) return res.status(400).json({ error: 'Valid email is required' });
         if (!password || password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
 
-        const rawMobile = (mobileNumber || phoneNumber || '').trim() || null;
+        const rawMobile = (mobileNumber || phoneNumber || '').trim();
+        if (!rawMobile) {
+            return res.status(400).json({ error: 'Mobile number is required for account registration' });
+        }
+        if (!/^[+]?[0-9\s\-()]{7,20}$/.test(rawMobile)) {
+            return res.status(400).json({ error: 'Please provide a valid mobile number (7-20 digits)' });
+        }
+
         const normalizedEmail = email.trim().toLowerCase();
         const hashedPassword = await bcrypt.hash(password, 10);
         const userId = String(Date.now());
@@ -597,9 +604,7 @@ app.post('/api/auth/signup', async (req, res) => {
                                     role: role || 'Developer',
                                     bio: '',
                                     skills: [],
-                                    availability: 'Available Now',
-                                    rating: 5.0,
-                                    upvotes: 0
+                                    availability: 'Available Now'
                                 }
                             }
                         }
@@ -610,24 +615,22 @@ app.post('/api/auth/signup', async (req, res) => {
                 const token = jwt.sign({ id: newUser.id, email: newUser.email, role: role || 'Developer' }, JWT_SECRET, { expiresIn: '7d' });
                 const refreshToken = uuidv4();
                 refreshTokenStore.set(refreshToken, newUser.id);
-                const sanitized = sanitizeUserObj(newUser);
 
+                const sanitized = sanitizeUserObj(newUser);
                 return res.status(201).json({
                     token,
                     refreshToken,
                     ...sanitized,
                     user: sanitized
                 });
-            } catch (err) {
-                if (NODE_ENV === 'production') {
-                    console.error('[Signup DB Error]:', err.message);
-                    return res.status(500).json({ error: 'Failed to create user account' });
-                }
+            } catch (dbErr) {
+                console.error('Database signup error, falling back if non-production:', dbErr);
+                if (NODE_ENV === 'production') throw dbErr;
             }
         }
 
-        // Offline Non-Production Fallback
-        const filePath = getFilePath('users');
+        // Offline / Dev File Fallback
+        const filePath = path.join(DATA_DIR, 'users.json');
         let users = [];
         try { users = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch { users = []; }
 
@@ -640,17 +643,8 @@ app.post('/api/auth/signup', async (req, res) => {
             name: name.trim(),
             email: normalizedEmail,
             password: hashedPassword,
+            phoneNumber: rawMobile,
             role: role || 'Developer',
-            title: role || 'Developer',
-            skills: [],
-            verifiedSkills: [],
-            bio: '',
-            avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-            rating: 5.0,
-            upvotes: 0,
-            availability: 'Available Now',
-            lookingFor: 'Looking for collaboration',
-            socialLinks: {},
             createdAt: new Date().toISOString()
         };
 
@@ -660,17 +654,18 @@ app.post('/api/auth/signup', async (req, res) => {
         const token = jwt.sign({ id: newUser.id, email: newUser.email, role: newUser.role }, JWT_SECRET, { expiresIn: '7d' });
         const refreshToken = uuidv4();
         refreshTokenStore.set(refreshToken, newUser.id);
-        const sanitized = sanitizeUserObj(newUser);
 
-        res.status(201).json({
+        const sanitized = sanitizeUserObj(newUser);
+        return res.status(201).json({
             token,
             refreshToken,
             ...sanitized,
             user: sanitized
         });
-    } catch (error) {
-        console.error('Signup error:', error);
-        res.status(500).json({ error: 'Internal server error during signup' });
+
+    } catch (err) {
+        console.error('Signup Error:', err);
+        return res.status(500).json({ error: 'Failed to create account' });
     }
 });
 
@@ -683,10 +678,7 @@ app.post('/api/auth/login', async (req, res) => {
         if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
 
         const rawMobile = (mobileNumber || phoneNumber || '').trim();
-        if (!rawMobile) {
-            return res.status(400).json({ error: 'Mobile number is required' });
-        }
-        if (!/^[+]?[0-9\s\-()]{7,20}$/.test(rawMobile)) {
+        if (rawMobile && !/^[+]?[0-9\s\-()]{7,20}$/.test(rawMobile)) {
             return res.status(400).json({ error: 'Please provide a valid mobile number (7-20 digits)' });
         }
 
@@ -708,16 +700,18 @@ app.post('/api/auth/login', async (req, res) => {
                     return res.status(401).json({ error: 'Invalid email or password' });
                 }
 
-                // Persist / update mobile number on UserProfile (strictly private)
-                await prisma.userProfile.upsert({
-                    where: { userId: user.id },
-                    update: { phoneNumber: rawMobile },
-                    create: {
-                        userId: user.id,
-                        phoneNumber: rawMobile,
-                        firstName: 'Developer'
-                    }
-                });
+                // If mobile number provided, update UserProfile (strictly private)
+                if (rawMobile) {
+                    await prisma.userProfile.upsert({
+                        where: { userId: user.id },
+                        update: { phoneNumber: rawMobile },
+                        create: {
+                            userId: user.id,
+                            phoneNumber: rawMobile,
+                            firstName: 'Developer'
+                        }
+                    });
+                }
 
                 const token = jwt.sign({ id: user.id, email: user.email, role: 'Developer' }, JWT_SECRET, { expiresIn: '7d' });
                 const refreshToken = uuidv4();

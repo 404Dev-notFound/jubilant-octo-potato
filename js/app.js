@@ -288,10 +288,15 @@ document.addEventListener('DOMContentLoaded', () => {
     async function navigate() {
         // SPA navigation: parse hash, load appropriate view, and fetch dynamic data
         window.updateAuthUI();
-        let hash = window.location.hash.substring(1) || 'home';
-        const rawViewName = hash.split('?')[0].toLowerCase().replace(/-/g, '_');
+        let rawHash = window.location.hash.substring(1);
+        if (!rawHash && typeof window !== 'undefined' && window.location.pathname && window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
+            rawHash = window.location.pathname.substring(1);
+        }
+        let hash = rawHash || 'home';
+        const cleanHash = hash.replace(/^\/+|\/+$/g, '');
+        const rawViewName = cleanHash.split('?')[0].toLowerCase().replace(/-/g, '_');
         const viewName = rawViewName || 'home';
-        const urlParams = new URLSearchParams(hash.split('?')[1] || '');
+        const urlParams = new URLSearchParams(cleanHash.split('?')[1] || '');
         const projectId = urlParams.get('projectId') || urlParams.get('id');
 
         // AI Chat feature disabled as per request

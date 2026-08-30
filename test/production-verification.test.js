@@ -108,17 +108,28 @@ async function runTests() {
         const emailC = `test_charlie_${uniqueSuffix}@example.com`;
         const passwordA = 'SecurePassword123!';
 
-        // Signup User A
+        // Signup missing mobile number rejected
         {
             const res = await request('/api/auth/signup', {
                 method: 'POST',
-                body: { email: emailA, password: passwordA, name: 'Alice Developer' }
+                body: { email: `nomobile_${uniqueSuffix}@example.com`, password: passwordA, name: 'No Mobile' }
+            });
+            assert(res.status === 400, 'Signup without mobile number is rejected with HTTP 400');
+        }
+
+        // Signup User A with mobile number
+        const mobileA = '+1 234 567 8900';
+        {
+            const res = await request('/api/auth/signup', {
+                method: 'POST',
+                body: { email: emailA, password: passwordA, name: 'Alice Developer', mobileNumber: mobileA }
             });
             assert(res.status === 201, 'Signup returns HTTP 201');
             assert(res.body.token && typeof res.body.token === 'string', 'Signup returns JWT token');
             assert(res.body.refreshToken && typeof res.body.refreshToken === 'string', 'Signup returns refreshToken');
             assert(res.body.password === undefined, 'Password is NEVER returned in signup response');
             assert(res.body.passwordHash === undefined, 'Password hash is NEVER returned in signup response');
+            assert(res.body.phoneNumber === undefined && res.body.mobileNumber === undefined, 'CRITICAL PRIVACY: Mobile number is NEVER returned in signup response');
             userA = res.body;
             userAToken = res.body.token;
             userARefreshToken = res.body.refreshToken;
@@ -128,7 +139,7 @@ async function runTests() {
         {
             const res = await request('/api/auth/signup', {
                 method: 'POST',
-                body: { email: emailA, password: passwordA, name: 'Alice Duplicate' }
+                body: { email: emailA, password: passwordA, name: 'Alice Duplicate', mobileNumber: mobileA }
             });
             assert(res.status === 400, 'Duplicate email signup is blocked with HTTP 400');
         }
@@ -137,7 +148,7 @@ async function runTests() {
         {
             const res = await request('/api/auth/signup', {
                 method: 'POST',
-                body: { email: `short_${uniqueSuffix}@example.com`, password: '123', name: 'Short' }
+                body: { email: `short_${uniqueSuffix}@example.com`, password: '123', name: 'Short', mobileNumber: mobileA }
             });
             assert(res.status === 400, 'Short password (<6 chars) is rejected with HTTP 400');
         }
@@ -146,7 +157,7 @@ async function runTests() {
         {
             const resB = await request('/api/auth/signup', {
                 method: 'POST',
-                body: { email: emailB, password: 'SecurePassword456!', name: 'Bob Maintainer' }
+                body: { email: emailB, password: 'SecurePassword456!', name: 'Bob Maintainer', mobileNumber: '+1 987 654 3210' }
             });
             assert(resB.status === 201, 'User B signup successful');
             userB = resB.body;
@@ -154,42 +165,23 @@ async function runTests() {
 
             const resC = await request('/api/auth/signup', {
                 method: 'POST',
-                body: { email: emailC, password: 'SecurePassword789!', name: 'Charlie Contributor' }
+                body: { email: emailC, password: 'SecurePassword789!', name: 'Charlie Contributor', mobileNumber: '+1 555 123 4567' }
             });
             assert(resC.status === 201, 'User C signup successful');
             userC = resC.body;
             userCToken = resC.body.token;
         }
 
-        // Login with missing mobile number rejected
+        // Standard Login with email & password
         {
             const res = await request('/api/auth/login', {
                 method: 'POST',
                 body: { email: emailA, password: passwordA }
             });
-            assert(res.status === 400, 'Login without mobile number is rejected with HTTP 400');
-        }
-
-        // Login with invalid mobile number rejected
-        {
-            const res = await request('/api/auth/login', {
-                method: 'POST',
-                body: { email: emailA, password: passwordA, mobileNumber: '123' }
-            });
-            assert(res.status === 400, 'Login with invalid short mobile number is rejected with HTTP 400');
-        }
-
-        // Login with valid credentials and mobile number
-        const mobileA = '+1 234 567 8900';
-        {
-            const res = await request('/api/auth/login', {
-                method: 'POST',
-                body: { email: emailA, password: passwordA, mobileNumber: mobileA }
-            });
-            assert(res.status === 200, 'Login with correct credentials and mobile number returns HTTP 200');
+            assert(res.status === 200, 'Standard login with email and password returns HTTP 200');
             assert(res.body.token, 'Login returns JWT token');
             assert(res.body.password === undefined && res.body.passwordHash === undefined, 'Login never exposes password');
-            assert(res.body.phoneNumber === undefined && res.body.mobileNumber === undefined, 'CRITICAL PRIVACY: Login never exposes mobile number in response');
+            assert(res.body.phoneNumber === undefined && res.body.mobileNumber === undefined, 'CRITICAL PRIVACY: Login response never exposes mobile number');
         }
 
         // Login with invalid credentials

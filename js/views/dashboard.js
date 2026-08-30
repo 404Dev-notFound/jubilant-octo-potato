@@ -239,9 +239,13 @@ export async function initDashboard() {
             window.apiFetch('/api/projectMembers').catch(() => null)
         ]);
 
-        const allProjects = (projectsRes && projectsRes.ok) ? await projectsRes.json() : [];
-        const allIssues = (issuesRes && issuesRes.ok) ? await issuesRes.json() : [];
-        const allMembers = (membersRes && membersRes.ok) ? await membersRes.json() : [];
+        const projectsData = (projectsRes && projectsRes.ok) ? await projectsRes.json().catch(() => []) : [];
+        const issuesData = (issuesRes && issuesRes.ok) ? await issuesRes.json().catch(() => []) : [];
+        const membersData = (membersRes && membersRes.ok) ? await membersRes.json().catch(() => []) : [];
+
+        const allProjects = Array.isArray(projectsData) ? projectsData : [];
+        const allIssues = Array.isArray(issuesData) ? issuesData : [];
+        const allMembers = Array.isArray(membersData) ? membersData : [];
 
         // Determine user's active projects
         const userProjectMap = new Map();
@@ -427,11 +431,17 @@ async function loadRequestsAndNotificationsHub(currentUser, allProjects) {
             window.apiFetch('/api/notifications').catch(() => null)
         ]);
 
-        const joinReceived = (jrRecRes && jrRecRes.ok) ? await jrRecRes.json() : [];
-        const joinSent = (jrSentRes && jrSentRes.ok) ? await jrSentRes.json() : [];
-        const meetReceived = (meetRecRes && meetRecRes.ok) ? await meetRecRes.json() : [];
-        const meetSent = (meetSentRes && meetSentRes.ok) ? await meetSentRes.json() : [];
-        const notifications = (notifRes && notifRes.ok) ? await notifRes.json() : [];
+        const jrRec = (jrRecRes && jrRecRes.ok) ? await jrRecRes.json().catch(() => []) : [];
+        const jrSent = (jrSentRes && jrSentRes.ok) ? await jrSentRes.json().catch(() => []) : [];
+        const meetRec = (meetRecRes && meetRecRes.ok) ? await meetRecRes.json().catch(() => []) : [];
+        const meetSentData = (meetSentRes && meetSentRes.ok) ? await meetSentRes.json().catch(() => []) : [];
+        const notif = (notifRes && notifRes.ok) ? await notifRes.json().catch(() => []) : [];
+
+        const joinReceived = Array.isArray(jrRec) ? jrRec : [];
+        const joinSent = Array.isArray(jrSent) ? jrSent : [];
+        const meetReceived = Array.isArray(meetRec) ? meetRec : [];
+        const meetSent = Array.isArray(meetSentData) ? meetSentData : [];
+        const notifications = Array.isArray(notif) ? notif : [];
 
         // Tab count badges
         const pendingJoinCount = joinReceived.filter(r => r.status === 'PENDING').length;

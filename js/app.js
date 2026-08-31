@@ -294,7 +294,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         let hash = rawHash || 'home';
         const cleanHash = hash.replace(/^\/+|\/+$/g, '');
-        const rawViewName = cleanHash.split('?')[0].toLowerCase().replace(/-/g, '_');
+        let rawViewName = cleanHash.split('?')[0].toLowerCase().replace(/-/g, '_');
+        if (rawViewName === 'community_hub') rawViewName = 'community';
+        if (rawViewName === 'home_explore') rawViewName = 'explore';
+        if (rawViewName === 'team_collaboration') rawViewName = 'community';
+        if (rawViewName === 'profile') rawViewName = 'user_profile';
+        if (rawViewName === 'user-profile') rawViewName = 'user_profile';
+        if (rawViewName === 'project-details') rawViewName = 'project_details';
         const viewName = rawViewName || 'home';
         const urlParams = new URLSearchParams(cleanHash.split('?')[1] || '');
         const projectId = urlParams.get('projectId') || urlParams.get('id');
@@ -373,6 +379,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 await module.initExplore();
             }
 
+            // Initialize Add Project view
+            if (viewName === 'add_project' && module && module.initAddProject) {
+                await module.initAddProject();
+            }
+
             // Initialize Organizations view
             if (viewName === 'organizations' && module && module.initOrganizations) {
                 await module.initOrganizations();
@@ -415,6 +426,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Initialize Notifications view
             if (viewName === 'notifications' && module && module.initNotifications) {
                 await module.initNotifications();
+            }
+
+            // Initialize Three.js simulation view
+            if (viewName === 'three_js' && module && module.initThree_js) {
+                await module.initThree_js();
             }
 
             // Update notification badge on navigation

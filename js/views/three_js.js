@@ -1,48 +1,139 @@
 export function render_three_js() {
     return `
- STITCH_THREEJS_START:ANIMATION_2 class="fixed inset-0 w-full h-full bg-transparent" 
-<div class="fixed inset-0 w-full h-full bg-transparent" style="display:block;">
-<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
-<div id="threejs-container-ANIMATION_2" style="width:100%;height:100%"></div>
-<script>
-(function() {
-  const container = document.getElementById('threejs-container-ANIMATION_2');
-  const devicePixelRatio = window.devicePixelRatio || 1;
-  
-const i3 = i * 3;
-const n = i / count;
+<main class="relative w-full h-[calc(100vh-80px)] flex flex-col items-center justify-center overflow-hidden">
+    <!-- Header overlay -->
+    <div class="absolute top-6 left-6 z-20 pointer-events-none">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-bold uppercase tracking-widest mb-2">
+            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+            Dynamic Three.js Simulation
+        </div>
+        <h1 class="text-2xl md:text-3xl font-display font-extrabold text-on-surface">Cosmic Harmonic Field</h1>
+        <p class="text-xs text-on-surface-variant max-w-sm mt-1">Interactive 3D particle field simulation driven by real-time mathematical harmonics.</p>
+    </div>
 
-// Independent mathematical frequencies
-const t1 = time * 0.15;
-const t2 = time * 0.11 + n * 2.0;
-const t3 = time * 0.08 + n * 4.0;
+    <!-- Controls overlay -->
+    <div class="absolute bottom-6 right-6 z-20 flex items-center gap-3">
+        <button onclick="window.location.hash='home'" class="px-4 py-2 bg-surface-container/80 backdrop-blur-md hover:bg-surface-variant text-on-surface border border-white/10 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-lg">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span> Return Home
+        </button>
+    </div>
 
-// Procedural harmonic motion
-const radius = 25.0 + 5.0 * Math.sin(t1 + n * 6.28);
-const angle = n * 62.8 + t2;
-const spiral = n * 15.0;
-
-// Interference patterns & Spiral field
-const x = radius * Math.cos(angle + spiral) * (1.0 + 0.2 * Math.sin(t3 * 2.5 + n * 10.0));
-const y = radius * Math.sin(angle + spiral) * (1.0 + 0.2 * Math.cos(t2 * 1.8 + n * 12.0));
-const z = 15.0 * Math.sin(t1 * 1.2 + n * 20.0) + 10.0 * Math.cos(t2 * 0.7 + n * 8.0);
-
-// Rotational fields & fractal-inspired evolution
-const rotX = x * Math.cos(t1) - z * Math.sin(t1);
-const rotZ = x * Math.sin(t1) + z * Math.cos(t1);
-
-target.set(rotX, y + Math.sin(t2 * 0.5) * 5.0, rotZ);
-
-// Dynamic color evolution based on position and time
-const hue = (0.6 + 0.1 * Math.sin(t1 + n * 5.0)) % 1.0;
-const saturation = 0.8 + 0.2 * Math.cos(t3);
-const lightness = 0.5 + 0.3 * Math.sin(t2 + n * 3.14);
-
-color.setHSL(hue, saturation, lightness);
-
-})();
-</script>
-</div>
- STITCH_THREEJS_END:ANIMATION_2 
+    <!-- Canvas Container -->
+    <div id="threejs-interactive-canvas" class="w-full h-full"></div>
+</main>
 `;
+}
+
+export function initThree_js() {
+    const container = document.getElementById('threejs-interactive-canvas');
+    if (!container) return;
+
+    // Check if THREE is available
+    if (typeof THREE === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+        script.onload = () => startSimulation(container);
+        document.head.appendChild(script);
+    } else {
+        startSimulation(container);
+    }
+}
+
+function startSimulation(container) {
+    if (!container || container.querySelector('canvas')) return;
+
+    const width = container.clientWidth || window.innerWidth;
+    const height = container.clientHeight || (window.innerHeight - 80);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+    camera.position.z = 70;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.appendChild(renderer.domElement);
+
+    // Particle field
+    const particleCount = 4000;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    const color = new THREE.Color();
+
+    for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        const radius = 25 + Math.random() * 20;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+
+        positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
+        positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+        positions[i3 + 2] = radius * Math.cos(phi);
+
+        color.setHSL(0.5 + (i / particleCount) * 0.3, 0.8, 0.6);
+        colors[i3] = color.r;
+        colors[i3 + 1] = color.g;
+        colors[i3 + 2] = color.b;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const material = new THREE.PointsMaterial({
+        size: 1.2,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending
+    });
+
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+
+    let animationFrameId;
+    let clock = new THREE.Clock();
+
+    function animate() {
+        if (!document.getElementById('threejs-interactive-canvas')) {
+            cancelAnimationFrame(animationFrameId);
+            renderer.dispose();
+            geometry.dispose();
+            material.dispose();
+            return;
+        }
+
+        animationFrameId = requestAnimationFrame(animate);
+        const elapsedTime = clock.getElapsedTime();
+
+        particles.rotation.y = elapsedTime * 0.08;
+        particles.rotation.x = Math.sin(elapsedTime * 0.05) * 0.2;
+
+        const posAttr = geometry.attributes.position;
+        const colAttr = geometry.attributes.color;
+
+        for (let i = 0; i < particleCount; i += 4) {
+            const i3 = i * 3;
+            const n = i / particleCount;
+            const t = elapsedTime * 0.5 + n * Math.PI * 2;
+            const wave = Math.sin(t) * 1.5;
+            posAttr.array[i3 + 1] += Math.sin(elapsedTime * 2 + n * 10) * 0.05;
+        }
+        posAttr.needsUpdate = true;
+
+        renderer.render(scene, camera);
+    }
+
+    animate();
+
+    const handleResize = () => {
+        if (!container) return;
+        const w = container.clientWidth || window.innerWidth;
+        const h = container.clientHeight || (window.innerHeight - 80);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+    };
+
+    window.addEventListener('resize', handleResize);
 }

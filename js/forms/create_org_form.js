@@ -17,17 +17,17 @@ export function render_create_org_form() {
             
             <div>
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">Organization Name</label>
-                <input type="text" required placeholder="e.g. OpenSource Heroes" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
+                <input type="text" name="name" required placeholder="e.g. OpenSource Heroes" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
             </div>
             
             <div>
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">Description</label>
-                <textarea rows="3" required placeholder="What is the mission of your organization?" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors resize-none"></textarea>
+                <textarea name="description" rows="3" required placeholder="What is the mission of your organization?" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors resize-none"></textarea>
             </div>
 
             <div>
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">Website URL</label>
-                <input type="url" placeholder="https://opensourceheroes.org" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
+                <input type="url" name="website" placeholder="https://opensourceheroes.org" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-secondary transition-colors">
             </div>
             
             <div class="flex justify-end gap-sm pt-md border-t border-white/5">

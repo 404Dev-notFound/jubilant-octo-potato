@@ -202,16 +202,19 @@ export async function initUserProfile(targetUserId = null) {
         }
 
         // Fetch User's collaborative projects
-        const projContainer = document.getElementById('profile-projects-list');
+        const projContainer = document.getElementById('profile-projects-grid');
         if (projContainer) {
             try {
+                const effectiveUserId = targetUserId || (currentUser ? currentUser.id : null);
                 const pRes = await window.apiFetch('/api/projects');
                 if (pRes.ok) {
                     const allProjects = await pRes.json();
-                    const userProjects = allProjects.filter(p => String(p.ownerId) === String(targetUserId) || (Array.isArray(p.members) && p.members.some(m => String(m.userId) === String(targetUserId))));
+                    const userProjects = effectiveUserId 
+                        ? allProjects.filter(p => String(p.ownerId) === String(effectiveUserId) || (Array.isArray(p.members) && p.members.some(m => String(m.userId || m.id) === String(effectiveUserId))))
+                        : [];
                     
                     if (userProjects.length === 0) {
-                        projContainer.innerHTML = `<div class="p-6 text-center text-on-surface-variant text-xs bg-surface-container/50 rounded-xl border border-white/5">No public projects associated with this developer yet.</div>`;
+                        projContainer.innerHTML = `<div class="col-span-full p-6 text-center text-on-surface-variant text-xs bg-surface-container/50 rounded-xl border border-white/5">No public projects associated with this developer yet.</div>`;
                     } else {
                         projContainer.innerHTML = userProjects.map(p => `
                         <div class="glass-panel p-4 rounded-xl border-l-4 border-l-primary cursor-pointer hover:bg-surface-variant transition-colors" onclick="window.location.hash='project_details?projectId=${p.id}'">

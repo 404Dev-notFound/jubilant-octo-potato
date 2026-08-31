@@ -297,7 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let rawViewName = cleanHash.split('?')[0].toLowerCase().replace(/-/g, '_');
         if (rawViewName === 'community_hub') rawViewName = 'community';
         if (rawViewName === 'home_explore') rawViewName = 'explore';
-        if (rawViewName === 'team_collaboration') rawViewName = 'community';
         if (rawViewName === 'profile') rawViewName = 'user_profile';
         if (rawViewName === 'user-profile') rawViewName = 'user_profile';
         if (rawViewName === 'project-details') rawViewName = 'project_details';
@@ -426,6 +425,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Initialize Notifications view
             if (viewName === 'notifications' && module && module.initNotifications) {
                 await module.initNotifications();
+            }
+
+            // Initialize Leaderboard view
+            if (viewName === 'leaderboard' && module && module.initLeaderboard) {
+                await module.initLeaderboard();
+            }
+
+            // Initialize Team Collaboration view
+            if (viewName === 'team_collaboration' && module && module.initTeam_collaboration) {
+                await module.initTeam_collaboration();
             }
 
             // Initialize Three.js simulation view

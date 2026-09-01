@@ -2643,10 +2643,11 @@ app.get('/api/projects/:projectId/meetings/my', authMiddleware, async (req, res)
 
         if (NODE_ENV === 'production' || (await isDbConnected())) {
             try {
-                const meeting = await prisma.meetingRequest.findFirst({
-                    where: { projectId, userId: currentUserId }
+                const meetings = await prisma.meetingRequest.findMany({
+                    where: { projectId, userId: currentUserId },
+                    orderBy: { createdAt: 'desc' }
                 });
-                return res.json(meeting ? sanitizeMeetingRequest(meeting) : null);
+                return res.json((meetings || []).map(m => sanitizeMeetingRequest(m)));
             } catch (err) {
                 if (NODE_ENV === 'production') {
                     console.error('[My Meeting DB Error]:', err.message);
@@ -2658,8 +2659,8 @@ app.get('/api/projects/:projectId/meetings/my', authMiddleware, async (req, res)
         const meetingsPath = getFilePath('conversations');
         let meetings = [];
         try { meetings = JSON.parse(await fs.readFile(meetingsPath, 'utf-8')); } catch {}
-        const meeting = meetings.find(m => String(m.projectId) === projectId && String(m.userId) === currentUserId);
-        res.json(meeting || null);
+        const userMeetings = meetings.filter(m => String(m.projectId) === projectId && String(m.userId) === currentUserId);
+        res.json((userMeetings || []).map(m => sanitizeMeetingRequest(m)));
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch meeting request' });
     }

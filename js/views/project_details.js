@@ -130,26 +130,40 @@ export async function initProjectDetails(projectId) {
                     window.apiFetch ? window.apiFetch(`/api/projects/${project.id}/join-requests/my`).catch(() => null) : null,
                     window.apiFetch ? window.apiFetch(`/api/projects/${project.id}/meetings/my`).catch(() => null) : null
                 ]);
-                if (jrRes && jrRes.ok) myJoinRequest = await jrRes.json();
-                if (meetRes && meetRes.ok) myMeetings = await meetRes.json();
+                if (jrRes && jrRes.ok) {
+                    const jrData = await jrRes.json();
+                    myJoinRequest = jrData || null;
+                }
+                if (meetRes && meetRes.ok) {
+                    const meetData = await meetRes.json();
+                    if (Array.isArray(meetData)) {
+                        myMeetings = meetData;
+                    } else if (meetData && typeof meetData === 'object') {
+                        myMeetings = [meetData];
+                    } else {
+                        myMeetings = [];
+                    }
+                }
             } catch (fetchErr) {
                 console.warn('Notice: Non-critical meeting/join-request sync error:', fetchErr.message);
             }
         }
 
         // Owner Info (Initials badge, Zero email exposure)
-        const owner = project.owner;
+        const owner = project.owner || null;
         const ownerName = owner?.name || (project.ownerId ? `Developer #${project.ownerId}` : 'Project Owner');
         const ownerInitial = ownerName ? ownerName.charAt(0).toUpperCase() : 'O';
 
         // Members & Roles
         const members = Array.isArray(project.members) ? project.members : [];
         const isOwner = currentUser && project.ownerId && String(project.ownerId) === String(currentUser.id);
-        const isMember = currentUser && members.some(m => String(m.userId) === String(currentUser.id));
+        const isMember = currentUser && members.some(m => m && String(m.userId) === String(currentUser.id));
 
         // Tech stack & issues count
-        const techStack = Array.isArray(project.techStack) ? project.techStack : (typeof project.techStack === 'string' ? project.techStack.split(',').map(s => s.trim()) : []);
-        const issuesCount = Array.isArray(project.issues) ? project.issues.length : 0;
+        const techStack = Array.isArray(project.techStack) ? project.techStack : (typeof project.techStack === 'string' ? project.techStack.split(',').map(s => s.trim()).filter(Boolean) : []);
+        const issues = Array.isArray(project.issues) ? project.issues : [];
+        const issuesCount = issues.length;
+        const safeMeetings = Array.isArray(myMeetings) ? myMeetings : [];
 
         // Join Action Button State
         let joinBtnHtml = '';
@@ -276,8 +290,8 @@ export async function initProjectDetails(projectId) {
                     ` : `
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             ${members.map(m => {
-                                const mUser = m.user;
-                                const mName = mUser?.name || (m.userId ? `Collaborator #${m.userId}` : 'Contributor');
+                                const mUser = m ? m.user : null;
+                                const mName = mUser?.name || (m?.userId ? `Collaborator #${m.userId}` : 'Contributor');
                                 const mInitial = mName.charAt(0).toUpperCase();
                                 return `
                                     <div class="p-3 bg-surface-container/60 border border-white/5 rounded-xl flex items-center justify-between gap-2">
@@ -293,26 +307,27 @@ export async function initProjectDetails(projectId) {
                                             </div>
                                         </div>
                                         <span class="px-2 py-0.5 bg-surface-variant text-on-surface-variant rounded text-[10px] font-bold uppercase flex-shrink-0">
-                                            ${escapeHtml(m.projectRole || 'Member')}
+                                            ${escapeHtml(m?.projectRole || 'Member')}
                                         </span>
                                     </div>
-                                `;
+                                ` ;
                             }).join('')}
                         </div>
                     `}
                 </div>
 
-                ${myMeetings.length > 0 ? `
+                ${safeMeetings.length > 0 ? `
                 <!-- Scheduled Meetings for this Project -->
                 <div class="glass-panel p-6 rounded-2xl border border-secondary/20 bg-secondary/5">
                     <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
                         <h3 class="font-bold text-on-surface text-sm flex items-center gap-2">
                             <span class="material-symbols-outlined text-secondary text-[18px]">event_available</span>
-                            Your Scheduled Meetings (${myMeetings.length})
+                            Your Scheduled Meetings (${safeMeetings.length})
                         </h3>
                     </div>
                     <div class="space-y-3">
-                        ${myMeetings.map(m => {
+                        ${safeMeetings.map(m => {
+                            if (!m) return '';
                             let statusBadge = '';
                             if (m.status === 'ACCEPTED') {
                                 statusBadge = '<span class="px-2 py-0.5 bg-tertiary/20 text-tertiary border border-tertiary/30 rounded text-[10px] font-bold uppercase">Accepted</span>';

@@ -427,6 +427,41 @@ async function runTests() {
             assert(res.status === 201, 'Newly admitted Member (User B) can now create issues in the project (HTTP 201)');
         }
 
+        // Test GET /api/projects/:projectId/meetings/my before scheduling -> Guaranteed Array
+        {
+            const res = await request(`/api/projects/${createdProjectId}/meetings/my`, {
+                headers: { 'Authorization': `Bearer ${userBToken}` }
+            });
+            assert(res.status === 200, 'GET /api/projects/:projectId/meetings/my returns HTTP 200');
+            assert(Array.isArray(res.body), 'GET /api/projects/:projectId/meetings/my returns an array');
+            assert(res.body.length === 0, 'No scheduled meetings initially returns empty array []');
+        }
+
+        // User B schedules a meeting request
+        {
+            const res = await request(`/api/projects/${createdProjectId}/meetings`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${userBToken}` },
+                body: {
+                    topic: 'Architecture Review Sync',
+                    preferredDate: new Date(Date.now() + 86400000).toISOString(),
+                    message: 'Discuss caching and database schema'
+                }
+            });
+            assert(res.status === 201, 'User B schedules meeting request with HTTP 201');
+        }
+
+        // Test GET /api/projects/:projectId/meetings/my after scheduling -> Array with meeting
+        {
+            const res = await request(`/api/projects/${createdProjectId}/meetings/my`, {
+                headers: { 'Authorization': `Bearer ${userBToken}` }
+            });
+            assert(res.status === 200, 'GET /api/projects/:projectId/meetings/my returns HTTP 200 after scheduling');
+            assert(Array.isArray(res.body), 'Returns array of meetings');
+            assert(res.body.length === 1, 'Contains 1 scheduled meeting');
+            assert(res.body[0].status === 'PENDING', 'Meeting status is PENDING');
+        }
+
         // ----------------------------------------------------------------------
         // 7. Notifications System & Recipient Isolation
         // ----------------------------------------------------------------------

@@ -170,17 +170,27 @@ if (typeof window !== 'undefined') {
         const form = event.target;
         let projectId = form.getAttribute('data-project-id');
     
-    // Fallback: If projectId is empty in form, attempt to detect from URL or active board
-    if (!projectId || projectId === 'null' || projectId === 'undefined') {
-        const hash = window.location.hash || '';
-        const params = new URLSearchParams(hash.split('?')[1] || '');
-        projectId = params.get('projectId') || window.currentActiveProjectId;
-    }
+        // Fallback: If projectId is empty in form, attempt to detect from URL, active board, or first project
+        if (!projectId || projectId === 'null' || projectId === 'undefined' || projectId === 'all') {
+            const hash = window.location.hash || '';
+            const params = new URLSearchParams(hash.split('?')[1] || '');
+            projectId = params.get('projectId') || window.currentActiveProjectId;
+        }
 
-    if (!projectId) {
-        window.UI.showToast('Please select a project before creating an issue.', 'error');
-        return false;
-    }
+        if (!projectId || projectId === 'all') {
+            try {
+                const pRes = await window.apiFetch('/api/projects');
+                if (pRes.ok) {
+                    const pList = await pRes.json();
+                    if (pList.length > 0) projectId = pList[0].id;
+                }
+            } catch {}
+        }
+
+        if (!projectId) {
+            window.UI.showToast('Please select a project before creating an issue.', 'error');
+            return false;
+        }
 
     const submitBtn = document.getElementById('issue-submit-btn');
     const originalBtnHtml = submitBtn ? submitBtn.innerHTML : 'Create Issue';

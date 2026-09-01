@@ -14,6 +14,41 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/'/g, '&#039;');
     };
 
+    // Shared Password Visibility Toggle Handler
+    window.togglePasswordVisibility = function (inputId, triggerElement) {
+        const input = (typeof inputId === 'string') ? document.getElementById(inputId) : inputId;
+        if (!input) return;
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+
+        const btn = triggerElement || input.parentElement?.querySelector('[data-toggle-password]');
+        if (btn) {
+            const icon = btn.querySelector('.material-symbols-outlined');
+            const label = btn.querySelector('.password-toggle-label');
+            if (icon) {
+                icon.textContent = isPassword ? 'visibility_off' : 'visibility';
+            }
+            if (label) {
+                label.textContent = isPassword ? 'Hide' : 'Show';
+            }
+            btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+        }
+    };
+
+    // Event delegation for password toggle buttons
+    document.addEventListener('click', (e) => {
+        const toggleBtn = e.target.closest('[data-toggle-password]');
+        if (toggleBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const targetId = toggleBtn.getAttribute('data-toggle-password');
+            const targetInput = targetId ? document.getElementById(targetId) : toggleBtn.closest('.relative')?.querySelector('input');
+            if (targetInput) {
+                window.togglePasswordVisibility(targetInput, toggleBtn);
+            }
+        }
+    });
+
     // --------------------------------------------------------------------------
     // API URL Discovery & Production-Ready Request Client
     // --------------------------------------------------------------------------

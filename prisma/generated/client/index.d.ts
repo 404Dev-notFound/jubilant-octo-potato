@@ -15842,8 +15842,18 @@ export namespace Prisma {
 
   export type AggregateProject = {
     _count: ProjectCountAggregateOutputType | null
+    _avg: ProjectAvgAggregateOutputType | null
+    _sum: ProjectSumAggregateOutputType | null
     _min: ProjectMinAggregateOutputType | null
     _max: ProjectMaxAggregateOutputType | null
+  }
+
+  export type ProjectAvgAggregateOutputType = {
+    progress: number | null
+  }
+
+  export type ProjectSumAggregateOutputType = {
+    progress: number | null
   }
 
   export type ProjectMinAggregateOutputType = {
@@ -15856,6 +15866,7 @@ export namespace Prisma {
     githubUrl: string | null
     isPinned: boolean | null
     isDemo: boolean | null
+    progress: number | null
     createdAt: Date | null
     updatedAt: Date | null
     ownerId: string | null
@@ -15871,6 +15882,7 @@ export namespace Prisma {
     githubUrl: string | null
     isPinned: boolean | null
     isDemo: boolean | null
+    progress: number | null
     createdAt: Date | null
     updatedAt: Date | null
     ownerId: string | null
@@ -15887,12 +15899,21 @@ export namespace Prisma {
     githubUrl: number
     isPinned: number
     isDemo: number
+    progress: number
     createdAt: number
     updatedAt: number
     ownerId: number
     _all: number
   }
 
+
+  export type ProjectAvgAggregateInputType = {
+    progress?: true
+  }
+
+  export type ProjectSumAggregateInputType = {
+    progress?: true
+  }
 
   export type ProjectMinAggregateInputType = {
     id?: true
@@ -15904,6 +15925,7 @@ export namespace Prisma {
     githubUrl?: true
     isPinned?: true
     isDemo?: true
+    progress?: true
     createdAt?: true
     updatedAt?: true
     ownerId?: true
@@ -15919,6 +15941,7 @@ export namespace Prisma {
     githubUrl?: true
     isPinned?: true
     isDemo?: true
+    progress?: true
     createdAt?: true
     updatedAt?: true
     ownerId?: true
@@ -15935,6 +15958,7 @@ export namespace Prisma {
     githubUrl?: true
     isPinned?: true
     isDemo?: true
+    progress?: true
     createdAt?: true
     updatedAt?: true
     ownerId?: true
@@ -15979,6 +16003,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: ProjectAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ProjectSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: ProjectMinAggregateInputType
@@ -16009,6 +16045,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: ProjectCountAggregateInputType | true
+    _avg?: ProjectAvgAggregateInputType
+    _sum?: ProjectSumAggregateInputType
     _min?: ProjectMinAggregateInputType
     _max?: ProjectMaxAggregateInputType
   }
@@ -16024,10 +16062,13 @@ export namespace Prisma {
     githubUrl: string
     isPinned: boolean
     isDemo: boolean
+    progress: number
     createdAt: Date
     updatedAt: Date
     ownerId: string | null
     _count: ProjectCountAggregateOutputType | null
+    _avg: ProjectAvgAggregateOutputType | null
+    _sum: ProjectSumAggregateOutputType | null
     _min: ProjectMinAggregateOutputType | null
     _max: ProjectMaxAggregateOutputType | null
   }
@@ -16057,6 +16098,7 @@ export namespace Prisma {
     githubUrl?: boolean
     isPinned?: boolean
     isDemo?: boolean
+    progress?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     ownerId?: boolean
@@ -16081,6 +16123,7 @@ export namespace Prisma {
     githubUrl?: boolean
     isPinned?: boolean
     isDemo?: boolean
+    progress?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     ownerId?: boolean
@@ -16098,6 +16141,7 @@ export namespace Prisma {
     githubUrl?: boolean
     isPinned?: boolean
     isDemo?: boolean
+    progress?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     ownerId?: boolean
@@ -16115,12 +16159,13 @@ export namespace Prisma {
     githubUrl?: boolean
     isPinned?: boolean
     isDemo?: boolean
+    progress?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     ownerId?: boolean
   }
 
-  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "category" | "difficulty" | "techStack" | "image" | "description" | "githubUrl" | "isPinned" | "isDemo" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["project"]>
+  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "category" | "difficulty" | "techStack" | "image" | "description" | "githubUrl" | "isPinned" | "isDemo" | "progress" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | Project$ownerArgs<ExtArgs>
     members?: boolean | Project$membersArgs<ExtArgs>
@@ -16160,6 +16205,7 @@ export namespace Prisma {
       githubUrl: string
       isPinned: boolean
       isDemo: boolean
+      progress: number
       createdAt: Date
       updatedAt: Date
       ownerId: string | null
@@ -16603,6 +16649,7 @@ export namespace Prisma {
     readonly githubUrl: FieldRef<"Project", 'String'>
     readonly isPinned: FieldRef<"Project", 'Boolean'>
     readonly isDemo: FieldRef<"Project", 'Boolean'>
+    readonly progress: FieldRef<"Project", 'Int'>
     readonly createdAt: FieldRef<"Project", 'DateTime'>
     readonly updatedAt: FieldRef<"Project", 'DateTime'>
     readonly ownerId: FieldRef<"Project", 'String'>
@@ -29721,6 +29768,7 @@ export namespace Prisma {
     githubUrl: 'githubUrl',
     isPinned: 'isPinned',
     isDemo: 'isDemo',
+    progress: 'progress',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     ownerId: 'ownerId'
@@ -30765,6 +30813,7 @@ export namespace Prisma {
     githubUrl?: StringFilter<"Project"> | string
     isPinned?: BoolFilter<"Project"> | boolean
     isDemo?: BoolFilter<"Project"> | boolean
+    progress?: IntFilter<"Project"> | number
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
     ownerId?: StringNullableFilter<"Project"> | string | null
@@ -30788,6 +30837,7 @@ export namespace Prisma {
     githubUrl?: SortOrder
     isPinned?: SortOrder
     isDemo?: SortOrder
+    progress?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     ownerId?: SortOrderInput | SortOrder
@@ -30814,6 +30864,7 @@ export namespace Prisma {
     githubUrl?: StringFilter<"Project"> | string
     isPinned?: BoolFilter<"Project"> | boolean
     isDemo?: BoolFilter<"Project"> | boolean
+    progress?: IntFilter<"Project"> | number
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
     ownerId?: StringNullableFilter<"Project"> | string | null
@@ -30837,12 +30888,15 @@ export namespace Prisma {
     githubUrl?: SortOrder
     isPinned?: SortOrder
     isDemo?: SortOrder
+    progress?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     ownerId?: SortOrderInput | SortOrder
     _count?: ProjectCountOrderByAggregateInput
+    _avg?: ProjectAvgOrderByAggregateInput
     _max?: ProjectMaxOrderByAggregateInput
     _min?: ProjectMinOrderByAggregateInput
+    _sum?: ProjectSumOrderByAggregateInput
   }
 
   export type ProjectScalarWhereWithAggregatesInput = {
@@ -30859,6 +30913,7 @@ export namespace Prisma {
     githubUrl?: StringWithAggregatesFilter<"Project"> | string
     isPinned?: BoolWithAggregatesFilter<"Project"> | boolean
     isDemo?: BoolWithAggregatesFilter<"Project"> | boolean
+    progress?: IntWithAggregatesFilter<"Project"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
     ownerId?: StringNullableWithAggregatesFilter<"Project"> | string | null
@@ -32430,6 +32485,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     owner?: UserCreateNestedOneWithoutOwnedProjectsInput
@@ -32452,6 +32508,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     ownerId?: string | null
@@ -32474,6 +32531,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneWithoutOwnedProjectsNestedInput
@@ -32496,6 +32554,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ownerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32518,6 +32577,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     ownerId?: string | null
@@ -32534,6 +32594,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -32549,6 +32610,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ownerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -34192,9 +34254,14 @@ export namespace Prisma {
     githubUrl?: SortOrder
     isPinned?: SortOrder
     isDemo?: SortOrder
+    progress?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     ownerId?: SortOrder
+  }
+
+  export type ProjectAvgOrderByAggregateInput = {
+    progress?: SortOrder
   }
 
   export type ProjectMaxOrderByAggregateInput = {
@@ -34207,6 +34274,7 @@ export namespace Prisma {
     githubUrl?: SortOrder
     isPinned?: SortOrder
     isDemo?: SortOrder
+    progress?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     ownerId?: SortOrder
@@ -34222,9 +34290,14 @@ export namespace Prisma {
     githubUrl?: SortOrder
     isPinned?: SortOrder
     isDemo?: SortOrder
+    progress?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     ownerId?: SortOrder
+  }
+
+  export type ProjectSumOrderByAggregateInput = {
+    progress?: SortOrder
   }
 
   export type ProjectScalarRelationFilter = {
@@ -37238,6 +37311,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberCreateNestedManyWithoutProjectInput
@@ -37259,6 +37333,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -37986,6 +38061,7 @@ export namespace Prisma {
     githubUrl?: StringFilter<"Project"> | string
     isPinned?: BoolFilter<"Project"> | boolean
     isDemo?: BoolFilter<"Project"> | boolean
+    progress?: IntFilter<"Project"> | number
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
     ownerId?: StringNullableFilter<"Project"> | string | null
@@ -39423,6 +39499,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     owner?: UserCreateNestedOneWithoutOwnedProjectsInput
@@ -39444,6 +39521,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     ownerId?: string | null
@@ -39556,6 +39634,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneWithoutOwnedProjectsNestedInput
@@ -39577,6 +39656,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ownerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40170,6 +40250,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     owner?: UserCreateNestedOneWithoutOwnedProjectsInput
@@ -40191,6 +40272,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     ownerId?: string | null
@@ -40297,6 +40379,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneWithoutOwnedProjectsNestedInput
@@ -40318,6 +40401,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ownerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40414,6 +40498,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     owner?: UserCreateNestedOneWithoutOwnedProjectsInput
@@ -40435,6 +40520,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     ownerId?: string | null
@@ -40610,6 +40696,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneWithoutOwnedProjectsNestedInput
@@ -40631,6 +40718,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ownerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40871,6 +40959,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     owner?: UserCreateNestedOneWithoutOwnedProjectsInput
@@ -40892,6 +40981,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     ownerId?: string | null
@@ -41073,6 +41163,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneWithoutOwnedProjectsNestedInput
@@ -41094,6 +41185,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ownerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41259,6 +41351,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     owner?: UserCreateNestedOneWithoutOwnedProjectsInput
@@ -41280,6 +41373,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     ownerId?: string | null
@@ -41461,6 +41555,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneWithoutOwnedProjectsNestedInput
@@ -41482,6 +41577,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ownerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41716,6 +41812,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     owner?: UserCreateNestedOneWithoutOwnedProjectsInput
@@ -41737,6 +41834,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     ownerId?: string | null
@@ -41924,6 +42022,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneWithoutOwnedProjectsNestedInput
@@ -41945,6 +42044,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ownerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43242,6 +43342,7 @@ export namespace Prisma {
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
+    progress?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -43559,6 +43660,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUpdateManyWithoutProjectNestedInput
@@ -43580,6 +43682,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -43601,6 +43704,7 @@ export namespace Prisma {
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

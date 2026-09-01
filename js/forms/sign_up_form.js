@@ -31,12 +31,24 @@ export function render_sign_up_form() {
             
             <div>
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">Password</label>
-                <input type="password" name="password" required placeholder="••••••••" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-tertiary transition-colors">
+                <div class="relative">
+                    <input type="password" id="signup-modal-password" name="password" required placeholder="••••••••" class="w-full bg-surface-container border border-white/10 rounded-xl pl-md pr-20 py-sm text-on-surface outline-none focus:border-tertiary transition-colors">
+                    <button type="button" data-toggle-password="signup-modal-password" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-tertiary transition-colors flex items-center gap-1 text-xs font-mono select-none px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 cursor-pointer" aria-label="Toggle password visibility">
+                        <span class="material-symbols-outlined text-[16px]">visibility</span>
+                        <span class="password-toggle-label text-[11px] font-bold">Show</span>
+                    </button>
+                </div>
             </div>
 
             <div>
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">Confirm Password</label>
-                <input type="password" required placeholder="••••••••" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-tertiary transition-colors">
+                <div class="relative">
+                    <input type="password" id="signup-modal-confirm-password" required placeholder="••••••••" class="w-full bg-surface-container border border-white/10 rounded-xl pl-md pr-20 py-sm text-on-surface outline-none focus:border-tertiary transition-colors">
+                    <button type="button" data-toggle-password="signup-modal-confirm-password" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-tertiary transition-colors flex items-center gap-1 text-xs font-mono select-none px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 cursor-pointer" aria-label="Toggle confirm password visibility">
+                        <span class="material-symbols-outlined text-[16px]">visibility</span>
+                        <span class="password-toggle-label text-[11px] font-bold">Show</span>
+                    </button>
+                </div>
             </div>
             
             <button type="submit" class="w-full py-md bg-tertiary text-on-tertiary rounded-xl font-bold shadow-lg shadow-tertiary/20 hover:scale-[1.02] transition-transform mt-sm flex justify-center items-center gap-xs">

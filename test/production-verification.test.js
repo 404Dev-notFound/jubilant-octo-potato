@@ -809,6 +809,103 @@ async function runTests() {
             console.log(`  ✅ PASS: Successfully rendered ${projectsRes.body.length} live project cards without errors`);
         }
 
+        // =========================================================================
+        // Test Suite: Project Completion Percentage & Owner Authorization
+        // =========================================================================
+        console.log('\n--- Testing Project Completion Percentage & Owner Authorization ---');
+
+        // Create a test project under User A (Owner)
+        const newProjRes = await request('/api/projects', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${userAToken}` },
+            body: {
+                title: 'Progress Tracking Test Engine',
+                category: 'Infrastructure',
+                difficulty: 'Advanced',
+                techStack: ['Node.js', 'PostgreSQL'],
+                description: 'Project to test completion percentage authorization and updates',
+                progress: 35
+            }
+        });
+        assert(newProjRes.status === 201, `Project creation returned status 201 (got ${newProjRes.status})`);
+        const progressTestProjId = newProjRes.body.id;
+        assert(newProjRes.body.progress === 35, `Created project returned initial progress 35% (got ${newProjRes.body.progress})`);
+        console.log('  ✅ PASS: Project created with initial completion percentage (35%)');
+
+        // Verify GET /api/projects/:id returns progress
+        const getProjRes = await request(`/api/projects/${progressTestProjId}`);
+        assert(getProjRes.status === 200, `GET project details returned 200`);
+        assert(getProjRes.body.progress === 35, `GET project details includes progress 35%`);
+        console.log('  ✅ PASS: GET /api/projects/:id returns dynamic completion percentage');
+
+        // User A (Owner) updates progress via PATCH /api/projects/:id/progress to 75%
+        const updateProgressRes = await request(`/api/projects/${progressTestProjId}/progress`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${userAToken}` },
+            body: { progress: 75 }
+        });
+        assert(updateProgressRes.status === 200, `Owner progress update returned 200 (got ${updateProgressRes.status})`);
+        assert(updateProgressRes.body.progress === 75, `Progress successfully updated to 75%`);
+        console.log('  ✅ PASS: Project owner successfully updated completion percentage to 75%');
+
+        // User B (Non-Owner) attempts to update progress -> Expect 403 Forbidden
+        const nonOwnerProgressRes = await request(`/api/projects/${progressTestProjId}/progress`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${userBToken}` },
+            body: { progress: 100 }
+        });
+        assert(nonOwnerProgressRes.status === 403, `Non-owner progress update rejected with 403 Forbidden (got ${nonOwnerProgressRes.status})`);
+        console.log('  ✅ PASS: Non-owner progress update strictly rejected with 403 Forbidden');
+
+        // Invalid progress (> 100 or < 0) -> Expect 400 Bad Request
+        const invalidProgressRes = await request(`/api/projects/${progressTestProjId}/progress`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${userAToken}` },
+            body: { progress: 150 }
+        });
+        assert(invalidProgressRes.status === 400, `Invalid progress (>100) rejected with 400 Bad Request`);
+        console.log('  ✅ PASS: Invalid progress input validated and rejected with 400 Bad Request');
+
+        // =========================================================================
+        // Test Suite: Context-Based Issues Querying & Filtering
+        // =========================================================================
+        console.log('\n--- Testing Context-Based Issues Filtering ---');
+
+        // Create an issue specifically for progressTestProjId
+        const createIssueRes = await request(`/api/projects/${progressTestProjId}/issues`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${userAToken}` },
+            body: {
+                title: 'Test issue for scoped project',
+                description: 'Verifying context-based issue querying',
+                status: 'TODO',
+                priority: 'HIGH'
+            }
+        });
+        assert(createIssueRes.status === 201, `Issue creation returned 201`);
+        const progressTestIssueId = createIssueRes.body.id;
+        console.log('  ✅ PASS: Created issue for scoped project');
+
+        // Query global issues GET /api/issues
+        const allIssuesRes = await request('/api/issues', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${userAToken}` }
+        });
+        assert(allIssuesRes.status === 200, `Global issues endpoint returned 200`);
+        assert(Array.isArray(allIssuesRes.body), `Global issues response is an array`);
+        assert(allIssuesRes.body.some(i => i.id === progressTestIssueId), `Global issues list contains the newly created issue`);
+        console.log(`  ✅ PASS: Global /api/issues returned all issues across projects (total: ${allIssuesRes.body.length})`);
+
+        // Query project-filtered issues GET /api/issues?projectId=...
+        const filteredIssuesRes = await request(`/api/issues?projectId=${progressTestProjId}`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${userAToken}` }
+        });
+        assert(filteredIssuesRes.status === 200, `Filtered issues endpoint returned 200`);
+        assert(Array.isArray(filteredIssuesRes.body), `Filtered issues response is an array`);
+        assert(filteredIssuesRes.body.every(i => String(i.projectId) === String(progressTestProjId)), `All returned issues belong exclusively to ${progressTestProjId}`);
+        console.log(`  ✅ PASS: Filtered /api/issues?projectId=${progressTestProjId} returned only scoped project issues`);
+
         console.log('\n===============================================================');
         console.log('🎉 ALL PRODUCTION VERIFICATION TESTS PASSED SUCCESSFULLY!');
         console.log('===============================================================\n');

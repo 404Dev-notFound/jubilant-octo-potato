@@ -6,21 +6,21 @@ export function render_issues() {
     return `
 <main class="relative w-full max-w-[1400px] mx-auto p-xl flex flex-col min-h-screen pt-4">
     <!-- Header Section -->
-    <div id="issues-header" class="flex flex-col md:flex-row md:items-center justify-between gap-md mb-lg">
+    <div id="issues-header" class="flex flex-col md:flex-row md:items-center justify-between gap-md mb-md">
         <div>
             <div class="flex items-center gap-xs mb-xs">
                 <span class="material-symbols-outlined text-primary text-[28px]">view_kanban</span>
                 <h1 class="font-display text-headline-lg text-primary">Issues Kanban</h1>
             </div>
             <div class="flex items-center gap-sm flex-wrap">
-                <span class="text-on-surface-variant font-label-sm tracking-wider uppercase text-xs">Project:</span>
+                <span class="text-on-surface-variant font-label-sm tracking-wider uppercase text-xs">Filter by Project:</span>
                 <div class="relative inline-block">
-                    <select id="issues-project-selector" class="bg-surface-container border border-white/10 rounded-lg px-3 py-1 text-xs text-on-surface font-mono font-bold outline-none focus:border-primary transition-colors appearance-none pr-7 cursor-pointer">
-                        <option value="">Loading projects...</option>
+                    <select id="issues-project-selector" class="bg-surface-container border border-white/10 rounded-lg px-3 py-1.5 text-xs text-on-surface font-mono font-bold outline-none focus:border-primary transition-colors appearance-none pr-8 cursor-pointer">
+                        <option value="all">🌐 All Projects (Global Feed)</option>
                     </select>
-                    <span class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[16px]">expand_more</span>
+                    <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[16px]">expand_more</span>
                 </div>
-                <span id="issues-total-count" class="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded-full text-xs font-mono">0 issues</span>
+                <span id="issues-total-count" class="px-2.5 py-0.5 bg-surface-container-high text-on-surface-variant rounded-full text-xs font-mono font-bold">0 issues</span>
             </div>
         </div>
         
@@ -29,6 +29,19 @@ export function render_issues() {
                 <span class="material-symbols-outlined text-[18px]">add_circle</span> NEW ISSUE
             </button>
         </div>
+    </div>
+
+    <!-- Project Context Banner (Shown when filtering by a specific project) -->
+    <div id="issues-context-banner" class="hidden mb-md p-3.5 bg-primary/10 border border-primary/25 rounded-2xl flex items-center justify-between gap-3 flex-wrap backdrop-blur-sm animate-fade-in-up">
+        <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-primary text-[22px]">filter_alt</span>
+            <span class="text-xs sm:text-sm text-on-surface">
+                Showing issues for: <strong id="issues-filtered-project-title" class="text-primary font-bold">Project</strong>
+            </span>
+        </div>
+        <button id="issues-view-all-btn" class="px-3.5 py-1.5 bg-surface-container hover:bg-surface-variant text-on-surface border border-white/10 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer">
+            <span class="material-symbols-outlined text-[15px] text-primary">clear_all</span> View All Issues
+        </button>
     </div>
     
     <!-- Kanban Board Columns -->
@@ -90,9 +103,14 @@ export function render_issues() {
 }
 
 export async function initIssues(initialProjectId) {
-    let currentProjectId = initialProjectId;
+    // Determine context: specific project vs. all projects
+    let currentProjectId = (initialProjectId && String(initialProjectId).trim() !== '' && String(initialProjectId).toLowerCase() !== 'all') 
+        ? String(initialProjectId).trim() 
+        : null;
+
     let currentProjectTitle = '';
     let cachedUsers = {};
+    let allProjects = [];
 
     // Close open dropdowns on outside click
     document.addEventListener('click', () => {
@@ -112,34 +130,35 @@ export async function initIssues(initialProjectId) {
     try {
         const res = await window.apiFetch('/api/projects');
         if (res.ok) {
-            const projects = await res.json();
+            allProjects = await res.json();
             const projectSelector = document.getElementById('issues-project-selector');
             
-            if (projectSelector && projects.length > 0) {
-                projectSelector.innerHTML = '';
-                projects.forEach(p => {
+            if (projectSelector && allProjects.length > 0) {
+                projectSelector.innerHTML = '<option value="all">🌐 All Projects (Global Feed)</option>';
+                allProjects.forEach(p => {
                     const opt = document.createElement('option');
                     opt.value = p.id;
                     opt.textContent = p.title || 'Untitled Project';
                     projectSelector.appendChild(opt);
                 });
 
-                // If no project specified in URL, pick first or pinned project
-                if (!currentProjectId) {
-                    const pinned = projects.find(p => p.isPinned) || projects[0];
-                    currentProjectId = pinned.id;
-                    window.location.hash = `issues?projectId=${currentProjectId}`;
+                if (currentProjectId) {
+                    projectSelector.value = currentProjectId;
+                    const activeProj = allProjects.find(p => String(p.id) === currentProjectId);
+                    if (activeProj) currentProjectTitle = activeProj.title;
+                } else {
+                    projectSelector.value = 'all';
                 }
 
-                projectSelector.value = currentProjectId;
-                const activeProj = projects.find(p => p.id === currentProjectId);
-                if (activeProj) currentProjectTitle = activeProj.title;
+                window.currentActiveProjectId = currentProjectId;
                 window.currentActiveProjectTitle = currentProjectTitle;
 
-                // Handle switching projects
+                // Handle switching projects in dropdown
                 projectSelector.addEventListener('change', (e) => {
                     const selectedId = e.target.value;
-                    if (selectedId) {
+                    if (!selectedId || selectedId === 'all') {
+                        window.location.hash = 'issues';
+                    } else {
                         window.location.hash = `issues?projectId=${selectedId}`;
                     }
                 });
@@ -149,14 +168,29 @@ export async function initIssues(initialProjectId) {
         console.error('Error fetching projects for selector:', e);
     }
 
-    window.currentActiveProjectId = currentProjectId;
+    // 3. Update Context Banner
+    const contextBanner = document.getElementById('issues-context-banner');
+    const projectTitleEl = document.getElementById('issues-filtered-project-title');
+    const viewAllBtn = document.getElementById('issues-view-all-btn');
 
-    if (!currentProjectId) {
-        const projectSelector = document.getElementById('issues-project-selector');
-        if (projectSelector) projectSelector.innerHTML = '<option>No projects available</option>';
-        return;
+    if (currentProjectId && currentProjectTitle) {
+        if (contextBanner) contextBanner.classList.remove('hidden');
+        if (projectTitleEl) projectTitleEl.textContent = currentProjectTitle;
+    } else if (currentProjectId) {
+        if (contextBanner) contextBanner.classList.remove('hidden');
+        if (projectTitleEl) projectTitleEl.textContent = `Project #${currentProjectId}`;
+    } else {
+        if (contextBanner) contextBanner.classList.add('hidden');
     }
 
+    if (viewAllBtn) {
+        viewAllBtn.addEventListener('click', () => {
+            window.location.hash = 'issues';
+        });
+    }
+
+    window.currentActiveProjectId = currentProjectId;
+    window.currentActiveProjectTitle = currentProjectTitle;
 
     // 4. Global hook to refresh board when an issue is created
     window.addIssueToBoard = async function(newIssue) {
@@ -166,10 +200,14 @@ export async function initIssues(initialProjectId) {
     setupColumnDropZones();
     await loadIssues();
 
-    // 5. Load Issues from PostgreSQL via Prisma API
+    // 5. Load Issues from PostgreSQL via Prisma API (either project-scoped or global)
     async function loadIssues() {
         try {
-            const res = await window.apiFetch(`/api/projects/${currentProjectId}/issues`);
+            const endpoint = currentProjectId 
+                ? `/api/issues?projectId=${encodeURIComponent(currentProjectId)}`
+                : '/api/issues';
+
+            const res = await window.apiFetch(endpoint);
             if (res.ok) {
                 const issues = await res.json();
                 renderBoard(issues);
@@ -222,7 +260,10 @@ export async function initIssues(initialProjectId) {
         });
 
         const totalCountEl = document.getElementById('issues-total-count');
-        if (totalCountEl) totalCountEl.textContent = `${totalIssues} issue${totalIssues === 1 ? '' : 's'}`;
+        if (totalCountEl) {
+            const contextText = currentProjectId ? `in ${currentProjectTitle || 'project'}` : 'across all projects';
+            totalCountEl.textContent = `${totalIssues} issue${totalIssues === 1 ? '' : 's'} (${contextText})`;
+        }
         
         setupDragAndDrop();
     }
@@ -238,9 +279,10 @@ export async function initIssues(initialProjectId) {
 
         div.draggable = true;
         div.setAttribute('data-id', issue.id);
+        div.setAttribute('data-project-id', issue.projectId || '');
         
         const tagsHtml = (issue.tags || []).map(t => 
-            `<span class="px-2 py-0.5 bg-surface-container-highest rounded text-[10px] font-mono font-bold uppercase text-on-surface-variant border border-white/5">${t}</span>`
+            `<span class="px-2 py-0.5 bg-surface-container-highest rounded text-[10px] font-mono font-bold uppercase text-on-surface-variant border border-white/5">${escapeHtml(t)}</span>`
         ).join(' ');
         
         const priorityColors = {
@@ -253,6 +295,15 @@ export async function initIssues(initialProjectId) {
         
         const titleClass = issue.status === 'DONE' ? 'line-through text-on-surface-variant' : 'text-on-surface';
 
+        // Project badge (especially useful in global view)
+        const projectTitle = issue.project ? issue.project.title : '';
+        const projectBadgeHtml = projectTitle ? `
+            <a href="#issues?projectId=${issue.projectId}" class="px-2 py-0.5 bg-surface-container rounded-md text-[10px] font-bold text-on-surface-variant hover:text-primary hover:bg-white/5 border border-white/5 flex items-center gap-1 transition-colors" title="Filter by ${escapeHtml(projectTitle)}">
+                <span class="material-symbols-outlined text-[12px] text-primary">folder</span>
+                <span class="truncate max-w-[120px]">${escapeHtml(projectTitle)}</span>
+            </a>
+        ` : '';
+
         // Assignee details
         let assigneeHtml = '';
         if (issue.assigneeId) {
@@ -260,9 +311,9 @@ export async function initIssues(initialProjectId) {
             const name = assignee ? (assignee.name || `User #${issue.assigneeId}`) : `User #${issue.assigneeId}`;
             const initial = name.charAt(0).toUpperCase();
             assigneeHtml = `
-                <div class="flex items-center gap-1.5 px-2 py-0.5 bg-white/5 border border-white/5 rounded-md text-[11px] text-on-surface-variant" title="Assigned to ${name}">
-                    <span class="w-4 h-4 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[9px] font-bold">${initial}</span>
-                    <span class="truncate max-w-[90px]">${name}</span>
+                <div class="flex items-center gap-1.5 px-2 py-0.5 bg-white/5 border border-white/5 rounded-md text-[11px] text-on-surface-variant" title="Assigned to ${escapeHtml(name)}">
+                    <span class="w-4 h-4 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[9px] font-bold">${escapeHtml(initial)}</span>
+                    <span class="truncate max-w-[90px]">${escapeHtml(name)}</span>
                 </div>
             `;
         }
@@ -283,12 +334,13 @@ export async function initIssues(initialProjectId) {
             <div class="flex justify-between items-start mb-2 gap-xs">
                 <div class="flex gap-1 flex-wrap flex-1 items-center">
                     <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${priorityStyle}">
-                        ${issue.priority || 'MEDIUM'}
+                        ${escapeHtml(issue.priority || 'MEDIUM')}
                     </span>
+                    ${projectBadgeHtml}
                     ${tagsHtml}
                 </div>
                 <div class="relative">
-                    <button type="button" class="menu-toggle-btn text-on-surface-variant hover:text-primary transition-colors p-1 rounded-md hover:bg-white/5">
+                    <button type="button" class="menu-toggle-btn text-on-surface-variant hover:text-primary transition-colors p-1 rounded-md hover:bg-white/5" aria-label="Issue actions">
                         <span class="material-symbols-outlined text-[18px]">more_vert</span>
                     </button>
                     <div class="dropdown-menu hidden absolute right-0 top-full mt-1 bg-surface-container border border-white/10 rounded-xl p-1.5 z-20 w-44 shadow-2xl backdrop-blur-md flex flex-col gap-0.5">
@@ -310,7 +362,7 @@ export async function initIssues(initialProjectId) {
                     ${assigneeHtml}
                 </div>
                 <span class="text-[10px] font-mono text-on-surface-variant/70">
-                    ${new Date(issue.createdAt).toLocaleDateString()}
+                    ${new Date(issue.createdAt || Date.now()).toLocaleDateString()}
                 </span>
             </div>
         `;
@@ -334,7 +386,7 @@ export async function initIssues(initialProjectId) {
                 e.stopPropagation();
                 if (dropdownMenu) dropdownMenu.classList.add('hidden');
                 const newStatus = btn.getAttribute('data-status');
-                await updateIssueStatus(issue.id, newStatus, div, issue.status);
+                await updateIssueStatus(issue.id, newStatus, div, issue.status, issue.projectId);
             });
         });
 
@@ -347,7 +399,8 @@ export async function initIssues(initialProjectId) {
                 if (!confirm('Are you sure you want to delete this issue?')) return;
                 
                 try {
-                    const res = await window.apiFetch(`/api/projects/${currentProjectId}/issues/${issue.id}`, {
+                    const deleteEndpoint = `/api/issues/${issue.id}`;
+                    const res = await window.apiFetch(deleteEndpoint, {
                         method: 'DELETE'
                     });
                     if (res.ok) {
@@ -374,6 +427,7 @@ export async function initIssues(initialProjectId) {
         cards.forEach(card => {
             card.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('text/plain', card.getAttribute('data-id'));
+                e.dataTransfer.setData('text/project-id', card.getAttribute('data-project-id') || '');
                 card.classList.add('opacity-40', 'scale-95');
             });
             card.addEventListener('dragend', () => {
@@ -400,6 +454,7 @@ export async function initIssues(initialProjectId) {
                 if (cardsContainer) cardsContainer.classList.remove('bg-white/5', 'ring-1', 'ring-primary/40');
                 
                 const issueId = e.dataTransfer.getData('text/plain');
+                const issueProjId = e.dataTransfer.getData('text/project-id');
                 if (!issueId) return;
                 
                 const newStatus = col.getAttribute('data-status');
@@ -410,13 +465,13 @@ export async function initIssues(initialProjectId) {
                 const oldStatus = oldCol ? oldCol.getAttribute('data-status') : null;
                 
                 if (oldStatus && oldStatus !== newStatus) {
-                    await updateIssueStatus(issueId, newStatus, card, oldStatus);
+                    await updateIssueStatus(issueId, newStatus, card, oldStatus, issueProjId);
                 }
             });
         });
     }
 
-    async function updateIssueStatus(issueId, newStatus, cardElement, oldStatus) {
+    async function updateIssueStatus(issueId, newStatus, cardElement, oldStatus, issueProjectId) {
         // Optimistic DOM Move
         const targetColCards = document.querySelector(`.kanban-column[data-status="${newStatus}"] .column-cards`);
         if (targetColCards && cardElement) {
@@ -432,7 +487,8 @@ export async function initIssues(initialProjectId) {
         }
 
         try {
-            const res = await window.apiFetch(`/api/projects/${currentProjectId}/issues/${issueId}`, {
+            const patchEndpoint = `/api/issues/${issueId}`;
+            const res = await window.apiFetch(patchEndpoint, {
                 method: 'PATCH',
                 body: JSON.stringify({ status: newStatus })
             });

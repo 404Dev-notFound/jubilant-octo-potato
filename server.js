@@ -1377,6 +1377,7 @@ app.get('/api/projects', async (req, res) => {
                     githubUrl: p.githubUrl,
                     isPinned: p.isPinned,
                     isDemo: p.isDemo,
+                    progress: typeof p.progress === 'number' ? p.progress : (p.completionPercentage || 0),
                     ownerId: p.ownerId,
                     owner: sanitizeUserObj(p.owner),
                     membersCount: p.members ? p.members.length : 0,
@@ -1407,6 +1408,7 @@ app.get('/api/projects', async (req, res) => {
             const projectMembers = rawMembers.filter(m => String(m.projectId) === String(p.id));
             return {
                 ...p,
+                progress: typeof p.progress === 'number' ? p.progress : (p.completionPercentage || 0),
                 owner: sanitizeUserObj(owner),
                 membersCount: projectMembers.length
             };
@@ -1450,6 +1452,7 @@ app.get('/api/projects/:id', async (req, res) => {
                     githubUrl: project.githubUrl,
                     isPinned: project.isPinned,
                     isDemo: project.isDemo,
+                    progress: typeof project.progress === 'number' ? project.progress : (project.completionPercentage || 0),
                     ownerId: project.ownerId,
                     owner: sanitizeUserObj(project.owner),
                     members: (project.members || []).map(m => ({
@@ -1495,6 +1498,7 @@ app.get('/api/projects/:id', async (req, res) => {
 
         res.json({
             ...project,
+            progress: typeof project.progress === 'number' ? project.progress : (project.completionPercentage || 0),
             owner: sanitizeUserObj(owner),
             members: projectMembers,
             issues: projectTasks
@@ -1511,9 +1515,12 @@ app.get('/api/projects/:id', async (req, res) => {
 app.post('/api/projects', authMiddleware, async (req, res) => {
     try {
         const currentUserId = String(req.user.id);
-        const { title, category, difficulty, techStack, image, description, githubUrl, isPinned, isDemo } = req.body;
+        const { title, category, difficulty, techStack, image, description, githubUrl, isPinned, isDemo, progress } = req.body;
 
         if (!title || !title.trim()) return res.status(400).json({ error: 'Project title is required' });
+
+        const rawProgress = parseInt(progress, 10);
+        const validProgress = (!isNaN(rawProgress) && rawProgress >= 0 && rawProgress <= 100) ? rawProgress : 0;
 
         const projectId = `proj_${Date.now()}_${uuidv4().substring(0, 6)}`;
         const projectPayload = {
@@ -1527,6 +1534,7 @@ app.post('/api/projects', authMiddleware, async (req, res) => {
             githubUrl: githubUrl || '',
             isPinned: Boolean(isPinned),
             isDemo: Boolean(isDemo),
+            progress: validProgress,
             ownerId: currentUserId
         };
 
@@ -1601,6 +1609,15 @@ const handleUpdateProject = async (req, res) => {
         const currentUserId = String(req.user.id);
         const updates = req.body;
 
+        let progressVal = undefined;
+        if (updates.progress !== undefined) {
+            const num = parseInt(updates.progress, 10);
+            if (isNaN(num) || num < 0 || num > 100) {
+                return res.status(400).json({ error: 'Progress percentage must be an integer between 0 and 100' });
+            }
+            progressVal = num;
+        }
+
         if (NODE_ENV === 'production' || (await isDbConnected())) {
             try {
                 const project = await prisma.project.findUnique({ where: { id: projectId } });
@@ -1620,7 +1637,8 @@ const handleUpdateProject = async (req, res) => {
                         description: updates.description !== undefined ? updates.description : undefined,
                         githubUrl: updates.githubUrl !== undefined ? updates.githubUrl : undefined,
                         isPinned: updates.isPinned !== undefined ? Boolean(updates.isPinned) : undefined,
-                        isDemo: updates.isDemo !== undefined ? Boolean(updates.isDemo) : undefined
+                        isDemo: updates.isDemo !== undefined ? Boolean(updates.isDemo) : undefined,
+                        progress: progressVal !== undefined ? progressVal : undefined
                     },
                     include: { owner: { include: { profile: true } } }
                 });
@@ -1643,7 +1661,12 @@ const handleUpdateProject = async (req, res) => {
             return res.status(403).json({ error: 'Only the project owner can edit this project' });
         }
 
-        projects[index] = { ...projects[index], ...updates, updatedAt: new Date().toISOString() };
+        projects[index] = { 
+            ...projects[index], 
+            ...updates, 
+            progress: progressVal !== undefined ? progressVal : (typeof projects[index].progress === 'number' ? projects[index].progress : 0),
+            updatedAt: new Date().toISOString() 
+        };
         await fs.writeFile(projectsPath, JSON.stringify(projects, null, 2));
 
         res.json(projects[index]);
@@ -1654,6 +1677,73 @@ const handleUpdateProject = async (req, res) => {
 };
 app.put('/api/projects/:id', authMiddleware, handleUpdateProject);
 app.patch('/api/projects/:id', authMiddleware, handleUpdateProject);
+
+/*
+ * Update Project Progress (Owner-Only Dedicated Endpoint)
+ */
+app.patch('/api/projects/:id/progress', authMiddleware, async (req, res) => {
+    try {
+        const projectId = String(req.params.id);
+        const currentUserId = String(req.user.id);
+        const { progress } = req.body;
+
+        const num = parseInt(progress, 10);
+        if (isNaN(num) || num < 0 || num > 100) {
+            return res.status(400).json({ error: 'Progress percentage must be an integer between 0 and 100' });
+        }
+
+        if (NODE_ENV === 'production' || (await isDbConnected())) {
+            try {
+                const project = await prisma.project.findUnique({ where: { id: projectId } });
+                if (!project) return res.status(404).json({ error: 'Project not found' });
+                if (String(project.ownerId) !== currentUserId) {
+                    return res.status(403).json({ error: 'Only the project owner can modify the project completion percentage' });
+                }
+
+                const updated = await prisma.project.update({
+                    where: { id: projectId },
+                    data: { progress: num },
+                    include: { owner: { include: { profile: true } } }
+                });
+
+                return res.json({ 
+                    success: true, 
+                    message: 'Project completion percentage updated successfully', 
+                    progress: updated.progress, 
+                    project: { ...updated, owner: sanitizeUserObj(updated.owner) } 
+                });
+            } catch (err) {
+                if (NODE_ENV === 'production') {
+                    console.error('[Update Progress DB Error]:', err.message);
+                    return res.status(500).json({ error: 'Failed to update project progress' });
+                }
+            }
+        }
+
+        const projectsPath = getFilePath('projects');
+        let projects = JSON.parse(await fs.readFile(projectsPath, 'utf-8'));
+        const index = projects.findIndex(p => String(p.id) === projectId);
+        if (index === -1) return res.status(404).json({ error: 'Project not found' });
+
+        if (String(projects[index].ownerId) !== currentUserId) {
+            return res.status(403).json({ error: 'Only the project owner can modify the project completion percentage' });
+        }
+
+        projects[index].progress = num;
+        projects[index].updatedAt = new Date().toISOString();
+        await fs.writeFile(projectsPath, JSON.stringify(projects, null, 2));
+
+        res.json({ 
+            success: true, 
+            message: 'Project completion percentage updated successfully', 
+            progress: num, 
+            project: projects[index] 
+        });
+    } catch (error) {
+        console.error('Error updating project progress:', error);
+        res.status(500).json({ error: 'Failed to update project progress' });
+    }
+});
 
 /*
  * Delete Project (Owner-Only Authorization with Cascade)
@@ -1835,9 +1925,15 @@ app.delete('/api/projects/:projectId/members/:userId', authMiddleware, async (re
  */
 app.get('/api/issues', authMiddleware, async (req, res) => {
     try {
+        const targetProjectId = (req.query.projectId && String(req.query.projectId).trim() !== '' && String(req.query.projectId) !== 'all') 
+            ? String(req.query.projectId).trim() 
+            : null;
+
         if (NODE_ENV === 'production' || (await isDbConnected())) {
             try {
+                const whereClause = targetProjectId ? { projectId: targetProjectId } : undefined;
                 const issues = await prisma.issue.findMany({
+                    where: whereClause,
                     include: {
                         project: { select: { id: true, title: true } },
                         creator: { include: { profile: true } },
@@ -1863,7 +1959,11 @@ app.get('/api/issues', authMiddleware, async (req, res) => {
         const tasksPath = getFilePath('tasks');
         const data = await fs.readFile(tasksPath, 'utf-8');
         const tasks = JSON.parse(data);
-        res.json(tasks.map(t => formatIssue(t, fileUsersMap)));
+        const filteredTasks = targetProjectId 
+            ? tasks.filter(t => String(t.projectId) === targetProjectId)
+            : tasks;
+
+        res.json(filteredTasks.map(t => formatIssue(t, fileUsersMap)));
     } catch (error) {
         console.error('Error fetching issues:', error);
         res.status(500).json({ error: 'Failed to fetch issues' });

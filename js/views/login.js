@@ -33,7 +33,11 @@ export function render_login() {
                 </div>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">lock</span>
-                    <input type="password" name="password" class="w-full bg-surface-container border border-white/10 rounded-lg pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors" placeholder="••••••••" required>
+                    <input type="password" id="login-view-password" name="password" class="w-full bg-surface-container border border-white/10 rounded-lg pl-xl pr-20 py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors" placeholder="••••••••" required>
+                    <button type="button" data-toggle-password="login-view-password" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 text-xs font-mono select-none px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 cursor-pointer" aria-label="Toggle password visibility">
+                        <span class="material-symbols-outlined text-[15px]">visibility</span>
+                        <span class="password-toggle-label text-[11px] font-bold">Show</span>
+                    </button>
                 </div>
             </div>
             

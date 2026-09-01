@@ -28,5 +28,17 @@
     "userId": "1785998502411",
     "projectRole": "contributor",
     "joinedAt": "2026-08-15T21:30:00.000Z"
+  },
+  {
+    "projectId": "proj_1788284640209_99c86a",
+    "userId": "1788284633974",
+    "projectRole": "owner",
+    "joinedAt": "2026-09-01T17:44:00.645Z"
+  },
+  {
+    "projectId": "proj_1788284671447_a1b7c6",
+    "userId": "1788284665127",
+    "projectRole": "owner",
+    "joinedAt": "2026-09-01T17:44:31.888Z"
   }
 ]

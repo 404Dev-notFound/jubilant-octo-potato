@@ -32,7 +32,13 @@ export function render_login_form() {
                         Forgot password?
                     </a>
                 </div>
-                <input type="password" name="password" required placeholder="••••••••" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-primary transition-colors">
+                <div class="relative">
+                    <input type="password" id="login-modal-password" name="password" required placeholder="••••••••" class="w-full bg-surface-container border border-white/10 rounded-xl pl-md pr-20 py-sm text-on-surface outline-none focus:border-primary transition-colors">
+                    <button type="button" data-toggle-password="login-modal-password" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 text-xs font-mono select-none px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 cursor-pointer" aria-label="Toggle password visibility">
+                        <span class="material-symbols-outlined text-[16px]">visibility</span>
+                        <span class="password-toggle-label text-[11px] font-bold">Show</span>
+                    </button>
+                </div>
             </div>
             
             <button type="submit" class="w-full py-md bg-primary text-on-primary rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform mt-sm flex justify-center items-center gap-xs">

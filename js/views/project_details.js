@@ -159,11 +159,14 @@ export async function initProjectDetails(projectId) {
         const isOwner = currentUser && project.ownerId && String(project.ownerId) === String(currentUser.id);
         const isMember = currentUser && members.some(m => m && String(m.userId) === String(currentUser.id));
 
-        // Tech stack & issues count
+        // Tech stack, issues count, and completion progress
         const techStack = Array.isArray(project.techStack) ? project.techStack : (typeof project.techStack === 'string' ? project.techStack.split(',').map(s => s.trim()).filter(Boolean) : []);
         const issues = Array.isArray(project.issues) ? project.issues : [];
         const issuesCount = issues.length;
         const safeMeetings = Array.isArray(myMeetings) ? myMeetings : [];
+        const progress = typeof project.progress === 'number' 
+            ? Math.min(100, Math.max(0, project.progress)) 
+            : (typeof project.completionPercentage === 'number' ? Math.min(100, Math.max(0, project.completionPercentage)) : 0);
 
         // Join Action Button State
         let joinBtnHtml = '';
@@ -215,7 +218,7 @@ export async function initProjectDetails(projectId) {
         <!-- Main Project Header -->
         <div class="glass-panel p-6 sm:p-8 rounded-2xl border-t-4 border-t-primary shadow-xl">
             <div class="flex flex-col md:flex-row justify-between items-start gap-4">
-                <div class="space-y-2">
+                <div class="space-y-2 flex-1">
                     <div class="flex flex-wrap items-center gap-2 mb-1">
                         <span class="material-symbols-outlined text-[28px] text-primary">terminal</span>
                         <h1 class="font-display text-2xl sm:text-3xl font-extrabold text-on-surface">${escapeHtml(project.title || 'Untitled Project')}</h1>
@@ -239,6 +242,31 @@ export async function initProjectDetails(projectId) {
                 </div>
             </div>
             
+            <!-- Project Completion Progress Banner -->
+            <div class="mt-6 pt-5 border-t border-white/5 space-y-2.5">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div class="flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-[20px] text-primary">donut_large</span>
+                        <span class="text-xs sm:text-sm font-bold tracking-wide text-on-surface flex items-center gap-1.5">
+                            Project Progress &mdash; <span id="project-progress-text" class="text-primary font-mono text-sm sm:text-base font-extrabold">${progress}%</span> Complete
+                        </span>
+                    </div>
+                    ${isOwner ? `
+                        <button id="btn-edit-project-progress" class="px-3.5 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer">
+                            <span class="material-symbols-outlined text-[15px]">edit</span> Update Progress
+                        </button>
+                    ` : `
+                        <div class="px-2.5 py-1 bg-surface-container rounded-lg border border-white/5 text-[11px] font-mono text-on-surface-variant flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full ${progress === 100 ? 'bg-tertiary' : 'bg-primary'} animate-pulse"></span>
+                            ${progress === 100 ? 'Completed' : 'In Development'}
+                        </div>
+                    `}
+                </div>
+                <div class="w-full bg-surface-container-highest/80 rounded-full h-3 p-0.5 overflow-hidden border border-white/10 relative shadow-inner">
+                    <div id="project-progress-bar" class="h-full rounded-full bg-gradient-to-r from-primary via-secondary to-tertiary transition-all duration-500 shadow-[0_0_12px_rgba(107,250,216,0.4)]" style="width: ${progress}%;"></div>
+                </div>
+            </div>
+
             <!-- Navigation Tabs -->
             <div class="flex gap-6 mt-6 border-t border-white/5 pt-4 text-xs font-bold uppercase tracking-wider">
                 <button class="pb-1 text-primary border-b-2 border-primary font-bold">Overview</button>
@@ -395,6 +423,10 @@ cd ${escapeHtml((project.title || 'project').toLowerCase().replace(/\\s+/g, '-')
                             <span class="font-bold text-on-surface">${escapeHtml(project.difficulty || 'Intermediate')}</span>
                         </div>
                         <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">donut_small</span> Progress</span>
+                            <span class="font-bold text-primary font-mono">${progress}% Complete</span>
+                        </div>
+                        <div class="flex items-center justify-between">
                             <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">scale</span> License</span>
                             <span class="font-bold text-on-surface">MIT License</span>
                         </div>
@@ -420,6 +452,117 @@ cd ${escapeHtml((project.title || 'project').toLowerCase().replace(/\\s+/g, '-')
         `;
 
         // Bind interactive buttons
+        const editProgressBtn = document.getElementById('btn-edit-project-progress');
+        if (editProgressBtn) {
+            editProgressBtn.addEventListener('click', () => {
+                const currentVal = parseInt(document.getElementById('project-progress-text')?.textContent, 10) || progress;
+                const modalHtml = `
+                <div class="glass-panel rounded-2xl border-t-4 border-t-primary overflow-hidden shadow-2xl max-w-md w-full mx-auto animate-fade-in-up">
+                    <div class="flex justify-between items-center p-md border-b border-white/5 bg-surface-container relative">
+                        <h3 class="font-bold text-lg text-on-surface flex items-center gap-xs">
+                            <span class="material-symbols-outlined text-primary">trending_up</span>
+                            Update Project Completion
+                        </h3>
+                        <button data-close-modal class="text-on-surface-variant hover:text-error transition-colors p-1 absolute right-4 top-4">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <form id="updateProjectProgressForm" class="p-lg space-y-md">
+                        <div>
+                            <p class="text-xs text-on-surface-variant mb-3">Set the current progress percentage for <strong class="text-on-surface">${escapeHtml(project.title)}</strong> (0% to 100%).</p>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-xs flex justify-between">
+                                <span>Completion Percentage</span>
+                                <span id="modal-progress-val" class="text-primary font-mono font-bold text-sm">${currentVal}%</span>
+                            </label>
+                            <input type="range" id="modal-progress-slider" min="0" max="100" value="${currentVal}" 
+                                class="w-full accent-primary cursor-pointer mb-3">
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="modal-progress-input" name="progress" min="0" max="100" value="${currentVal}" 
+                                    class="w-24 bg-surface-container border border-white/10 rounded-xl px-3 py-2 text-sm text-on-surface font-mono font-bold outline-none focus:border-primary transition-colors text-center">
+                                <span class="text-xs text-on-surface-variant font-bold">% Complete</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-2 pt-2 border-t border-white/5">
+                            <button type="button" data-close-modal class="px-4 py-2 bg-surface-variant text-on-surface rounded-xl text-xs font-bold hover:bg-outline-variant transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" id="btn-save-progress" class="px-5 py-2 bg-primary text-on-primary rounded-xl text-xs font-bold shadow-md shadow-primary/20 hover:scale-105 transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">save</span> Save Progress
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                `;
+
+                window.UI.openModal(modalHtml);
+
+                const slider = document.getElementById('modal-progress-slider');
+                const numInput = document.getElementById('modal-progress-input');
+                const valDisplay = document.getElementById('modal-progress-val');
+                const form = document.getElementById('updateProjectProgressForm');
+
+                if (slider && numInput && valDisplay) {
+                    slider.addEventListener('input', (e) => {
+                        numInput.value = e.target.value;
+                        valDisplay.textContent = `${e.target.value}%`;
+                    });
+                    numInput.addEventListener('input', (e) => {
+                        let v = Math.min(100, Math.max(0, parseInt(e.target.value, 10) || 0));
+                        slider.value = v;
+                        valDisplay.textContent = `${v}%`;
+                    });
+                }
+
+                if (form) {
+                    form.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const rawProgress = parseInt(numInput.value, 10);
+                        if (isNaN(rawProgress) || rawProgress < 0 || rawProgress > 100) {
+                            window.UI.showToast('Please enter a percentage between 0 and 100', 'error');
+                            return;
+                        }
+
+                        const submitBtn = form.querySelector('#btn-save-progress');
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span> Saving...';
+                        }
+
+                        try {
+                            const res = await window.apiFetch(`/api/projects/${project.id}/progress`, {
+                                method: 'PATCH',
+                                body: JSON.stringify({ progress: rawProgress })
+                            });
+                            const resData = await res.json();
+                            if (res.ok) {
+                                window.UI.closeModal();
+                                window.UI.showToast(`Project progress updated to ${rawProgress}%!`, 'success');
+                                
+                                const textEl = document.getElementById('project-progress-text');
+                                const barEl = document.getElementById('project-progress-bar');
+                                if (textEl) textEl.textContent = `${rawProgress}%`;
+                                if (barEl) barEl.style.width = `${rawProgress}%`;
+                                project.progress = rawProgress;
+                            } else {
+                                window.UI.showToast(resData.error || 'Failed to update progress', 'error');
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">save</span> Save Progress';
+                                }
+                            }
+                        } catch (err) {
+                            console.error('Error updating progress:', err);
+                            window.UI.showToast(err.message || 'Error updating progress', 'error');
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">save</span> Save Progress';
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
         const joinBtn = document.getElementById('btn-action-join-project');
         if (joinBtn) {
             joinBtn.addEventListener('click', async () => {

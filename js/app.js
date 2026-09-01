@@ -192,11 +192,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.updateAuthUI = function () {
-        // Update UI based on authentication status (show/hide login, profile, etc.)
+        // Update UI based on authentication status (show/hide login, profile, hero CTA, etc.)
         const currentUserStr = localStorage.getItem('currentUser');
         const authButtons = document.getElementById('auth-buttons-container');
         const profileDropdown = document.getElementById('profile-dropdown-container');
         const profileAvatar = document.getElementById('profile-avatar');
+        const heroCtaBtn = document.getElementById('hero-cta-btn');
         let user = null;
         if (currentUserStr) {
             try {
@@ -213,6 +214,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (profileDropdown) profileDropdown.classList.remove('hidden');
             if (profileAvatar) profileAvatar.textContent = (user.name ? user.name.charAt(0) : 'U').toUpperCase();
+            if (heroCtaBtn) {
+                heroCtaBtn.removeAttribute('data-form');
+                heroCtaBtn.setAttribute('onclick', "window.location.hash='dashboard'");
+                heroCtaBtn.setAttribute('title', 'Dashboard');
+                heroCtaBtn.innerHTML = `
+                    <span class="material-symbols-outlined text-[20px] text-secondary transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">dashboard</span>
+                    <span>Dashboard</span>
+                `;
+            }
         } else {
             if (authButtons) {
                 authButtons.classList.remove('hidden');
@@ -220,6 +230,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (profileDropdown) profileDropdown.classList.add('hidden');
             if (profileAvatar) profileAvatar.textContent = 'U';
+            if (heroCtaBtn) {
+                heroCtaBtn.removeAttribute('onclick');
+                heroCtaBtn.setAttribute('data-form', 'sign_up_form');
+                heroCtaBtn.setAttribute('title', 'Sign Up');
+                heroCtaBtn.innerHTML = `
+                    <span class="material-symbols-outlined text-[20px] text-secondary transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">rocket_launch</span>
+                    <span>Sign Up</span>
+                `;
+            }
         }
 
         window.updateNotificationBadge();

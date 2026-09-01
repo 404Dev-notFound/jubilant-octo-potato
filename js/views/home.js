@@ -1,4 +1,21 @@
 export function render_home() {
+    let isAuthenticated = false;
+    try {
+        isAuthenticated = !!localStorage.getItem('currentUser');
+    } catch (e) {}
+
+    const ctaButtonHtml = isAuthenticated
+        ? `<!-- 2. Secondary CTA: Dashboard -->
+        <button id="hero-cta-btn" onclick="window.location.hash='dashboard'" title="Dashboard" class="w-full sm:w-auto group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-surface-container-high/80 hover:bg-surface-variant border border-white/10 hover:border-secondary/40 text-on-surface hover:text-secondary font-bold text-sm sm:text-base backdrop-blur-md shadow-lg shadow-black/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer">
+            <span class="material-symbols-outlined text-[20px] text-secondary transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">dashboard</span>
+            <span>Dashboard</span>
+        </button>`
+        : `<!-- 2. Secondary CTA: Sign Up -->
+        <button id="hero-cta-btn" data-form="sign_up_form" title="Sign Up" class="w-full sm:w-auto group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-surface-container-high/80 hover:bg-surface-variant border border-white/10 hover:border-secondary/40 text-on-surface hover:text-secondary font-bold text-sm sm:text-base backdrop-blur-md shadow-lg shadow-black/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer">
+            <span class="material-symbols-outlined text-[20px] text-secondary transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">rocket_launch</span>
+            <span>Sign Up</span>
+        </button>`;
+
     return `<div class="relative w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col min-h-[85vh] items-center justify-center text-center">
     <!-- Subtle Background Ambient Glow -->
     <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[650px] h-[320px] bg-gradient-to-tr from-primary/15 via-secondary/15 to-transparent rounded-full blur-[120px] pointer-events-none -z-10"></div>
@@ -28,11 +45,7 @@ export function render_home() {
             <span>Explore Projects</span>
         </button>
 
-        <!-- 2. Secondary CTA: Start Contributing -->
-        <button data-form="sign_up_form" title="Sign Up" class="w-full sm:w-auto group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-surface-container-high/80 hover:bg-surface-variant border border-white/10 hover:border-secondary/40 text-on-surface hover:text-secondary font-bold text-sm sm:text-base backdrop-blur-md shadow-lg shadow-black/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer">
-            <span class="material-symbols-outlined text-[20px] text-secondary transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">rocket_launch</span>
-            <span>Start Contributing</span>
-        </button>
+        ${ctaButtonHtml}
 
         <!-- 3. Subtle/Text CTA: Learn More -->
         <button onclick="window.location.hash='about'" class="w-full sm:w-auto group inline-flex items-center justify-center gap-1.5 px-5 py-3.5 text-on-surface-variant hover:text-on-surface font-semibold text-sm sm:text-base rounded-xl transition-all duration-300 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-outline focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer">
@@ -53,6 +66,9 @@ export function render_home() {
 }
 
 export async function initHome() {
+    if (window.updateAuthUI) {
+        window.updateAuthUI();
+    }
     try {
         const res = await (window.apiFetch ? window.apiFetch('/api/stats') : fetch('/api/stats'));
         if (res.ok) {

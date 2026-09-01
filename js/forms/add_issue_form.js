@@ -151,24 +151,24 @@ export function render_add_issue_form(defaultStatus = 'TODO', projectId = '', pr
 }
 
 // Quick Tag helper
-window.appendTag = function(tag) {
-    const input = document.getElementById('issue-tags-input');
-    if (!input) return;
-    const existing = input.value.split(',').map(t => t.trim()).filter(Boolean);
-    if (!existing.includes(tag)) {
-        existing.push(tag);
-        input.value = existing.join(', ');
-    }
-};
+if (typeof window !== 'undefined') {
+    window.appendTag = function(tag) {
+        const input = document.getElementById('issue-tags-input');
+        if (!input) return;
+        const existing = input.value.split(',').map(t => t.trim()).filter(Boolean);
+        if (!existing.includes(tag)) {
+            existing.push(tag);
+            input.value = existing.join(', ');
+        }
+    };
 
-// Global handler for the add-issue form submission
-window.handleAddIssue = async function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+    window.handleAddIssue = async function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.stopImmediatePropagation) event.stopImmediatePropagation();
 
-    const form = event.target;
-    let projectId = form.getAttribute('data-project-id');
+        const form = event.target;
+        let projectId = form.getAttribute('data-project-id');
     
     // Fallback: If projectId is empty in form, attempt to detect from URL or active board
     if (!projectId || projectId === 'null' || projectId === 'undefined') {
@@ -232,4 +232,5 @@ window.handleAddIssue = async function(event) {
     }
 
     return false;
-};
+    };
+}

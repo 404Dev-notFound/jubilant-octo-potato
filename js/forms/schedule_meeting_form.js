@@ -105,74 +105,65 @@ export function render_schedule_meeting_form(projectId = '', projectTitle = '') 
     `;
 }
 
-function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
+if (typeof window !== 'undefined') {
+    window.handleScheduleMeeting = async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const projectId = form.getAttribute('data-project-id');
+        if (!projectId) {
+            window.UI.showToast('Invalid project selected', 'error');
+            return false;
+        }
 
-window.handleScheduleMeeting = async function(e) {
-    e.preventDefault();
-    const form = e.target;
-    const projectId = form.getAttribute('data-project-id');
-    if (!projectId) {
-        window.UI.showToast('Invalid project selected', 'error');
-        return false;
-    }
+        const topic = form.querySelector('[name="topic"]')?.value?.trim();
+        const preferredDate = form.querySelector('[name="preferredDate"]')?.value;
+        const details = form.querySelector('[name="message"]')?.value?.trim();
 
-    const topic = form.querySelector('[name="topic"]')?.value?.trim();
-    const preferredDate = form.querySelector('[name="preferredDate"]')?.value;
-    const details = form.querySelector('[name="message"]')?.value?.trim();
+        if (!topic) {
+            window.UI.showToast('Please enter a meeting topic', 'error');
+            return false;
+        }
 
-    if (!topic) {
-        window.UI.showToast('Please enter a meeting topic', 'error');
-        return false;
-    }
+        const submitBtn = form.querySelector('#btn-submit-meeting');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span> Sending...';
+        }
 
-    const submitBtn = form.querySelector('#btn-submit-meeting');
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span> Sending...';
-    }
+        try {
+            const res = await window.apiFetch(`/api/projects/${projectId}/meetings`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    topic,
+                    preferredDate,
+                    details
+                })
+            });
 
-    try {
-        const fullMessage = details ? `${topic} — ${details}` : topic;
-        const res = await window.apiFetch(`/api/projects/${projectId}/meetings`, {
-            method: 'POST',
-            body: JSON.stringify({
-                topic,
-                preferredDate: preferredDate ? new Date(preferredDate).toISOString() : null,
-                message: fullMessage
-            })
-        });
+            const result = await res.json();
 
-        const result = await res.json();
-        if (res.ok) {
-            window.UI.closeModal();
-            window.UI.showToast('Meeting request submitted to project owner!', 'success');
-            // Refresh meeting status on current view if available
-            if (window.refreshProjectDetailsMeetings) {
-                window.refreshProjectDetailsMeetings();
+            if (res.ok) {
+                window.UI.closeModal();
+                window.UI.showToast('Meeting request sent successfully!', 'success');
+                if (window.location.hash.includes('dashboard')) {
+                    window.dispatchEvent(new HashChangeEvent('hashchange'));
+                }
+            } else {
+                window.UI.showToast(result.error || 'Failed to submit meeting request', 'error');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">send</span> Send Meeting Request';
+                }
             }
-        } else {
-            window.UI.showToast(result.error || 'Failed to submit meeting request', 'error');
+        } catch (err) {
+            console.error('Error submitting meeting request:', err);
+            window.UI.showToast(err.message || 'Error connecting to backend server', 'error');
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">send</span> Send Meeting Request';
             }
         }
-    } catch (err) {
-        console.error('Error submitting meeting request:', err);
-        window.UI.showToast(err.message || 'Error connecting to backend server', 'error');
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">send</span> Send Meeting Request';
-        }
-    }
 
-    return false;
-};
+        return false;
+    };
+}

@@ -1356,34 +1356,51 @@ app.post('/api/users/availability', authMiddleware, handleUpdateAvailability);
  */
 app.get('/api/projects', async (req, res) => {
     try {
+        let currentUserId = null;
+        const authHeader = req.headers['authorization'];
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            try {
+                const token = authHeader.split(' ')[1];
+                const decoded = jwt.verify(token, JWT_SECRET);
+                if (decoded && decoded.id) currentUserId = String(decoded.id);
+            } catch {}
+        }
+
         if (NODE_ENV === 'production' || (await isDbConnected())) {
             try {
                 const projects = await prisma.project.findMany({
                     include: {
                         owner: { include: { profile: true } },
-                        members: true
+                        members: true,
+                        projectUpvotes: true
                     },
                     orderBy: { createdAt: 'desc' }
                 });
 
-                const formatted = projects.map(p => ({
-                    id: p.id,
-                    title: p.title,
-                    category: p.category,
-                    difficulty: p.difficulty,
-                    techStack: p.techStack || [],
-                    image: p.image,
-                    description: p.description,
-                    githubUrl: p.githubUrl,
-                    isPinned: p.isPinned,
-                    isDemo: p.isDemo,
-                    progress: typeof p.progress === 'number' ? p.progress : (p.completionPercentage || 0),
-                    ownerId: p.ownerId,
-                    owner: sanitizeUserObj(p.owner),
-                    membersCount: p.members ? p.members.length : 0,
-                    createdAt: p.createdAt,
-                    updatedAt: p.updatedAt
-                }));
+                const formatted = projects.map(p => {
+                    const upvotesList = Array.isArray(p.projectUpvotes) ? p.projectUpvotes : [];
+                    return {
+                        id: p.id,
+                        title: p.title,
+                        category: p.category,
+                        difficulty: p.difficulty,
+                        techStack: p.techStack || [],
+                        image: p.image,
+                        description: p.description,
+                        readme: p.readme || p.description || '',
+                        githubUrl: p.githubUrl,
+                        isPinned: p.isPinned,
+                        isDemo: p.isDemo,
+                        progress: typeof p.progress === 'number' ? p.progress : (p.completionPercentage || 0),
+                        upvotes: upvotesList.length,
+                        hasUpvoted: currentUserId ? upvotesList.some(u => String(u.userId) === currentUserId) : false,
+                        ownerId: p.ownerId,
+                        owner: sanitizeUserObj(p.owner),
+                        membersCount: p.members ? p.members.length : 0,
+                        createdAt: p.createdAt,
+                        updatedAt: p.updatedAt
+                    };
+                });
 
                 return res.json(formatted);
             } catch (err) {
@@ -1397,8 +1414,10 @@ app.get('/api/projects', async (req, res) => {
         const rawProjects = JSON.parse(await fs.readFile(getFilePath('projects'), 'utf-8'));
         let rawUsers = [];
         let rawMembers = [];
+        let rawUpvotes = [];
         try { rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8')); } catch {}
         try { rawMembers = JSON.parse(await fs.readFile(getFilePath('projectMembers'), 'utf-8')); } catch {}
+        try { rawUpvotes = JSON.parse(await fs.readFile(getFilePath('projectUpvotes'), 'utf-8')); } catch {}
 
         const usersMap = new Map();
         rawUsers.forEach(u => usersMap.set(String(u.id), u));
@@ -1406,9 +1425,13 @@ app.get('/api/projects', async (req, res) => {
         const formatted = rawProjects.map(p => {
             const owner = p.ownerId ? usersMap.get(String(p.ownerId)) : null;
             const projectMembers = rawMembers.filter(m => String(m.projectId) === String(p.id));
+            const projUpvotes = rawUpvotes.filter(u => String(u.projectId) === String(p.id));
             return {
                 ...p,
                 progress: typeof p.progress === 'number' ? p.progress : (p.completionPercentage || 0),
+                readme: p.readme || p.description || '',
+                upvotes: projUpvotes.length,
+                hasUpvoted: currentUserId ? projUpvotes.some(u => String(u.userId) === currentUserId) : false,
                 owner: sanitizeUserObj(owner),
                 membersCount: projectMembers.length
             };
@@ -1427,6 +1450,15 @@ app.get('/api/projects', async (req, res) => {
 app.get('/api/projects/:id', async (req, res) => {
     try {
         const projectId = String(req.params.id);
+        let currentUserId = null;
+        const authHeader = req.headers['authorization'];
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            try {
+                const token = authHeader.split(' ')[1];
+                const decoded = jwt.verify(token, JWT_SECRET);
+                if (decoded && decoded.id) currentUserId = String(decoded.id);
+            } catch {}
+        }
 
         if (NODE_ENV === 'production' || (await isDbConnected())) {
             try {
@@ -1435,11 +1467,14 @@ app.get('/api/projects/:id', async (req, res) => {
                     include: {
                         owner: { include: { profile: true } },
                         members: { include: { user: { include: { profile: true } } } },
-                        issues: { include: { creator: { include: { profile: true } }, assignee: { include: { profile: true } } } }
+                        issues: { include: { creator: { include: { profile: true } }, assignee: { include: { profile: true } } } },
+                        projectUpvotes: true
                     }
                 });
 
                 if (!project) return res.status(404).json({ error: 'Project not found' });
+
+                const upvotesList = Array.isArray(project.projectUpvotes) ? project.projectUpvotes : [];
 
                 const formatted = {
                     id: project.id,
@@ -1449,10 +1484,13 @@ app.get('/api/projects/:id', async (req, res) => {
                     techStack: project.techStack || [],
                     image: project.image,
                     description: project.description,
+                    readme: project.readme || project.description || '',
                     githubUrl: project.githubUrl,
                     isPinned: project.isPinned,
                     isDemo: project.isDemo,
                     progress: typeof project.progress === 'number' ? project.progress : (project.completionPercentage || 0),
+                    upvotes: upvotesList.length,
+                    hasUpvoted: currentUserId ? upvotesList.some(u => String(u.userId) === currentUserId) : false,
                     ownerId: project.ownerId,
                     owner: sanitizeUserObj(project.owner),
                     members: (project.members || []).map(m => ({
@@ -1482,9 +1520,11 @@ app.get('/api/projects/:id', async (req, res) => {
         let rawUsers = [];
         let rawMembers = [];
         let rawTasks = [];
+        let rawUpvotes = [];
         try { rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8')); } catch {}
         try { rawMembers = JSON.parse(await fs.readFile(getFilePath('projectMembers'), 'utf-8')); } catch {}
         try { rawTasks = JSON.parse(await fs.readFile(getFilePath('tasks'), 'utf-8')); } catch {}
+        try { rawUpvotes = JSON.parse(await fs.readFile(getFilePath('projectUpvotes'), 'utf-8')); } catch {}
 
         const usersMap = new Map();
         rawUsers.forEach(u => usersMap.set(String(u.id), u));
@@ -1495,10 +1535,14 @@ app.get('/api/projects/:id', async (req, res) => {
             user: sanitizeUserObj(usersMap.get(String(m.userId)))
         }));
         const projectTasks = rawTasks.filter(t => String(t.projectId) === projectId).map(t => formatIssue(t, usersMap));
+        const projUpvotes = rawUpvotes.filter(u => String(u.projectId) === projectId);
 
         res.json({
             ...project,
             progress: typeof project.progress === 'number' ? project.progress : (project.completionPercentage || 0),
+            readme: project.readme || project.description || '',
+            upvotes: projUpvotes.length,
+            hasUpvoted: currentUserId ? projUpvotes.some(u => String(u.userId) === currentUserId) : false,
             owner: sanitizeUserObj(owner),
             members: projectMembers,
             issues: projectTasks
@@ -1514,8 +1558,8 @@ app.get('/api/projects/:id', async (req, res) => {
  */
 app.post('/api/projects', authMiddleware, async (req, res) => {
     try {
+        const { title, category, difficulty, techStack, image, description, readme, githubUrl, isPinned, isDemo, progress } = req.body;
         const currentUserId = String(req.user.id);
-        const { title, category, difficulty, techStack, image, description, githubUrl, isPinned, isDemo, progress } = req.body;
 
         if (!title || !title.trim()) return res.status(400).json({ error: 'Project title is required' });
 
@@ -1531,6 +1575,7 @@ app.post('/api/projects', authMiddleware, async (req, res) => {
             techStack: Array.isArray(techStack) ? techStack : [],
             image: image || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
             description: description || '',
+            readme: readme || description || '',
             githubUrl: githubUrl || '',
             isPinned: Boolean(isPinned),
             isDemo: Boolean(isDemo),
@@ -1551,12 +1596,15 @@ app.post('/api/projects', authMiddleware, async (req, res) => {
                         }
                     },
                     include: {
-                        owner: { include: { profile: true } }
+                        owner: { include: { profile: true } },
+                        projectUpvotes: true
                     }
                 });
 
                 return res.status(201).json({
                     ...createdProject,
+                    upvotes: 0,
+                    hasUpvoted: false,
                     owner: sanitizeUserObj(createdProject.owner)
                 });
             } catch (err) {
@@ -1592,6 +1640,8 @@ app.post('/api/projects', authMiddleware, async (req, res) => {
 
         res.status(201).json({
             ...projectPayload,
+            upvotes: 0,
+            hasUpvoted: false,
             owner: sanitizeUserObj(owner)
         });
     } catch (error) {
@@ -1620,7 +1670,13 @@ const handleUpdateProject = async (req, res) => {
 
         if (NODE_ENV === 'production' || (await isDbConnected())) {
             try {
-                const project = await prisma.project.findUnique({ where: { id: projectId } });
+                const project = await prisma.project.findUnique({
+                    where: { id: projectId },
+                    include: {
+                        projectUpvotes: true,
+                        owner: { include: { profile: true } }
+                    }
+                });
                 if (!project) return res.status(404).json({ error: 'Project not found' });
                 if (String(project.ownerId) !== currentUserId) {
                     return res.status(403).json({ error: 'Only the project owner can edit this project' });
@@ -1635,15 +1691,28 @@ const handleUpdateProject = async (req, res) => {
                         techStack: Array.isArray(updates.techStack) ? updates.techStack : undefined,
                         image: updates.image !== undefined ? updates.image : undefined,
                         description: updates.description !== undefined ? updates.description : undefined,
+                        readme: updates.readme !== undefined ? updates.readme : undefined,
                         githubUrl: updates.githubUrl !== undefined ? updates.githubUrl : undefined,
                         isPinned: updates.isPinned !== undefined ? Boolean(updates.isPinned) : undefined,
                         isDemo: updates.isDemo !== undefined ? Boolean(updates.isDemo) : undefined,
                         progress: progressVal !== undefined ? progressVal : undefined
                     },
-                    include: { owner: { include: { profile: true } } }
+                    include: {
+                        owner: { include: { profile: true } },
+                        projectUpvotes: true,
+                        members: { include: { user: { include: { profile: true } } } },
+                        issues: { include: { creator: { include: { profile: true } }, assignee: { include: { profile: true } } } }
+                    }
                 });
 
-                return res.json({ ...updated, owner: sanitizeUserObj(updated.owner) });
+                const upvotesList = Array.isArray(updated.projectUpvotes) ? updated.projectUpvotes : [];
+
+                return res.json({
+                    ...updated,
+                    upvotes: upvotesList.length,
+                    hasUpvoted: upvotesList.some(u => String(u.userId) === currentUserId),
+                    owner: sanitizeUserObj(updated.owner)
+                });
             } catch (err) {
                 if (NODE_ENV === 'production') {
                     console.error('[Update Project DB Error]:', err.message);
@@ -1663,13 +1732,29 @@ const handleUpdateProject = async (req, res) => {
 
         projects[index] = { 
             ...projects[index], 
-            ...updates, 
+            ...updates,
+            title: updates.title !== undefined ? updates.title.trim() : projects[index].title,
+            description: updates.description !== undefined ? updates.description : projects[index].description,
+            readme: updates.readme !== undefined ? updates.readme : projects[index].readme,
+            category: updates.category !== undefined ? updates.category : projects[index].category,
+            difficulty: updates.difficulty !== undefined ? updates.difficulty : projects[index].difficulty,
+            techStack: Array.isArray(updates.techStack) ? updates.techStack : projects[index].techStack,
+            githubUrl: updates.githubUrl !== undefined ? updates.githubUrl : projects[index].githubUrl,
+            image: updates.image !== undefined ? updates.image : projects[index].image,
             progress: progressVal !== undefined ? progressVal : (typeof projects[index].progress === 'number' ? projects[index].progress : 0),
             updatedAt: new Date().toISOString() 
         };
         await fs.writeFile(projectsPath, JSON.stringify(projects, null, 2));
 
-        res.json(projects[index]);
+        let rawUpvotes = [];
+        try { rawUpvotes = JSON.parse(await fs.readFile(getFilePath('projectUpvotes'), 'utf-8')); } catch {}
+        const projUpvotes = rawUpvotes.filter(u => String(u.projectId) === projectId);
+
+        res.json({
+            ...projects[index],
+            upvotes: projUpvotes.length,
+            hasUpvoted: projUpvotes.some(u => String(u.userId) === currentUserId)
+        });
     } catch (error) {
         console.error('Error updating project:', error);
         res.status(500).json({ error: 'Failed to update project' });
@@ -1677,6 +1762,100 @@ const handleUpdateProject = async (req, res) => {
 };
 app.put('/api/projects/:id', authMiddleware, handleUpdateProject);
 app.patch('/api/projects/:id', authMiddleware, handleUpdateProject);
+
+/*
+ * Project Upvote (Authenticated - Toggle Behavior)
+ */
+app.post('/api/projects/:id/upvote', authMiddleware, async (req, res) => {
+    try {
+        const projectId = String(req.params.id);
+        const currentUserId = String(req.user.id);
+
+        if (NODE_ENV === 'production' || (await isDbConnected())) {
+            try {
+                const project = await prisma.project.findUnique({
+                    where: { id: projectId }
+                });
+                if (!project) return res.status(404).json({ error: 'Project not found' });
+
+                const existingUpvote = await prisma.projectUpvote.findUnique({
+                    where: {
+                        userId_projectId: {
+                            userId: currentUserId,
+                            projectId: projectId
+                        }
+                    }
+                });
+
+                let hasUpvoted = false;
+                if (existingUpvote) {
+                    await prisma.projectUpvote.delete({
+                        where: { id: existingUpvote.id }
+                    });
+                    hasUpvoted = false;
+                } else {
+                    await prisma.projectUpvote.create({
+                        data: {
+                            userId: currentUserId,
+                            projectId: projectId
+                        }
+                    });
+                    hasUpvoted = true;
+                }
+
+                const upvotesCount = await prisma.projectUpvote.count({
+                    where: { projectId: projectId }
+                });
+
+                return res.json({
+                    success: true,
+                    hasUpvoted,
+                    upvotes: upvotesCount,
+                    message: hasUpvoted ? 'Project upvoted' : 'Upvote removed'
+                });
+            } catch (err) {
+                if (NODE_ENV === 'production') {
+                    console.error('[Project Upvote DB Error]:', err.message);
+                    return res.status(500).json({ error: 'Failed to toggle upvote' });
+                }
+            }
+        }
+
+        const upvotesPath = getFilePath('projectUpvotes');
+        let upvotes = [];
+        try { upvotes = JSON.parse(await fs.readFile(upvotesPath, 'utf-8')); } catch { upvotes = []; }
+
+        const existingIndex = upvotes.findIndex(u => String(u.projectId) === projectId && String(u.userId) === currentUserId);
+        let hasUpvoted = false;
+
+        if (existingIndex !== -1) {
+            upvotes.splice(existingIndex, 1);
+            hasUpvoted = false;
+        } else {
+            upvotes.push({
+                id: `upv_${Date.now()}_${uuidv4().substring(0, 6)}`,
+                projectId,
+                userId: currentUserId,
+                createdAt: new Date().toISOString()
+            });
+            hasUpvoted = true;
+        }
+
+        await fs.writeFile(upvotesPath, JSON.stringify(upvotes, null, 2));
+
+        const upvotesCount = upvotes.filter(u => String(u.projectId) === projectId).length;
+
+        res.json({
+            success: true,
+            hasUpvoted,
+            upvotes: upvotesCount,
+            message: hasUpvoted ? 'Project upvoted' : 'Upvote removed'
+        });
+    } catch (error) {
+        console.error('Error toggling project upvote:', error);
+        res.status(500).json({ error: 'Failed to toggle project upvote' });
+    }
+});
 
 /*
  * Update Project Progress (Owner-Only Dedicated Endpoint)

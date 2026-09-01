@@ -2,6 +2,37 @@ const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml)
     ? window.escapeHtml 
     : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
 
+// Helper to format basic Markdown to safe HTML for README presentation
+function formatMarkdown(content) {
+    if (!content) return '';
+    let escaped = escapeHtml(content);
+
+    // Code blocks ```lang ... ```
+    escaped = escaped.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+        return `<pre class="bg-surface-container-lowest p-4 rounded-xl border border-white/5 text-xs font-mono overflow-x-auto my-3 text-primary"><code>${code}</code></pre>`;
+    });
+
+    // Inline code `code`
+    escaped = escaped.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 bg-surface-container-highest rounded text-primary font-mono text-xs border border-white/5">$1</code>');
+
+    // Headers
+    escaped = escaped.replace(/^### (.*$)/gim, '<h4 class="text-base font-bold text-on-surface mt-4 mb-2">$1</h4>');
+    escaped = escaped.replace(/^## (.*$)/gim, '<h3 class="text-lg font-bold text-on-surface mt-5 mb-2.5 border-b border-white/5 pb-1">$1</h3>');
+    escaped = escaped.replace(/^# (.*$)/gim, '<h2 class="text-xl font-extrabold text-on-surface mt-6 mb-3">$1</h2>');
+
+    // Bold and Italic
+    escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+    // Unordered lists
+    escaped = escaped.replace(/^\s*-\s+(.*$)/gim, '<li class="ml-4 list-disc text-on-surface-variant leading-relaxed mb-1">$1</li>');
+
+    // Paragraphs / line breaks
+    escaped = escaped.replace(/\n\n+/g, '</p><p class="leading-relaxed mb-3 text-on-surface-variant">');
+
+    return `<p class="leading-relaxed mb-3 text-on-surface-variant">${escaped}</p>`;
+}
+
 export function render_project_details() {
     return `
 <main id="project-details-container" class="relative w-full max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8 flex flex-col min-h-screen pt-4 space-y-6">
@@ -40,13 +71,6 @@ export function render_project_details() {
                         <div class="w-36 h-4 rounded bg-surface-variant"></div>
                         <div class="w-24 h-3 rounded bg-surface-variant"></div>
                     </div>
-                </div>
-            </div>
-            <div class="glass-panel p-6 rounded-2xl space-y-4 animate-pulse">
-                <div class="w-40 h-5 rounded bg-surface-variant"></div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="h-16 rounded-xl bg-surface-variant"></div>
-                    <div class="h-16 rounded-xl bg-surface-variant"></div>
                 </div>
             </div>
         </div>
@@ -149,7 +173,7 @@ export async function initProjectDetails(projectId) {
             }
         }
 
-        // Owner Info (Initials badge, Zero email exposure)
+        // Owner Info (Zero email exposure)
         const owner = project.owner || null;
         const ownerName = owner?.name || (project.ownerId ? `Developer #${project.ownerId}` : 'Project Owner');
         const ownerInitial = ownerName ? ownerName.charAt(0).toUpperCase() : 'O';
@@ -159,7 +183,7 @@ export async function initProjectDetails(projectId) {
         const isOwner = currentUser && project.ownerId && String(project.ownerId) === String(currentUser.id);
         const isMember = currentUser && members.some(m => m && String(m.userId) === String(currentUser.id));
 
-        // Tech stack, issues count, and completion progress
+        // Tech stack, issues count, upvotes, and completion progress
         const techStack = Array.isArray(project.techStack) ? project.techStack : (typeof project.techStack === 'string' ? project.techStack.split(',').map(s => s.trim()).filter(Boolean) : []);
         const issues = Array.isArray(project.issues) ? project.issues : [];
         const issuesCount = issues.length;
@@ -168,11 +192,30 @@ export async function initProjectDetails(projectId) {
             ? Math.min(100, Math.max(0, project.progress)) 
             : (typeof project.completionPercentage === 'number' ? Math.min(100, Math.max(0, project.completionPercentage)) : 0);
 
+        let upvotesCount = typeof project.upvotes === 'number' ? project.upvotes : 0;
+        let hasUpvoted = Boolean(project.hasUpvoted);
+
+        // Upvote Button Component
+        const upvoteBtnHtml = `
+            <button id="btn-project-upvote" class="px-4 py-2.5 ${hasUpvoted ? 'bg-primary/20 text-primary border-primary/40 shadow-primary/20' : 'bg-surface-container hover:bg-surface-variant text-on-surface border-white/10 hover:border-primary/40'} border rounded-xl transition-all flex items-center gap-1.5 text-xs font-bold shadow-md cursor-pointer active:scale-95">
+                <span class="material-symbols-outlined text-[16px] text-primary">arrow_upward</span>
+                <span id="project-upvote-label">${hasUpvoted ? 'Upvoted' : 'Upvote'}</span>
+                <span id="project-upvotes-count" class="font-mono ${hasUpvoted ? 'bg-primary/25 text-primary' : 'bg-white/10 text-on-surface-variant'} px-2 py-0.5 rounded-md text-[11px] font-extrabold ml-0.5">${upvotesCount}</span>
+            </button>
+        `;
+
+        // Edit Project Button Component (Owner Only)
+        const editProjectBtnHtml = isOwner ? `
+            <button id="btn-edit-project-details" class="px-4 py-2.5 bg-secondary/15 hover:bg-secondary/25 text-secondary border border-secondary/30 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">edit_note</span> Edit Project
+            </button>
+        ` : '';
+
         // Join Action Button State
         let joinBtnHtml = '';
         if (!currentUser) {
             joinBtnHtml = `
-                <button onclick="window.UI.showToast('Please log in to collaborate on this project', 'info')" class="px-4 py-2.5 bg-primary text-on-primary rounded-xl shadow-md hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1.5 text-xs font-bold">
+                <button onclick="window.UI.showToast('Please sign in to collaborate on this project', 'info')" class="px-4 py-2.5 bg-primary text-on-primary rounded-xl shadow-md hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1.5 text-xs font-bold">
                     <span class="material-symbols-outlined text-[16px]">person_add</span> Join Project
                 </button>
             `;
@@ -214,6 +257,7 @@ export async function initProjectDetails(projectId) {
             </button>
         `;
 
+        // Render project details layout
         container.innerHTML = `
         <!-- Main Project Header -->
         <div class="glass-panel p-6 sm:p-8 rounded-2xl border-t-4 border-t-primary shadow-xl">
@@ -221,16 +265,18 @@ export async function initProjectDetails(projectId) {
                 <div class="space-y-2 flex-1">
                     <div class="flex flex-wrap items-center gap-2 mb-1">
                         <span class="material-symbols-outlined text-[28px] text-primary">terminal</span>
-                        <h1 class="font-display text-2xl sm:text-3xl font-extrabold text-on-surface">${escapeHtml(project.title || 'Untitled Project')}</h1>
-                        <span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-bold uppercase tracking-wider">${escapeHtml(project.category || 'Open Source')}</span>
-                        <span class="px-2.5 py-1 bg-secondary/15 text-secondary border border-secondary/25 rounded-lg text-xs font-semibold uppercase">${escapeHtml(project.difficulty || 'Intermediate')}</span>
+                        <h1 id="project-title-display" class="font-display text-2xl sm:text-3xl font-extrabold text-on-surface">${escapeHtml(project.title || 'Untitled Project')}</h1>
+                        <span id="project-category-badge" class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-bold uppercase tracking-wider">${escapeHtml(project.category || 'Open Source')}</span>
+                        <span id="project-difficulty-badge" class="px-2.5 py-1 bg-secondary/15 text-secondary border border-secondary/25 rounded-lg text-xs font-semibold uppercase">${escapeHtml(project.difficulty || 'Intermediate')}</span>
                         ${project.isPinned ? `<span class="px-2 py-0.5 bg-tertiary/20 text-tertiary border border-tertiary/30 rounded text-[10px] font-bold uppercase tracking-wider">Pinned</span>` : ''}
                     </div>
-                    <p class="text-on-surface-variant max-w-3xl text-sm leading-relaxed">${escapeHtml(project.description || 'Collaborative open source project on CodeCollab.')}</p>
+                    <p id="project-description-display" class="text-on-surface-variant max-w-3xl text-sm leading-relaxed">${escapeHtml(project.description || 'Collaborative open source project on CodeCollab.')}</p>
                 </div>
                 <div class="flex gap-2 flex-wrap items-center">
+                    ${upvoteBtnHtml}
+                    ${editProjectBtnHtml}
                     ${project.githubUrl ? `
-                        <a href="${escapeHtml(project.githubUrl)}" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 bg-surface-container rounded-xl border border-white/10 hover:border-primary/50 transition-colors flex items-center gap-1.5 text-xs font-medium text-on-surface">
+                        <a id="project-github-link" href="${escapeHtml(project.githubUrl)}" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 bg-surface-container rounded-xl border border-white/10 hover:border-primary/50 transition-colors flex items-center gap-1.5 text-xs font-medium text-on-surface">
                             <span class="material-symbols-outlined text-[16px]">code</span> GitHub Repo
                         </a>
                     ` : ''}
@@ -253,7 +299,7 @@ export async function initProjectDetails(projectId) {
                     </div>
                     ${isOwner ? `
                         <button id="btn-edit-project-progress" class="px-3.5 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer">
-                            <span class="material-symbols-outlined text-[15px]">edit</span> Update Progress
+                            <span class="material-symbols-outlined text-[15px]">trending_up</span> Update Progress
                         </button>
                     ` : `
                         <div class="px-2.5 py-1 bg-surface-container rounded-lg border border-white/5 text-[11px] font-mono text-on-surface-variant flex items-center gap-1.5">
@@ -393,10 +439,14 @@ export async function initProjectDetails(projectId) {
                         <h3 class="font-bold flex items-center gap-2 text-on-surface text-sm">
                             <span class="material-symbols-outlined text-[18px] text-primary">menu_book</span> README.md
                         </h3>
+                        ${isOwner ? `
+                            <button id="btn-edit-readme" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-on-surface border border-white/10 hover:border-secondary/40 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+                                <span class="material-symbols-outlined text-[14px] text-secondary">edit</span> Edit README
+                            </button>
+                        ` : ''}
                     </div>
-                    <div class="prose prose-invert max-w-none text-on-surface-variant text-sm space-y-3">
-                        <h2 class="text-lg font-bold text-on-surface">${escapeHtml(project.title)}</h2>
-                        <p class="leading-relaxed">${escapeHtml(project.description || 'Welcome to this open source repository.')}</p>
+                    <div id="project-readme-content" class="prose prose-invert max-w-none text-on-surface-variant text-sm space-y-3">
+                        ${formatMarkdown(project.readme || project.description || 'Welcome to this open source repository.')}
                         
                         ${project.githubUrl ? `
                             <div class="mt-4 pt-4 border-t border-white/5">
@@ -416,15 +466,19 @@ cd ${escapeHtml((project.title || 'project').toLowerCase().replace(/\\s+/g, '-')
                     <div class="space-y-2.5 text-xs text-on-surface-variant">
                         <div class="flex items-center justify-between">
                             <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">category</span> Category</span>
-                            <span class="font-bold text-on-surface">${escapeHtml(project.category || 'General')}</span>
+                            <span id="meta-category-val" class="font-bold text-on-surface">${escapeHtml(project.category || 'General')}</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">signal_cellular_alt</span> Difficulty</span>
-                            <span class="font-bold text-on-surface">${escapeHtml(project.difficulty || 'Intermediate')}</span>
+                            <span id="meta-difficulty-val" class="font-bold text-on-surface">${escapeHtml(project.difficulty || 'Intermediate')}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">arrow_upward</span> Upvotes</span>
+                            <span id="meta-upvotes-val" class="font-bold text-primary font-mono">${upvotesCount}</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">donut_small</span> Progress</span>
-                            <span class="font-bold text-primary font-mono">${progress}% Complete</span>
+                            <span id="meta-progress-val" class="font-bold text-primary font-mono">${progress}% Complete</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">scale</span> License</span>
@@ -439,19 +493,145 @@ cd ${escapeHtml((project.title || 'project').toLowerCase().replace(/\\s+/g, '-')
                     </div>
                 </div>
                 
-                ${techStack.length > 0 ? `
                 <div class="glass-panel p-6 rounded-2xl space-y-3">
                     <h3 class="font-bold text-on-surface text-sm border-b border-white/5 pb-2">Technologies</h3>
-                    <div class="flex flex-wrap gap-1.5">
-                        ${techStack.map(t => `<span class="px-2.5 py-1 bg-surface-container border border-white/10 rounded-lg text-xs font-medium text-on-surface">${escapeHtml(t)}</span>`).join('')}
+                    <div id="project-techstack-container" class="flex flex-wrap gap-1.5">
+                        ${techStack.length > 0 
+                            ? techStack.map(t => `<span class="px-2.5 py-1 bg-surface-container border border-white/10 rounded-lg text-xs font-medium text-on-surface">${escapeHtml(t)}</span>`).join('') 
+                            : '<span class="text-xs text-on-surface-variant italic">No technologies specified</span>'}
                     </div>
                 </div>
-                ` : ''}
             </div>
         </div>
         `;
 
-        // Bind interactive buttons
+        // 1. Upvote Button Interaction
+        const upvoteBtn = document.getElementById('btn-project-upvote');
+        if (upvoteBtn) {
+            upvoteBtn.addEventListener('click', async () => {
+                if (!currentUser) {
+                    window.UI.showToast('Please sign in to upvote projects', 'info');
+                    return;
+                }
+
+                upvoteBtn.disabled = true;
+                try {
+                    const res = await window.apiFetch(`/api/projects/${project.id}/upvote`, {
+                        method: 'POST'
+                    });
+                    const resData = await res.json();
+                    if (res.ok) {
+                        hasUpvoted = Boolean(resData.hasUpvoted);
+                        upvotesCount = typeof resData.upvotes === 'number' ? resData.upvotes : upvotesCount;
+
+                        const labelEl = document.getElementById('project-upvote-label');
+                        const countEl = document.getElementById('project-upvotes-count');
+                        const metaCountEl = document.getElementById('meta-upvotes-val');
+
+                        if (labelEl) labelEl.textContent = hasUpvoted ? 'Upvoted' : 'Upvote';
+                        if (countEl) countEl.textContent = upvotesCount;
+                        if (metaCountEl) metaCountEl.textContent = upvotesCount;
+
+                        if (hasUpvoted) {
+                            upvoteBtn.className = 'px-4 py-2.5 bg-primary/20 text-primary border-primary/40 shadow-primary/20 border rounded-xl transition-all flex items-center gap-1.5 text-xs font-bold shadow-md cursor-pointer active:scale-95';
+                            if (countEl) countEl.className = 'font-mono bg-primary/25 text-primary px-2 py-0.5 rounded-md text-[11px] font-extrabold ml-0.5';
+                            window.UI.showToast('Project upvoted! ▲', 'success');
+                        } else {
+                            upvoteBtn.className = 'px-4 py-2.5 bg-surface-container hover:bg-surface-variant text-on-surface border-white/10 hover:border-primary/40 border rounded-xl transition-all flex items-center gap-1.5 text-xs font-medium shadow-md cursor-pointer active:scale-95';
+                            if (countEl) countEl.className = 'font-mono bg-white/10 text-on-surface-variant px-2 py-0.5 rounded-md text-[11px] font-extrabold ml-0.5';
+                            window.UI.showToast('Upvote removed', 'info');
+                        }
+                    } else {
+                        window.UI.showToast(resData.error || 'Failed to update upvote', 'error');
+                    }
+                } catch (upvErr) {
+                    console.error('Error toggling upvote:', upvErr);
+                    window.UI.showToast('Error communicating with server', 'error');
+                } finally {
+                    upvoteBtn.disabled = false;
+                }
+            });
+        }
+
+        // 2. Edit Project Modal Interaction (Owner Only)
+        const openEditModal = async () => {
+            try {
+                const module = await import('../forms/edit_project_form.js');
+                if (module.render_edit_project_form) {
+                    const modalHtml = module.render_edit_project_form(project);
+                    window.UI.openModal(modalHtml);
+
+                    const form = document.getElementById('editProjectForm');
+                    if (form) {
+                        form.addEventListener('submit', async (e) => {
+                            e.preventDefault();
+                            const submitBtn = document.getElementById('edit-project-submit-btn');
+                            if (submitBtn) {
+                                submitBtn.disabled = true;
+                                submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span> <span>Saving...</span>';
+                            }
+
+                            const formData = new FormData(form);
+                            const rawTech = formData.get('techStack') || '';
+                            const techArray = rawTech.split(',').map(t => t.trim()).filter(Boolean);
+
+                            const payload = {
+                                title: (formData.get('title') || '').trim(),
+                                category: formData.get('category') || 'Engineering',
+                                difficulty: formData.get('difficulty') || 'Intermediate',
+                                techStack: techArray,
+                                description: (formData.get('description') || '').trim(),
+                                readme: (formData.get('readme') || '').trim(),
+                                githubUrl: (formData.get('githubUrl') || '').trim(),
+                                progress: parseInt(formData.get('progress'), 10) || 0
+                            };
+
+                            try {
+                                const patchRes = await window.apiFetch(`/api/projects/${project.id}`, {
+                                    method: 'PATCH',
+                                    body: JSON.stringify(payload)
+                                });
+                                const patchData = await patchRes.json();
+                                if (patchRes.ok) {
+                                    window.UI.closeModal();
+                                    window.UI.showToast('Project updated successfully!', 'success');
+                                    // Refresh view with updated data
+                                    await initProjectDetails(project.id);
+                                } else {
+                                    window.UI.showToast(patchData.error || 'Failed to update project', 'error');
+                                    if (submitBtn) {
+                                        submitBtn.disabled = false;
+                                        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">save</span> <span>Save Changes</span>';
+                                    }
+                                }
+                            } catch (err) {
+                                console.error('Error saving project changes:', err);
+                                window.UI.showToast(err.message || 'Error updating project', 'error');
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">save</span> <span>Save Changes</span>';
+                                }
+                            }
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to load edit project modal:', err);
+                window.UI.showToast('Failed to open project editor', 'error');
+            }
+        };
+
+        const editProjectBtn = document.getElementById('btn-edit-project-details');
+        if (editProjectBtn) {
+            editProjectBtn.addEventListener('click', openEditModal);
+        }
+
+        const editReadmeBtn = document.getElementById('btn-edit-readme');
+        if (editReadmeBtn) {
+            editReadmeBtn.addEventListener('click', openEditModal);
+        }
+
+        // 3. Edit Progress Modal Interaction
         const editProgressBtn = document.getElementById('btn-edit-project-progress');
         if (editProgressBtn) {
             editProgressBtn.addEventListener('click', () => {
@@ -478,7 +658,7 @@ cd ${escapeHtml((project.title || 'project').toLowerCase().replace(/\\s+/g, '-')
                                 class="w-full accent-primary cursor-pointer mb-3">
                             <div class="flex items-center gap-2">
                                 <input type="number" id="modal-progress-input" name="progress" min="0" max="100" value="${currentVal}" 
-                                    class="w-24 bg-surface-container border border-white/10 rounded-xl px-3 py-2 text-sm text-on-surface font-mono font-bold outline-none focus:border-primary transition-colors text-center">
+                                     class="w-24 bg-surface-container border border-white/10 rounded-xl px-3 py-2 text-sm text-on-surface font-mono font-bold outline-none focus:border-primary transition-colors text-center">
                                 <span class="text-xs text-on-surface-variant font-bold">% Complete</span>
                             </div>
                         </div>
@@ -540,8 +720,10 @@ cd ${escapeHtml((project.title || 'project').toLowerCase().replace(/\\s+/g, '-')
                                 
                                 const textEl = document.getElementById('project-progress-text');
                                 const barEl = document.getElementById('project-progress-bar');
+                                const metaValEl = document.getElementById('meta-progress-val');
                                 if (textEl) textEl.textContent = `${rawProgress}%`;
                                 if (barEl) barEl.style.width = `${rawProgress}%`;
+                                if (metaValEl) metaValEl.textContent = `${rawProgress}% Complete`;
                                 project.progress = rawProgress;
                             } else {
                                 window.UI.showToast(resData.error || 'Failed to update progress', 'error');
@@ -563,6 +745,7 @@ cd ${escapeHtml((project.title || 'project').toLowerCase().replace(/\\s+/g, '-')
             });
         }
 
+        // 4. Join Project Interaction
         const joinBtn = document.getElementById('btn-action-join-project');
         if (joinBtn) {
             joinBtn.addEventListener('click', async () => {
@@ -596,6 +779,7 @@ cd ${escapeHtml((project.title || 'project').toLowerCase().replace(/\\s+/g, '-')
             });
         }
 
+        // 5. Schedule Meeting Interaction
         const meetingBtn = document.getElementById('btn-action-schedule-meeting');
         if (meetingBtn) {
             meetingBtn.addEventListener('click', async () => {

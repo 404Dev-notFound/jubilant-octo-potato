@@ -299,6 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const ownerInitial = ownerName.charAt(0).toUpperCase();
         const ownerDisplay = `<div class="flex items-center gap-2 text-xs text-on-surface-variant mb-3"><div class="w-5 h-5 rounded-full bg-secondary/20 text-secondary text-[11px] font-bold flex items-center justify-center border border-secondary/30">${ownerInitial}</div><span class="truncate font-medium">By ${escapeHtml(ownerName)}</span></div>`;
 
+        const upvotesCount = typeof p.upvotes === 'number' ? p.upvotes : 0;
+        const hasUpvoted = Boolean(p.hasUpvoted);
+
         return `
         <div class="glass-card bg-surface-container-low/50 backdrop-blur-md rounded-[22px] border border-white/10 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:-translate-y-1.5 p-6" data-project-id="${p.id || ''}">
             <div class="flex items-center justify-between gap-2 mb-4">
@@ -310,7 +313,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${escapeHtml(p.difficulty || 'Intermediate')}
                     </span>
                 </div>
-                ${p.isPinned ? `<span class="px-2 py-0.5 bg-tertiary/20 text-tertiary border border-tertiary/30 rounded text-[10px] font-bold uppercase tracking-wider">Pinned</span>` : ''}
+                <div class="flex items-center gap-1.5">
+                    <span class="px-2 py-0.5 ${hasUpvoted ? 'bg-primary/20 text-primary border-primary/40' : 'bg-surface-container-highest text-on-surface-variant border-white/5'} border rounded-md text-[11px] font-bold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[13px] text-primary">arrow_upward</span> ${upvotesCount}
+                    </span>
+                    ${p.isPinned ? `<span class="px-2 py-0.5 bg-tertiary/20 text-tertiary border border-tertiary/30 rounded text-[10px] font-bold uppercase tracking-wider">Pinned</span>` : ''}
+                </div>
             </div>
 
             <h4 class="font-bold text-xl text-on-surface mb-2 group-hover:text-primary transition-colors leading-tight flex items-center gap-2">

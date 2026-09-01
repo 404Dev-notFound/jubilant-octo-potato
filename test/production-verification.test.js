@@ -906,6 +906,107 @@ async function runTests() {
         assert(filteredIssuesRes.body.every(i => String(i.projectId) === String(progressTestProjId)), `All returned issues belong exclusively to ${progressTestProjId}`);
         console.log(`  ✅ PASS: Filtered /api/issues?projectId=${progressTestProjId} returned only scoped project issues`);
 
+        // =========================================================================
+        // Test Suite: Project Upvote System & Toggle Behavior
+        // =========================================================================
+        console.log('\n--- Testing Project Upvote System & Toggle Behavior ---');
+
+        // Unauthenticated upvote attempt -> Expect 401
+        const unauthUpvoteRes = await request(`/api/projects/${progressTestProjId}/upvote`, {
+            method: 'POST'
+        });
+        assert(unauthUpvoteRes.status === 401, `Unauthenticated upvote rejected with 401 Unauthorized (got ${unauthUpvoteRes.status})`);
+        console.log('  ✅ PASS: Unauthenticated upvote attempt rejected with 401 Unauthorized');
+
+        // User B upvotes User A's project
+        const userBUpvoteRes = await request(`/api/projects/${progressTestProjId}/upvote`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${userBToken}` }
+        });
+        assert(userBUpvoteRes.status === 200, `User B upvote returned 200`);
+        assert(userBUpvoteRes.body.hasUpvoted === true, `User B hasUpvoted is true`);
+        assert(userBUpvoteRes.body.upvotes === 1, `Project upvotes count incremented to 1 (got ${userBUpvoteRes.body.upvotes})`);
+        console.log('  ✅ PASS: User B successfully upvoted project (count: 1)');
+
+        // User C upvotes the same project
+        const userCUpvoteRes = await request(`/api/projects/${progressTestProjId}/upvote`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${userCToken}` }
+        });
+        assert(userCUpvoteRes.status === 200, `User C upvote returned 200`);
+        assert(userCUpvoteRes.body.hasUpvoted === true, `User C hasUpvoted is true`);
+        assert(userCUpvoteRes.body.upvotes === 2, `Project upvotes count incremented to 2 (got ${userCUpvoteRes.body.upvotes})`);
+        console.log('  ✅ PASS: User C successfully upvoted project (count: 2)');
+
+        // User B upvotes again -> Toggle off (un-upvote)
+        const userBToggleOffRes = await request(`/api/projects/${progressTestProjId}/upvote`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${userBToken}` }
+        });
+        assert(userBToggleOffRes.status === 200, `User B toggle off returned 200`);
+        assert(userBToggleOffRes.body.hasUpvoted === false, `User B hasUpvoted is now false`);
+        assert(userBToggleOffRes.body.upvotes === 1, `Project upvotes count decremented to 1 (got ${userBToggleOffRes.body.upvotes})`);
+        console.log('  ✅ PASS: User B toggle off successfully decremented upvotes count (count: 1)');
+
+        // GET /api/projects/:id reflects current upvote state for User C
+        const checkProjUpvoteRes = await request(`/api/projects/${progressTestProjId}`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${userCToken}` }
+        });
+        assert(checkProjUpvoteRes.status === 200, `GET project returned 200`);
+        assert(checkProjUpvoteRes.body.upvotes === 1, `GET project reports upvotes count: 1`);
+        assert(checkProjUpvoteRes.body.hasUpvoted === true, `GET project reports hasUpvoted: true for User C`);
+        console.log('  ✅ PASS: GET /api/projects/:id accurately reflects stored upvotes and auth state');
+
+        // =========================================================================
+        // Test Suite: Project Owner Full Edit (Name, Description, README)
+        // =========================================================================
+        console.log('\n--- Testing Project Owner Full Edit & Authorization ---');
+
+        // Non-owner (User B) attempts to edit project info -> Expect 403
+        const nonOwnerEditRes = await request(`/api/projects/${progressTestProjId}`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${userBToken}` },
+            body: {
+                title: 'Hacked Project Name',
+                description: 'Unauthorized edit',
+                readme: 'Hacked readme'
+            }
+        });
+        assert(nonOwnerEditRes.status === 403, `Non-owner project edit rejected with 403 Forbidden (got ${nonOwnerEditRes.status})`);
+        console.log('  ✅ PASS: Non-owner full edit rejected with 403 Forbidden');
+
+        // Owner (User A) updates Project Name, Description, README, Category, and Tech Stack
+        const updatedReadmeText = '# Hardened Architecture Overview\n\n- Zero Trust Security\n- High Throughput\n\n```bash\nmake run\n```';
+        const ownerEditRes = await request(`/api/projects/${progressTestProjId}`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${userAToken}` },
+            body: {
+                title: 'Next-Gen Distributed Engine v2',
+                description: 'A revolutionary asynchronous compute framework.',
+                readme: updatedReadmeText,
+                category: 'Systems & Rust',
+                difficulty: 'Advanced',
+                techStack: ['Rust', 'Tokio', 'PostgreSQL', 'Docker']
+            }
+        });
+        assert(ownerEditRes.status === 200, `Owner project edit returned 200`);
+        assert(ownerEditRes.body.id === progressTestProjId, `Project ID is preserved and identical`);
+        assert(ownerEditRes.body.title === 'Next-Gen Distributed Engine v2', `Project title successfully updated`);
+        assert(ownerEditRes.body.description === 'A revolutionary asynchronous compute framework.', `Project description successfully updated`);
+        assert(ownerEditRes.body.readme === updatedReadmeText, `Project README successfully updated`);
+        console.log('  ✅ PASS: Owner successfully updated project title, description, and README');
+
+        // Verify with GET /api/projects/:id that all relations and data are preserved
+        const verifyEditedProjRes = await request(`/api/projects/${progressTestProjId}`);
+        assert(verifyEditedProjRes.status === 200, `GET updated project returned 200`);
+        assert(verifyEditedProjRes.body.id === progressTestProjId, `Project ID is unchanged`);
+        assert(verifyEditedProjRes.body.title === 'Next-Gen Distributed Engine v2', `Title persists in DB`);
+        assert(verifyEditedProjRes.body.readme === updatedReadmeText, `README persists in DB`);
+        assert(verifyEditedProjRes.body.upvotes === 1, `Upvotes relation remains intact after edit`);
+        assert(Array.isArray(verifyEditedProjRes.body.issues) && verifyEditedProjRes.body.issues.length >= 1, `Issues relation remains intact after edit`);
+        console.log('  ✅ PASS: Project ID and all database relationships (members, issues, upvotes) preserved intact');
+
         console.log('\n===============================================================');
         console.log('🎉 ALL PRODUCTION VERIFICATION TESTS PASSED SUCCESSFULLY!');
         console.log('===============================================================\n');

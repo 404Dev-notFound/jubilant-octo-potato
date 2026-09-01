@@ -43,6 +43,7 @@ model User {
   teamApplications        TeamApplication[]
   ownedOrganizations      Organization[]       @relation("OrgOwner")
   organizationMemberships OrganizationMember[]
+  projectUpvotes          ProjectUpvote[]      @relation("UserProjectUpvotes")
 }
 
 model UserProfile {
@@ -165,6 +166,7 @@ model Project {
   techStack   String[]
   image       String
   description String
+  readme      String?  @db.Text
   githubUrl   String
   isPinned    Boolean  @default(false)
   isDemo      Boolean  @default(false)
@@ -181,6 +183,19 @@ model Project {
   joinRequests    JoinRequest[]
   meetingRequests MeetingRequest[]
   notifications   Notification[]
+  projectUpvotes  ProjectUpvote[]
+}
+
+model ProjectUpvote {
+  id        String   @id @default(uuid())
+  userId    String
+  projectId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation("UserProjectUpvotes", fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
 }
 
 model ProjectMember {

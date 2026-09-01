@@ -74,6 +74,11 @@ export type SecurityLog = $Result.DefaultSelection<Prisma.$SecurityLogPayload>
  */
 export type Project = $Result.DefaultSelection<Prisma.$ProjectPayload>
 /**
+ * Model ProjectUpvote
+ * 
+ */
+export type ProjectUpvote = $Result.DefaultSelection<Prisma.$ProjectUpvotePayload>
+/**
  * Model ProjectMember
  * 
  */
@@ -411,6 +416,16 @@ export class PrismaClient<
     * ```
     */
   get project(): Prisma.ProjectDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.projectUpvote`: Exposes CRUD operations for the **ProjectUpvote** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProjectUpvotes
+    * const projectUpvotes = await prisma.projectUpvote.findMany()
+    * ```
+    */
+  get projectUpvote(): Prisma.ProjectUpvoteDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.projectMember`: Exposes CRUD operations for the **ProjectMember** model.
@@ -973,6 +988,7 @@ export namespace Prisma {
     ApiKey: 'ApiKey',
     SecurityLog: 'SecurityLog',
     Project: 'Project',
+    ProjectUpvote: 'ProjectUpvote',
     ProjectMember: 'ProjectMember',
     Issue: 'Issue',
     JoinRequest: 'JoinRequest',
@@ -1002,7 +1018,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userProfile" | "oAuthIdentity" | "role" | "permission" | "userRole" | "rolePermission" | "userSession" | "verificationToken" | "apiKey" | "securityLog" | "project" | "projectMember" | "issue" | "joinRequest" | "meetingRequest" | "notification" | "lookingFor" | "team" | "teamMember" | "teamApplication" | "organization" | "organizationMember"
+      modelProps: "user" | "userProfile" | "oAuthIdentity" | "role" | "permission" | "userRole" | "rolePermission" | "userSession" | "verificationToken" | "apiKey" | "securityLog" | "project" | "projectUpvote" | "projectMember" | "issue" | "joinRequest" | "meetingRequest" | "notification" | "lookingFor" | "team" | "teamMember" | "teamApplication" | "organization" | "organizationMember"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1891,6 +1907,80 @@ export namespace Prisma {
           count: {
             args: Prisma.ProjectCountArgs<ExtArgs>
             result: $Utils.Optional<ProjectCountAggregateOutputType> | number
+          }
+        }
+      }
+      ProjectUpvote: {
+        payload: Prisma.$ProjectUpvotePayload<ExtArgs>
+        fields: Prisma.ProjectUpvoteFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProjectUpvoteFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectUpvotePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProjectUpvoteFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectUpvotePayload>
+          }
+          findFirst: {
+            args: Prisma.ProjectUpvoteFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectUpvotePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProjectUpvoteFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectUpvotePayload>
+          }
+          findMany: {
+            args: Prisma.ProjectUpvoteFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectUpvotePayload>[]
+          }
+          create: {
+            args: Prisma.ProjectUpvoteCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectUpvotePayload>
+          }
+          createMany: {
+            args: Prisma.ProjectUpvoteCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ProjectUpvoteCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectUpvotePayload>[]
+          }
+          delete: {
+            args: Prisma.ProjectUpvoteDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectUpvotePayload>
+          }
+          update: {
+            args: Prisma.ProjectUpvoteUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectUpvotePayload>
+          }
+          deleteMany: {
+            args: Prisma.ProjectUpvoteDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProjectUpvoteUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ProjectUpvoteUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectUpvotePayload>[]
+          }
+          upsert: {
+            args: Prisma.ProjectUpvoteUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectUpvotePayload>
+          }
+          aggregate: {
+            args: Prisma.ProjectUpvoteAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProjectUpvote>
+          }
+          groupBy: {
+            args: Prisma.ProjectUpvoteGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProjectUpvoteGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProjectUpvoteCountArgs<ExtArgs>
+            result: $Utils.Optional<ProjectUpvoteCountAggregateOutputType> | number
           }
         }
       }
@@ -2816,6 +2906,7 @@ export namespace Prisma {
     apiKey?: ApiKeyOmit
     securityLog?: SecurityLogOmit
     project?: ProjectOmit
+    projectUpvote?: ProjectUpvoteOmit
     projectMember?: ProjectMemberOmit
     issue?: IssueOmit
     joinRequest?: JoinRequestOmit
@@ -2929,6 +3020,7 @@ export namespace Prisma {
     teamApplications: number
     ownedOrganizations: number
     organizationMemberships: number
+    projectUpvotes: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2954,6 +3046,7 @@ export namespace Prisma {
     teamApplications?: boolean | UserCountOutputTypeCountTeamApplicationsArgs
     ownedOrganizations?: boolean | UserCountOutputTypeCountOwnedOrganizationsArgs
     organizationMemberships?: boolean | UserCountOutputTypeCountOrganizationMembershipsArgs
+    projectUpvotes?: boolean | UserCountOutputTypeCountProjectUpvotesArgs
   }
 
   // Custom InputTypes
@@ -3121,6 +3214,13 @@ export namespace Prisma {
     where?: OrganizationMemberWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountProjectUpvotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProjectUpvoteWhereInput
+  }
+
 
   /**
    * Count Type RoleCountOutputType
@@ -3204,6 +3304,7 @@ export namespace Prisma {
     joinRequests: number
     meetingRequests: number
     notifications: number
+    projectUpvotes: number
   }
 
   export type ProjectCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3213,6 +3314,7 @@ export namespace Prisma {
     joinRequests?: boolean | ProjectCountOutputTypeCountJoinRequestsArgs
     meetingRequests?: boolean | ProjectCountOutputTypeCountMeetingRequestsArgs
     notifications?: boolean | ProjectCountOutputTypeCountNotificationsArgs
+    projectUpvotes?: boolean | ProjectCountOutputTypeCountProjectUpvotesArgs
   }
 
   // Custom InputTypes
@@ -3266,6 +3368,13 @@ export namespace Prisma {
    */
   export type ProjectCountOutputTypeCountNotificationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: NotificationWhereInput
+  }
+
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeCountProjectUpvotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProjectUpvoteWhereInput
   }
 
 
@@ -3547,6 +3656,7 @@ export namespace Prisma {
     teamApplications?: boolean | User$teamApplicationsArgs<ExtArgs>
     ownedOrganizations?: boolean | User$ownedOrganizationsArgs<ExtArgs>
     organizationMemberships?: boolean | User$organizationMembershipsArgs<ExtArgs>
+    projectUpvotes?: boolean | User$projectUpvotesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3605,6 +3715,7 @@ export namespace Prisma {
     teamApplications?: boolean | User$teamApplicationsArgs<ExtArgs>
     ownedOrganizations?: boolean | User$ownedOrganizationsArgs<ExtArgs>
     organizationMemberships?: boolean | User$organizationMembershipsArgs<ExtArgs>
+    projectUpvotes?: boolean | User$projectUpvotesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3636,6 +3747,7 @@ export namespace Prisma {
       teamApplications: Prisma.$TeamApplicationPayload<ExtArgs>[]
       ownedOrganizations: Prisma.$OrganizationPayload<ExtArgs>[]
       organizationMemberships: Prisma.$OrganizationMemberPayload<ExtArgs>[]
+      projectUpvotes: Prisma.$ProjectUpvotePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4062,6 +4174,7 @@ export namespace Prisma {
     teamApplications<T extends User$teamApplicationsArgs<ExtArgs> = {}>(args?: Subset<T, User$teamApplicationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TeamApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     ownedOrganizations<T extends User$ownedOrganizationsArgs<ExtArgs> = {}>(args?: Subset<T, User$ownedOrganizationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     organizationMemberships<T extends User$organizationMembershipsArgs<ExtArgs> = {}>(args?: Subset<T, User$organizationMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrganizationMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    projectUpvotes<T extends User$projectUpvotesArgs<ExtArgs> = {}>(args?: Subset<T, User$projectUpvotesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5030,6 +5143,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: OrganizationMemberScalarFieldEnum | OrganizationMemberScalarFieldEnum[]
+  }
+
+  /**
+   * User.projectUpvotes
+   */
+  export type User$projectUpvotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteInclude<ExtArgs> | null
+    where?: ProjectUpvoteWhereInput
+    orderBy?: ProjectUpvoteOrderByWithRelationInput | ProjectUpvoteOrderByWithRelationInput[]
+    cursor?: ProjectUpvoteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProjectUpvoteScalarFieldEnum | ProjectUpvoteScalarFieldEnum[]
   }
 
   /**
@@ -15863,6 +16000,7 @@ export namespace Prisma {
     difficulty: string | null
     image: string | null
     description: string | null
+    readme: string | null
     githubUrl: string | null
     isPinned: boolean | null
     isDemo: boolean | null
@@ -15879,6 +16017,7 @@ export namespace Prisma {
     difficulty: string | null
     image: string | null
     description: string | null
+    readme: string | null
     githubUrl: string | null
     isPinned: boolean | null
     isDemo: boolean | null
@@ -15896,6 +16035,7 @@ export namespace Prisma {
     techStack: number
     image: number
     description: number
+    readme: number
     githubUrl: number
     isPinned: number
     isDemo: number
@@ -15922,6 +16062,7 @@ export namespace Prisma {
     difficulty?: true
     image?: true
     description?: true
+    readme?: true
     githubUrl?: true
     isPinned?: true
     isDemo?: true
@@ -15938,6 +16079,7 @@ export namespace Prisma {
     difficulty?: true
     image?: true
     description?: true
+    readme?: true
     githubUrl?: true
     isPinned?: true
     isDemo?: true
@@ -15955,6 +16097,7 @@ export namespace Prisma {
     techStack?: true
     image?: true
     description?: true
+    readme?: true
     githubUrl?: true
     isPinned?: true
     isDemo?: true
@@ -16059,6 +16202,7 @@ export namespace Prisma {
     techStack: string[]
     image: string
     description: string
+    readme: string | null
     githubUrl: string
     isPinned: boolean
     isDemo: boolean
@@ -16095,6 +16239,7 @@ export namespace Prisma {
     techStack?: boolean
     image?: boolean
     description?: boolean
+    readme?: boolean
     githubUrl?: boolean
     isPinned?: boolean
     isDemo?: boolean
@@ -16109,6 +16254,7 @@ export namespace Prisma {
     joinRequests?: boolean | Project$joinRequestsArgs<ExtArgs>
     meetingRequests?: boolean | Project$meetingRequestsArgs<ExtArgs>
     notifications?: boolean | Project$notificationsArgs<ExtArgs>
+    projectUpvotes?: boolean | Project$projectUpvotesArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
@@ -16120,6 +16266,7 @@ export namespace Prisma {
     techStack?: boolean
     image?: boolean
     description?: boolean
+    readme?: boolean
     githubUrl?: boolean
     isPinned?: boolean
     isDemo?: boolean
@@ -16138,6 +16285,7 @@ export namespace Prisma {
     techStack?: boolean
     image?: boolean
     description?: boolean
+    readme?: boolean
     githubUrl?: boolean
     isPinned?: boolean
     isDemo?: boolean
@@ -16156,6 +16304,7 @@ export namespace Prisma {
     techStack?: boolean
     image?: boolean
     description?: boolean
+    readme?: boolean
     githubUrl?: boolean
     isPinned?: boolean
     isDemo?: boolean
@@ -16165,7 +16314,7 @@ export namespace Prisma {
     ownerId?: boolean
   }
 
-  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "category" | "difficulty" | "techStack" | "image" | "description" | "githubUrl" | "isPinned" | "isDemo" | "progress" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["project"]>
+  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "category" | "difficulty" | "techStack" | "image" | "description" | "readme" | "githubUrl" | "isPinned" | "isDemo" | "progress" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | Project$ownerArgs<ExtArgs>
     members?: boolean | Project$membersArgs<ExtArgs>
@@ -16174,6 +16323,7 @@ export namespace Prisma {
     joinRequests?: boolean | Project$joinRequestsArgs<ExtArgs>
     meetingRequests?: boolean | Project$meetingRequestsArgs<ExtArgs>
     notifications?: boolean | Project$notificationsArgs<ExtArgs>
+    projectUpvotes?: boolean | Project$projectUpvotesArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProjectIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -16193,6 +16343,7 @@ export namespace Prisma {
       joinRequests: Prisma.$JoinRequestPayload<ExtArgs>[]
       meetingRequests: Prisma.$MeetingRequestPayload<ExtArgs>[]
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
+      projectUpvotes: Prisma.$ProjectUpvotePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -16202,6 +16353,7 @@ export namespace Prisma {
       techStack: string[]
       image: string
       description: string
+      readme: string | null
       githubUrl: string
       isPinned: boolean
       isDemo: boolean
@@ -16610,6 +16762,7 @@ export namespace Prisma {
     joinRequests<T extends Project$joinRequestsArgs<ExtArgs> = {}>(args?: Subset<T, Project$joinRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JoinRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     meetingRequests<T extends Project$meetingRequestsArgs<ExtArgs> = {}>(args?: Subset<T, Project$meetingRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MeetingRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notifications<T extends Project$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, Project$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    projectUpvotes<T extends Project$projectUpvotesArgs<ExtArgs> = {}>(args?: Subset<T, Project$projectUpvotesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -16646,6 +16799,7 @@ export namespace Prisma {
     readonly techStack: FieldRef<"Project", 'String[]'>
     readonly image: FieldRef<"Project", 'String'>
     readonly description: FieldRef<"Project", 'String'>
+    readonly readme: FieldRef<"Project", 'String'>
     readonly githubUrl: FieldRef<"Project", 'String'>
     readonly isPinned: FieldRef<"Project", 'Boolean'>
     readonly isDemo: FieldRef<"Project", 'Boolean'>
@@ -17212,6 +17366,30 @@ export namespace Prisma {
   }
 
   /**
+   * Project.projectUpvotes
+   */
+  export type Project$projectUpvotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteInclude<ExtArgs> | null
+    where?: ProjectUpvoteWhereInput
+    orderBy?: ProjectUpvoteOrderByWithRelationInput | ProjectUpvoteOrderByWithRelationInput[]
+    cursor?: ProjectUpvoteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProjectUpvoteScalarFieldEnum | ProjectUpvoteScalarFieldEnum[]
+  }
+
+  /**
    * Project without action
    */
   export type ProjectDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -17227,6 +17405,1059 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: ProjectInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ProjectUpvote
+   */
+
+  export type AggregateProjectUpvote = {
+    _count: ProjectUpvoteCountAggregateOutputType | null
+    _min: ProjectUpvoteMinAggregateOutputType | null
+    _max: ProjectUpvoteMaxAggregateOutputType | null
+  }
+
+  export type ProjectUpvoteMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    projectId: string | null
+    createdAt: Date | null
+  }
+
+  export type ProjectUpvoteMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    projectId: string | null
+    createdAt: Date | null
+  }
+
+  export type ProjectUpvoteCountAggregateOutputType = {
+    id: number
+    userId: number
+    projectId: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ProjectUpvoteMinAggregateInputType = {
+    id?: true
+    userId?: true
+    projectId?: true
+    createdAt?: true
+  }
+
+  export type ProjectUpvoteMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    projectId?: true
+    createdAt?: true
+  }
+
+  export type ProjectUpvoteCountAggregateInputType = {
+    id?: true
+    userId?: true
+    projectId?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ProjectUpvoteAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProjectUpvote to aggregate.
+     */
+    where?: ProjectUpvoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProjectUpvotes to fetch.
+     */
+    orderBy?: ProjectUpvoteOrderByWithRelationInput | ProjectUpvoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProjectUpvoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProjectUpvotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProjectUpvotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProjectUpvotes
+    **/
+    _count?: true | ProjectUpvoteCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProjectUpvoteMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProjectUpvoteMaxAggregateInputType
+  }
+
+  export type GetProjectUpvoteAggregateType<T extends ProjectUpvoteAggregateArgs> = {
+        [P in keyof T & keyof AggregateProjectUpvote]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProjectUpvote[P]>
+      : GetScalarType<T[P], AggregateProjectUpvote[P]>
+  }
+
+
+
+
+  export type ProjectUpvoteGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProjectUpvoteWhereInput
+    orderBy?: ProjectUpvoteOrderByWithAggregationInput | ProjectUpvoteOrderByWithAggregationInput[]
+    by: ProjectUpvoteScalarFieldEnum[] | ProjectUpvoteScalarFieldEnum
+    having?: ProjectUpvoteScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProjectUpvoteCountAggregateInputType | true
+    _min?: ProjectUpvoteMinAggregateInputType
+    _max?: ProjectUpvoteMaxAggregateInputType
+  }
+
+  export type ProjectUpvoteGroupByOutputType = {
+    id: string
+    userId: string
+    projectId: string
+    createdAt: Date
+    _count: ProjectUpvoteCountAggregateOutputType | null
+    _min: ProjectUpvoteMinAggregateOutputType | null
+    _max: ProjectUpvoteMaxAggregateOutputType | null
+  }
+
+  type GetProjectUpvoteGroupByPayload<T extends ProjectUpvoteGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProjectUpvoteGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProjectUpvoteGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProjectUpvoteGroupByOutputType[P]>
+            : GetScalarType<T[P], ProjectUpvoteGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProjectUpvoteSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    projectId?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["projectUpvote"]>
+
+  export type ProjectUpvoteSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    projectId?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["projectUpvote"]>
+
+  export type ProjectUpvoteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    projectId?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["projectUpvote"]>
+
+  export type ProjectUpvoteSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    projectId?: boolean
+    createdAt?: boolean
+  }
+
+  export type ProjectUpvoteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "projectId" | "createdAt", ExtArgs["result"]["projectUpvote"]>
+  export type ProjectUpvoteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }
+  export type ProjectUpvoteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }
+  export type ProjectUpvoteIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }
+
+  export type $ProjectUpvotePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProjectUpvote"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      project: Prisma.$ProjectPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      projectId: string
+      createdAt: Date
+    }, ExtArgs["result"]["projectUpvote"]>
+    composites: {}
+  }
+
+  type ProjectUpvoteGetPayload<S extends boolean | null | undefined | ProjectUpvoteDefaultArgs> = $Result.GetResult<Prisma.$ProjectUpvotePayload, S>
+
+  type ProjectUpvoteCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ProjectUpvoteFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ProjectUpvoteCountAggregateInputType | true
+    }
+
+  export interface ProjectUpvoteDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProjectUpvote'], meta: { name: 'ProjectUpvote' } }
+    /**
+     * Find zero or one ProjectUpvote that matches the filter.
+     * @param {ProjectUpvoteFindUniqueArgs} args - Arguments to find a ProjectUpvote
+     * @example
+     * // Get one ProjectUpvote
+     * const projectUpvote = await prisma.projectUpvote.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProjectUpvoteFindUniqueArgs>(args: SelectSubset<T, ProjectUpvoteFindUniqueArgs<ExtArgs>>): Prisma__ProjectUpvoteClient<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ProjectUpvote that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ProjectUpvoteFindUniqueOrThrowArgs} args - Arguments to find a ProjectUpvote
+     * @example
+     * // Get one ProjectUpvote
+     * const projectUpvote = await prisma.projectUpvote.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProjectUpvoteFindUniqueOrThrowArgs>(args: SelectSubset<T, ProjectUpvoteFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProjectUpvoteClient<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProjectUpvote that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectUpvoteFindFirstArgs} args - Arguments to find a ProjectUpvote
+     * @example
+     * // Get one ProjectUpvote
+     * const projectUpvote = await prisma.projectUpvote.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProjectUpvoteFindFirstArgs>(args?: SelectSubset<T, ProjectUpvoteFindFirstArgs<ExtArgs>>): Prisma__ProjectUpvoteClient<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProjectUpvote that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectUpvoteFindFirstOrThrowArgs} args - Arguments to find a ProjectUpvote
+     * @example
+     * // Get one ProjectUpvote
+     * const projectUpvote = await prisma.projectUpvote.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProjectUpvoteFindFirstOrThrowArgs>(args?: SelectSubset<T, ProjectUpvoteFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProjectUpvoteClient<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ProjectUpvotes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectUpvoteFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProjectUpvotes
+     * const projectUpvotes = await prisma.projectUpvote.findMany()
+     * 
+     * // Get first 10 ProjectUpvotes
+     * const projectUpvotes = await prisma.projectUpvote.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const projectUpvoteWithIdOnly = await prisma.projectUpvote.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProjectUpvoteFindManyArgs>(args?: SelectSubset<T, ProjectUpvoteFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ProjectUpvote.
+     * @param {ProjectUpvoteCreateArgs} args - Arguments to create a ProjectUpvote.
+     * @example
+     * // Create one ProjectUpvote
+     * const ProjectUpvote = await prisma.projectUpvote.create({
+     *   data: {
+     *     // ... data to create a ProjectUpvote
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProjectUpvoteCreateArgs>(args: SelectSubset<T, ProjectUpvoteCreateArgs<ExtArgs>>): Prisma__ProjectUpvoteClient<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ProjectUpvotes.
+     * @param {ProjectUpvoteCreateManyArgs} args - Arguments to create many ProjectUpvotes.
+     * @example
+     * // Create many ProjectUpvotes
+     * const projectUpvote = await prisma.projectUpvote.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProjectUpvoteCreateManyArgs>(args?: SelectSubset<T, ProjectUpvoteCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ProjectUpvotes and returns the data saved in the database.
+     * @param {ProjectUpvoteCreateManyAndReturnArgs} args - Arguments to create many ProjectUpvotes.
+     * @example
+     * // Create many ProjectUpvotes
+     * const projectUpvote = await prisma.projectUpvote.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ProjectUpvotes and only return the `id`
+     * const projectUpvoteWithIdOnly = await prisma.projectUpvote.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ProjectUpvoteCreateManyAndReturnArgs>(args?: SelectSubset<T, ProjectUpvoteCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ProjectUpvote.
+     * @param {ProjectUpvoteDeleteArgs} args - Arguments to delete one ProjectUpvote.
+     * @example
+     * // Delete one ProjectUpvote
+     * const ProjectUpvote = await prisma.projectUpvote.delete({
+     *   where: {
+     *     // ... filter to delete one ProjectUpvote
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProjectUpvoteDeleteArgs>(args: SelectSubset<T, ProjectUpvoteDeleteArgs<ExtArgs>>): Prisma__ProjectUpvoteClient<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ProjectUpvote.
+     * @param {ProjectUpvoteUpdateArgs} args - Arguments to update one ProjectUpvote.
+     * @example
+     * // Update one ProjectUpvote
+     * const projectUpvote = await prisma.projectUpvote.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProjectUpvoteUpdateArgs>(args: SelectSubset<T, ProjectUpvoteUpdateArgs<ExtArgs>>): Prisma__ProjectUpvoteClient<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ProjectUpvotes.
+     * @param {ProjectUpvoteDeleteManyArgs} args - Arguments to filter ProjectUpvotes to delete.
+     * @example
+     * // Delete a few ProjectUpvotes
+     * const { count } = await prisma.projectUpvote.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProjectUpvoteDeleteManyArgs>(args?: SelectSubset<T, ProjectUpvoteDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProjectUpvotes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectUpvoteUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProjectUpvotes
+     * const projectUpvote = await prisma.projectUpvote.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProjectUpvoteUpdateManyArgs>(args: SelectSubset<T, ProjectUpvoteUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProjectUpvotes and returns the data updated in the database.
+     * @param {ProjectUpvoteUpdateManyAndReturnArgs} args - Arguments to update many ProjectUpvotes.
+     * @example
+     * // Update many ProjectUpvotes
+     * const projectUpvote = await prisma.projectUpvote.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ProjectUpvotes and only return the `id`
+     * const projectUpvoteWithIdOnly = await prisma.projectUpvote.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ProjectUpvoteUpdateManyAndReturnArgs>(args: SelectSubset<T, ProjectUpvoteUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ProjectUpvote.
+     * @param {ProjectUpvoteUpsertArgs} args - Arguments to update or create a ProjectUpvote.
+     * @example
+     * // Update or create a ProjectUpvote
+     * const projectUpvote = await prisma.projectUpvote.upsert({
+     *   create: {
+     *     // ... data to create a ProjectUpvote
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProjectUpvote we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProjectUpvoteUpsertArgs>(args: SelectSubset<T, ProjectUpvoteUpsertArgs<ExtArgs>>): Prisma__ProjectUpvoteClient<$Result.GetResult<Prisma.$ProjectUpvotePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ProjectUpvotes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectUpvoteCountArgs} args - Arguments to filter ProjectUpvotes to count.
+     * @example
+     * // Count the number of ProjectUpvotes
+     * const count = await prisma.projectUpvote.count({
+     *   where: {
+     *     // ... the filter for the ProjectUpvotes we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProjectUpvoteCountArgs>(
+      args?: Subset<T, ProjectUpvoteCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProjectUpvoteCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProjectUpvote.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectUpvoteAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProjectUpvoteAggregateArgs>(args: Subset<T, ProjectUpvoteAggregateArgs>): Prisma.PrismaPromise<GetProjectUpvoteAggregateType<T>>
+
+    /**
+     * Group by ProjectUpvote.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectUpvoteGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProjectUpvoteGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProjectUpvoteGroupByArgs['orderBy'] }
+        : { orderBy?: ProjectUpvoteGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProjectUpvoteGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProjectUpvoteGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProjectUpvote model
+   */
+  readonly fields: ProjectUpvoteFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProjectUpvote.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProjectUpvoteClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProjectUpvote model
+   */
+  interface ProjectUpvoteFieldRefs {
+    readonly id: FieldRef<"ProjectUpvote", 'String'>
+    readonly userId: FieldRef<"ProjectUpvote", 'String'>
+    readonly projectId: FieldRef<"ProjectUpvote", 'String'>
+    readonly createdAt: FieldRef<"ProjectUpvote", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProjectUpvote findUnique
+   */
+  export type ProjectUpvoteFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteInclude<ExtArgs> | null
+    /**
+     * Filter, which ProjectUpvote to fetch.
+     */
+    where: ProjectUpvoteWhereUniqueInput
+  }
+
+  /**
+   * ProjectUpvote findUniqueOrThrow
+   */
+  export type ProjectUpvoteFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteInclude<ExtArgs> | null
+    /**
+     * Filter, which ProjectUpvote to fetch.
+     */
+    where: ProjectUpvoteWhereUniqueInput
+  }
+
+  /**
+   * ProjectUpvote findFirst
+   */
+  export type ProjectUpvoteFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteInclude<ExtArgs> | null
+    /**
+     * Filter, which ProjectUpvote to fetch.
+     */
+    where?: ProjectUpvoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProjectUpvotes to fetch.
+     */
+    orderBy?: ProjectUpvoteOrderByWithRelationInput | ProjectUpvoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProjectUpvotes.
+     */
+    cursor?: ProjectUpvoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProjectUpvotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProjectUpvotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProjectUpvotes.
+     */
+    distinct?: ProjectUpvoteScalarFieldEnum | ProjectUpvoteScalarFieldEnum[]
+  }
+
+  /**
+   * ProjectUpvote findFirstOrThrow
+   */
+  export type ProjectUpvoteFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteInclude<ExtArgs> | null
+    /**
+     * Filter, which ProjectUpvote to fetch.
+     */
+    where?: ProjectUpvoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProjectUpvotes to fetch.
+     */
+    orderBy?: ProjectUpvoteOrderByWithRelationInput | ProjectUpvoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProjectUpvotes.
+     */
+    cursor?: ProjectUpvoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProjectUpvotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProjectUpvotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProjectUpvotes.
+     */
+    distinct?: ProjectUpvoteScalarFieldEnum | ProjectUpvoteScalarFieldEnum[]
+  }
+
+  /**
+   * ProjectUpvote findMany
+   */
+  export type ProjectUpvoteFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteInclude<ExtArgs> | null
+    /**
+     * Filter, which ProjectUpvotes to fetch.
+     */
+    where?: ProjectUpvoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProjectUpvotes to fetch.
+     */
+    orderBy?: ProjectUpvoteOrderByWithRelationInput | ProjectUpvoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProjectUpvotes.
+     */
+    cursor?: ProjectUpvoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProjectUpvotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProjectUpvotes.
+     */
+    skip?: number
+    distinct?: ProjectUpvoteScalarFieldEnum | ProjectUpvoteScalarFieldEnum[]
+  }
+
+  /**
+   * ProjectUpvote create
+   */
+  export type ProjectUpvoteCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ProjectUpvote.
+     */
+    data: XOR<ProjectUpvoteCreateInput, ProjectUpvoteUncheckedCreateInput>
+  }
+
+  /**
+   * ProjectUpvote createMany
+   */
+  export type ProjectUpvoteCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProjectUpvotes.
+     */
+    data: ProjectUpvoteCreateManyInput | ProjectUpvoteCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProjectUpvote createManyAndReturn
+   */
+  export type ProjectUpvoteCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * The data used to create many ProjectUpvotes.
+     */
+    data: ProjectUpvoteCreateManyInput | ProjectUpvoteCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ProjectUpvote update
+   */
+  export type ProjectUpvoteUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ProjectUpvote.
+     */
+    data: XOR<ProjectUpvoteUpdateInput, ProjectUpvoteUncheckedUpdateInput>
+    /**
+     * Choose, which ProjectUpvote to update.
+     */
+    where: ProjectUpvoteWhereUniqueInput
+  }
+
+  /**
+   * ProjectUpvote updateMany
+   */
+  export type ProjectUpvoteUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProjectUpvotes.
+     */
+    data: XOR<ProjectUpvoteUpdateManyMutationInput, ProjectUpvoteUncheckedUpdateManyInput>
+    /**
+     * Filter which ProjectUpvotes to update
+     */
+    where?: ProjectUpvoteWhereInput
+    /**
+     * Limit how many ProjectUpvotes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProjectUpvote updateManyAndReturn
+   */
+  export type ProjectUpvoteUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * The data used to update ProjectUpvotes.
+     */
+    data: XOR<ProjectUpvoteUpdateManyMutationInput, ProjectUpvoteUncheckedUpdateManyInput>
+    /**
+     * Filter which ProjectUpvotes to update
+     */
+    where?: ProjectUpvoteWhereInput
+    /**
+     * Limit how many ProjectUpvotes to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ProjectUpvote upsert
+   */
+  export type ProjectUpvoteUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ProjectUpvote to update in case it exists.
+     */
+    where: ProjectUpvoteWhereUniqueInput
+    /**
+     * In case the ProjectUpvote found by the `where` argument doesn't exist, create a new ProjectUpvote with this data.
+     */
+    create: XOR<ProjectUpvoteCreateInput, ProjectUpvoteUncheckedCreateInput>
+    /**
+     * In case the ProjectUpvote was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProjectUpvoteUpdateInput, ProjectUpvoteUncheckedUpdateInput>
+  }
+
+  /**
+   * ProjectUpvote delete
+   */
+  export type ProjectUpvoteDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteInclude<ExtArgs> | null
+    /**
+     * Filter which ProjectUpvote to delete.
+     */
+    where: ProjectUpvoteWhereUniqueInput
+  }
+
+  /**
+   * ProjectUpvote deleteMany
+   */
+  export type ProjectUpvoteDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProjectUpvotes to delete
+     */
+    where?: ProjectUpvoteWhereInput
+    /**
+     * Limit how many ProjectUpvotes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProjectUpvote without action
+   */
+  export type ProjectUpvoteDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectUpvote
+     */
+    select?: ProjectUpvoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectUpvote
+     */
+    omit?: ProjectUpvoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectUpvoteInclude<ExtArgs> | null
   }
 
 
@@ -29765,6 +30996,7 @@ export namespace Prisma {
     techStack: 'techStack',
     image: 'image',
     description: 'description',
+    readme: 'readme',
     githubUrl: 'githubUrl',
     isPinned: 'isPinned',
     isDemo: 'isDemo',
@@ -29775,6 +31007,16 @@ export namespace Prisma {
   };
 
   export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
+
+
+  export const ProjectUpvoteScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    projectId: 'projectId',
+    createdAt: 'createdAt'
+  };
+
+  export type ProjectUpvoteScalarFieldEnum = (typeof ProjectUpvoteScalarFieldEnum)[keyof typeof ProjectUpvoteScalarFieldEnum]
 
 
   export const ProjectMemberScalarFieldEnum: {
@@ -30139,6 +31381,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationListRelationFilter
     ownedOrganizations?: OrganizationListRelationFilter
     organizationMemberships?: OrganizationMemberListRelationFilter
+    projectUpvotes?: ProjectUpvoteListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -30172,6 +31415,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationOrderByRelationAggregateInput
     ownedOrganizations?: OrganizationOrderByRelationAggregateInput
     organizationMemberships?: OrganizationMemberOrderByRelationAggregateInput
+    projectUpvotes?: ProjectUpvoteOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -30208,6 +31452,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationListRelationFilter
     ownedOrganizations?: OrganizationListRelationFilter
     organizationMemberships?: OrganizationMemberListRelationFilter
+    projectUpvotes?: ProjectUpvoteListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -30810,6 +32055,7 @@ export namespace Prisma {
     techStack?: StringNullableListFilter<"Project">
     image?: StringFilter<"Project"> | string
     description?: StringFilter<"Project"> | string
+    readme?: StringNullableFilter<"Project"> | string | null
     githubUrl?: StringFilter<"Project"> | string
     isPinned?: BoolFilter<"Project"> | boolean
     isDemo?: BoolFilter<"Project"> | boolean
@@ -30824,6 +32070,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestListRelationFilter
     meetingRequests?: MeetingRequestListRelationFilter
     notifications?: NotificationListRelationFilter
+    projectUpvotes?: ProjectUpvoteListRelationFilter
   }
 
   export type ProjectOrderByWithRelationInput = {
@@ -30834,6 +32081,7 @@ export namespace Prisma {
     techStack?: SortOrder
     image?: SortOrder
     description?: SortOrder
+    readme?: SortOrderInput | SortOrder
     githubUrl?: SortOrder
     isPinned?: SortOrder
     isDemo?: SortOrder
@@ -30848,6 +32096,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestOrderByRelationAggregateInput
     meetingRequests?: MeetingRequestOrderByRelationAggregateInput
     notifications?: NotificationOrderByRelationAggregateInput
+    projectUpvotes?: ProjectUpvoteOrderByRelationAggregateInput
   }
 
   export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -30861,6 +32110,7 @@ export namespace Prisma {
     techStack?: StringNullableListFilter<"Project">
     image?: StringFilter<"Project"> | string
     description?: StringFilter<"Project"> | string
+    readme?: StringNullableFilter<"Project"> | string | null
     githubUrl?: StringFilter<"Project"> | string
     isPinned?: BoolFilter<"Project"> | boolean
     isDemo?: BoolFilter<"Project"> | boolean
@@ -30875,6 +32125,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestListRelationFilter
     meetingRequests?: MeetingRequestListRelationFilter
     notifications?: NotificationListRelationFilter
+    projectUpvotes?: ProjectUpvoteListRelationFilter
   }, "id">
 
   export type ProjectOrderByWithAggregationInput = {
@@ -30885,6 +32136,7 @@ export namespace Prisma {
     techStack?: SortOrder
     image?: SortOrder
     description?: SortOrder
+    readme?: SortOrderInput | SortOrder
     githubUrl?: SortOrder
     isPinned?: SortOrder
     isDemo?: SortOrder
@@ -30910,6 +32162,7 @@ export namespace Prisma {
     techStack?: StringNullableListFilter<"Project">
     image?: StringWithAggregatesFilter<"Project"> | string
     description?: StringWithAggregatesFilter<"Project"> | string
+    readme?: StringNullableWithAggregatesFilter<"Project"> | string | null
     githubUrl?: StringWithAggregatesFilter<"Project"> | string
     isPinned?: BoolWithAggregatesFilter<"Project"> | boolean
     isDemo?: BoolWithAggregatesFilter<"Project"> | boolean
@@ -30917,6 +32170,60 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
     ownerId?: StringNullableWithAggregatesFilter<"Project"> | string | null
+  }
+
+  export type ProjectUpvoteWhereInput = {
+    AND?: ProjectUpvoteWhereInput | ProjectUpvoteWhereInput[]
+    OR?: ProjectUpvoteWhereInput[]
+    NOT?: ProjectUpvoteWhereInput | ProjectUpvoteWhereInput[]
+    id?: StringFilter<"ProjectUpvote"> | string
+    userId?: StringFilter<"ProjectUpvote"> | string
+    projectId?: StringFilter<"ProjectUpvote"> | string
+    createdAt?: DateTimeFilter<"ProjectUpvote"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
+  }
+
+  export type ProjectUpvoteOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    projectId?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    project?: ProjectOrderByWithRelationInput
+  }
+
+  export type ProjectUpvoteWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_projectId?: ProjectUpvoteUserIdProjectIdCompoundUniqueInput
+    AND?: ProjectUpvoteWhereInput | ProjectUpvoteWhereInput[]
+    OR?: ProjectUpvoteWhereInput[]
+    NOT?: ProjectUpvoteWhereInput | ProjectUpvoteWhereInput[]
+    userId?: StringFilter<"ProjectUpvote"> | string
+    projectId?: StringFilter<"ProjectUpvote"> | string
+    createdAt?: DateTimeFilter<"ProjectUpvote"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
+  }, "id" | "userId_projectId">
+
+  export type ProjectUpvoteOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    projectId?: SortOrder
+    createdAt?: SortOrder
+    _count?: ProjectUpvoteCountOrderByAggregateInput
+    _max?: ProjectUpvoteMaxOrderByAggregateInput
+    _min?: ProjectUpvoteMinOrderByAggregateInput
+  }
+
+  export type ProjectUpvoteScalarWhereWithAggregatesInput = {
+    AND?: ProjectUpvoteScalarWhereWithAggregatesInput | ProjectUpvoteScalarWhereWithAggregatesInput[]
+    OR?: ProjectUpvoteScalarWhereWithAggregatesInput[]
+    NOT?: ProjectUpvoteScalarWhereWithAggregatesInput | ProjectUpvoteScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ProjectUpvote"> | string
+    userId?: StringWithAggregatesFilter<"ProjectUpvote"> | string
+    projectId?: StringWithAggregatesFilter<"ProjectUpvote"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"ProjectUpvote"> | Date | string
   }
 
   export type ProjectMemberWhereInput = {
@@ -31800,6 +33107,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -31833,6 +33141,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -31866,6 +33175,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -31899,6 +33209,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -32482,6 +33793,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -32495,6 +33807,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestCreateNestedManyWithoutProjectInput
     notifications?: NotificationCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateInput = {
@@ -32505,6 +33818,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -32518,6 +33832,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUncheckedCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestUncheckedCreateNestedManyWithoutProjectInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUpdateInput = {
@@ -32528,6 +33843,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -32541,6 +33857,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateInput = {
@@ -32551,6 +33868,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -32564,6 +33882,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUncheckedUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUncheckedUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateManyInput = {
@@ -32574,6 +33893,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -32591,6 +33911,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -32607,6 +33928,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -32614,6 +33936,53 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ownerId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ProjectUpvoteCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutProjectUpvotesInput
+    project: ProjectCreateNestedOneWithoutProjectUpvotesInput
+  }
+
+  export type ProjectUpvoteUncheckedCreateInput = {
+    id?: string
+    userId: string
+    projectId: string
+    createdAt?: Date | string
+  }
+
+  export type ProjectUpvoteUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutProjectUpvotesNestedInput
+    project?: ProjectUpdateOneRequiredWithoutProjectUpvotesNestedInput
+  }
+
+  export type ProjectUpvoteUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectUpvoteCreateManyInput = {
+    id?: string
+    userId: string
+    projectId: string
+    createdAt?: Date | string
+  }
+
+  export type ProjectUpvoteUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectUpvoteUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ProjectMemberCreateInput = {
@@ -33653,6 +35022,12 @@ export namespace Prisma {
     none?: OrganizationMemberWhereInput
   }
 
+  export type ProjectUpvoteListRelationFilter = {
+    every?: ProjectUpvoteWhereInput
+    some?: ProjectUpvoteWhereInput
+    none?: ProjectUpvoteWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -33727,6 +35102,10 @@ export namespace Prisma {
   }
 
   export type OrganizationMemberOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ProjectUpvoteOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -34251,6 +35630,7 @@ export namespace Prisma {
     techStack?: SortOrder
     image?: SortOrder
     description?: SortOrder
+    readme?: SortOrder
     githubUrl?: SortOrder
     isPinned?: SortOrder
     isDemo?: SortOrder
@@ -34271,6 +35651,7 @@ export namespace Prisma {
     difficulty?: SortOrder
     image?: SortOrder
     description?: SortOrder
+    readme?: SortOrder
     githubUrl?: SortOrder
     isPinned?: SortOrder
     isDemo?: SortOrder
@@ -34287,6 +35668,7 @@ export namespace Prisma {
     difficulty?: SortOrder
     image?: SortOrder
     description?: SortOrder
+    readme?: SortOrder
     githubUrl?: SortOrder
     isPinned?: SortOrder
     isDemo?: SortOrder
@@ -34303,6 +35685,32 @@ export namespace Prisma {
   export type ProjectScalarRelationFilter = {
     is?: ProjectWhereInput
     isNot?: ProjectWhereInput
+  }
+
+  export type ProjectUpvoteUserIdProjectIdCompoundUniqueInput = {
+    userId: string
+    projectId: string
+  }
+
+  export type ProjectUpvoteCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    projectId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ProjectUpvoteMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    projectId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ProjectUpvoteMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    projectId?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type ProjectMemberProjectIdUserIdCompoundUniqueInput = {
@@ -34943,6 +36351,13 @@ export namespace Prisma {
     connect?: OrganizationMemberWhereUniqueInput | OrganizationMemberWhereUniqueInput[]
   }
 
+  export type ProjectUpvoteCreateNestedManyWithoutUserInput = {
+    create?: XOR<ProjectUpvoteCreateWithoutUserInput, ProjectUpvoteUncheckedCreateWithoutUserInput> | ProjectUpvoteCreateWithoutUserInput[] | ProjectUpvoteUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ProjectUpvoteCreateOrConnectWithoutUserInput | ProjectUpvoteCreateOrConnectWithoutUserInput[]
+    createMany?: ProjectUpvoteCreateManyUserInputEnvelope
+    connect?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+  }
+
   export type UserProfileUncheckedCreateNestedOneWithoutUserInput = {
     create?: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: UserProfileCreateOrConnectWithoutUserInput
@@ -35101,6 +36516,13 @@ export namespace Prisma {
     connectOrCreate?: OrganizationMemberCreateOrConnectWithoutUserInput | OrganizationMemberCreateOrConnectWithoutUserInput[]
     createMany?: OrganizationMemberCreateManyUserInputEnvelope
     connect?: OrganizationMemberWhereUniqueInput | OrganizationMemberWhereUniqueInput[]
+  }
+
+  export type ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ProjectUpvoteCreateWithoutUserInput, ProjectUpvoteUncheckedCreateWithoutUserInput> | ProjectUpvoteCreateWithoutUserInput[] | ProjectUpvoteUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ProjectUpvoteCreateOrConnectWithoutUserInput | ProjectUpvoteCreateOrConnectWithoutUserInput[]
+    createMany?: ProjectUpvoteCreateManyUserInputEnvelope
+    connect?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -35437,6 +36859,20 @@ export namespace Prisma {
     deleteMany?: OrganizationMemberScalarWhereInput | OrganizationMemberScalarWhereInput[]
   }
 
+  export type ProjectUpvoteUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ProjectUpvoteCreateWithoutUserInput, ProjectUpvoteUncheckedCreateWithoutUserInput> | ProjectUpvoteCreateWithoutUserInput[] | ProjectUpvoteUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ProjectUpvoteCreateOrConnectWithoutUserInput | ProjectUpvoteCreateOrConnectWithoutUserInput[]
+    upsert?: ProjectUpvoteUpsertWithWhereUniqueWithoutUserInput | ProjectUpvoteUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ProjectUpvoteCreateManyUserInputEnvelope
+    set?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    disconnect?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    delete?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    connect?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    update?: ProjectUpvoteUpdateWithWhereUniqueWithoutUserInput | ProjectUpvoteUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ProjectUpvoteUpdateManyWithWhereWithoutUserInput | ProjectUpvoteUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ProjectUpvoteScalarWhereInput | ProjectUpvoteScalarWhereInput[]
+  }
+
   export type UserProfileUncheckedUpdateOneWithoutUserNestedInput = {
     create?: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: UserProfileCreateOrConnectWithoutUserInput
@@ -35753,6 +37189,20 @@ export namespace Prisma {
     update?: OrganizationMemberUpdateWithWhereUniqueWithoutUserInput | OrganizationMemberUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: OrganizationMemberUpdateManyWithWhereWithoutUserInput | OrganizationMemberUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: OrganizationMemberScalarWhereInput | OrganizationMemberScalarWhereInput[]
+  }
+
+  export type ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ProjectUpvoteCreateWithoutUserInput, ProjectUpvoteUncheckedCreateWithoutUserInput> | ProjectUpvoteCreateWithoutUserInput[] | ProjectUpvoteUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ProjectUpvoteCreateOrConnectWithoutUserInput | ProjectUpvoteCreateOrConnectWithoutUserInput[]
+    upsert?: ProjectUpvoteUpsertWithWhereUniqueWithoutUserInput | ProjectUpvoteUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ProjectUpvoteCreateManyUserInputEnvelope
+    set?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    disconnect?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    delete?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    connect?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    update?: ProjectUpvoteUpdateWithWhereUniqueWithoutUserInput | ProjectUpvoteUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ProjectUpvoteUpdateManyWithWhereWithoutUserInput | ProjectUpvoteUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ProjectUpvoteScalarWhereInput | ProjectUpvoteScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutProfileInput = {
@@ -36101,6 +37551,13 @@ export namespace Prisma {
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
   }
 
+  export type ProjectUpvoteCreateNestedManyWithoutProjectInput = {
+    create?: XOR<ProjectUpvoteCreateWithoutProjectInput, ProjectUpvoteUncheckedCreateWithoutProjectInput> | ProjectUpvoteCreateWithoutProjectInput[] | ProjectUpvoteUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ProjectUpvoteCreateOrConnectWithoutProjectInput | ProjectUpvoteCreateOrConnectWithoutProjectInput[]
+    createMany?: ProjectUpvoteCreateManyProjectInputEnvelope
+    connect?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+  }
+
   export type ProjectMemberUncheckedCreateNestedManyWithoutProjectInput = {
     create?: XOR<ProjectMemberCreateWithoutProjectInput, ProjectMemberUncheckedCreateWithoutProjectInput> | ProjectMemberCreateWithoutProjectInput[] | ProjectMemberUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: ProjectMemberCreateOrConnectWithoutProjectInput | ProjectMemberCreateOrConnectWithoutProjectInput[]
@@ -36141,6 +37598,13 @@ export namespace Prisma {
     connectOrCreate?: NotificationCreateOrConnectWithoutProjectInput | NotificationCreateOrConnectWithoutProjectInput[]
     createMany?: NotificationCreateManyProjectInputEnvelope
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
+  export type ProjectUpvoteUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<ProjectUpvoteCreateWithoutProjectInput, ProjectUpvoteUncheckedCreateWithoutProjectInput> | ProjectUpvoteCreateWithoutProjectInput[] | ProjectUpvoteUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ProjectUpvoteCreateOrConnectWithoutProjectInput | ProjectUpvoteCreateOrConnectWithoutProjectInput[]
+    createMany?: ProjectUpvoteCreateManyProjectInputEnvelope
+    connect?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
   }
 
   export type ProjectUpdatetechStackInput = {
@@ -36242,6 +37706,20 @@ export namespace Prisma {
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
   }
 
+  export type ProjectUpvoteUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<ProjectUpvoteCreateWithoutProjectInput, ProjectUpvoteUncheckedCreateWithoutProjectInput> | ProjectUpvoteCreateWithoutProjectInput[] | ProjectUpvoteUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ProjectUpvoteCreateOrConnectWithoutProjectInput | ProjectUpvoteCreateOrConnectWithoutProjectInput[]
+    upsert?: ProjectUpvoteUpsertWithWhereUniqueWithoutProjectInput | ProjectUpvoteUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: ProjectUpvoteCreateManyProjectInputEnvelope
+    set?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    disconnect?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    delete?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    connect?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    update?: ProjectUpvoteUpdateWithWhereUniqueWithoutProjectInput | ProjectUpvoteUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: ProjectUpvoteUpdateManyWithWhereWithoutProjectInput | ProjectUpvoteUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: ProjectUpvoteScalarWhereInput | ProjectUpvoteScalarWhereInput[]
+  }
+
   export type ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput = {
     create?: XOR<ProjectMemberCreateWithoutProjectInput, ProjectMemberUncheckedCreateWithoutProjectInput> | ProjectMemberCreateWithoutProjectInput[] | ProjectMemberUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: ProjectMemberCreateOrConnectWithoutProjectInput | ProjectMemberCreateOrConnectWithoutProjectInput[]
@@ -36324,6 +37802,48 @@ export namespace Prisma {
     update?: NotificationUpdateWithWhereUniqueWithoutProjectInput | NotificationUpdateWithWhereUniqueWithoutProjectInput[]
     updateMany?: NotificationUpdateManyWithWhereWithoutProjectInput | NotificationUpdateManyWithWhereWithoutProjectInput[]
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
+  export type ProjectUpvoteUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<ProjectUpvoteCreateWithoutProjectInput, ProjectUpvoteUncheckedCreateWithoutProjectInput> | ProjectUpvoteCreateWithoutProjectInput[] | ProjectUpvoteUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ProjectUpvoteCreateOrConnectWithoutProjectInput | ProjectUpvoteCreateOrConnectWithoutProjectInput[]
+    upsert?: ProjectUpvoteUpsertWithWhereUniqueWithoutProjectInput | ProjectUpvoteUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: ProjectUpvoteCreateManyProjectInputEnvelope
+    set?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    disconnect?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    delete?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    connect?: ProjectUpvoteWhereUniqueInput | ProjectUpvoteWhereUniqueInput[]
+    update?: ProjectUpvoteUpdateWithWhereUniqueWithoutProjectInput | ProjectUpvoteUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: ProjectUpvoteUpdateManyWithWhereWithoutProjectInput | ProjectUpvoteUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: ProjectUpvoteScalarWhereInput | ProjectUpvoteScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutProjectUpvotesInput = {
+    create?: XOR<UserCreateWithoutProjectUpvotesInput, UserUncheckedCreateWithoutProjectUpvotesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutProjectUpvotesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ProjectCreateNestedOneWithoutProjectUpvotesInput = {
+    create?: XOR<ProjectCreateWithoutProjectUpvotesInput, ProjectUncheckedCreateWithoutProjectUpvotesInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutProjectUpvotesInput
+    connect?: ProjectWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutProjectUpvotesNestedInput = {
+    create?: XOR<UserCreateWithoutProjectUpvotesInput, UserUncheckedCreateWithoutProjectUpvotesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutProjectUpvotesInput
+    upsert?: UserUpsertWithoutProjectUpvotesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutProjectUpvotesInput, UserUpdateWithoutProjectUpvotesInput>, UserUncheckedUpdateWithoutProjectUpvotesInput>
+  }
+
+  export type ProjectUpdateOneRequiredWithoutProjectUpvotesNestedInput = {
+    create?: XOR<ProjectCreateWithoutProjectUpvotesInput, ProjectUncheckedCreateWithoutProjectUpvotesInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutProjectUpvotesInput
+    upsert?: ProjectUpsertWithoutProjectUpvotesInput
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutProjectUpvotesInput, ProjectUpdateWithoutProjectUpvotesInput>, ProjectUncheckedUpdateWithoutProjectUpvotesInput>
   }
 
   export type ProjectCreateNestedOneWithoutMembersInput = {
@@ -37308,6 +38828,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -37320,6 +38841,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestCreateNestedManyWithoutProjectInput
     notifications?: NotificationCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutOwnerInput = {
@@ -37330,6 +38852,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -37342,6 +38865,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUncheckedCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestUncheckedCreateNestedManyWithoutProjectInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutOwnerInput = {
@@ -37838,6 +39362,28 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ProjectUpvoteCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    project: ProjectCreateNestedOneWithoutProjectUpvotesInput
+  }
+
+  export type ProjectUpvoteUncheckedCreateWithoutUserInput = {
+    id?: string
+    projectId: string
+    createdAt?: Date | string
+  }
+
+  export type ProjectUpvoteCreateOrConnectWithoutUserInput = {
+    where: ProjectUpvoteWhereUniqueInput
+    create: XOR<ProjectUpvoteCreateWithoutUserInput, ProjectUpvoteUncheckedCreateWithoutUserInput>
+  }
+
+  export type ProjectUpvoteCreateManyUserInputEnvelope = {
+    data: ProjectUpvoteCreateManyUserInput | ProjectUpvoteCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserProfileUpsertWithoutUserInput = {
     update: XOR<UserProfileUpdateWithoutUserInput, UserProfileUncheckedUpdateWithoutUserInput>
     create: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
@@ -38058,6 +39604,7 @@ export namespace Prisma {
     techStack?: StringNullableListFilter<"Project">
     image?: StringFilter<"Project"> | string
     description?: StringFilter<"Project"> | string
+    readme?: StringNullableFilter<"Project"> | string | null
     githubUrl?: StringFilter<"Project"> | string
     isPinned?: BoolFilter<"Project"> | boolean
     isDemo?: BoolFilter<"Project"> | boolean
@@ -38467,6 +40014,32 @@ export namespace Prisma {
     joinedAt?: DateTimeFilter<"OrganizationMember"> | Date | string
   }
 
+  export type ProjectUpvoteUpsertWithWhereUniqueWithoutUserInput = {
+    where: ProjectUpvoteWhereUniqueInput
+    update: XOR<ProjectUpvoteUpdateWithoutUserInput, ProjectUpvoteUncheckedUpdateWithoutUserInput>
+    create: XOR<ProjectUpvoteCreateWithoutUserInput, ProjectUpvoteUncheckedCreateWithoutUserInput>
+  }
+
+  export type ProjectUpvoteUpdateWithWhereUniqueWithoutUserInput = {
+    where: ProjectUpvoteWhereUniqueInput
+    data: XOR<ProjectUpvoteUpdateWithoutUserInput, ProjectUpvoteUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ProjectUpvoteUpdateManyWithWhereWithoutUserInput = {
+    where: ProjectUpvoteScalarWhereInput
+    data: XOR<ProjectUpvoteUpdateManyMutationInput, ProjectUpvoteUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ProjectUpvoteScalarWhereInput = {
+    AND?: ProjectUpvoteScalarWhereInput | ProjectUpvoteScalarWhereInput[]
+    OR?: ProjectUpvoteScalarWhereInput[]
+    NOT?: ProjectUpvoteScalarWhereInput | ProjectUpvoteScalarWhereInput[]
+    id?: StringFilter<"ProjectUpvote"> | string
+    userId?: StringFilter<"ProjectUpvote"> | string
+    projectId?: StringFilter<"ProjectUpvote"> | string
+    createdAt?: DateTimeFilter<"ProjectUpvote"> | Date | string
+  }
+
   export type UserCreateWithoutProfileInput = {
     id?: string
     email: string
@@ -38497,6 +40070,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutProfileInput = {
@@ -38529,6 +40103,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutProfileInput = {
@@ -38577,6 +40152,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProfileInput = {
@@ -38609,6 +40185,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutOauthIdentitiesInput = {
@@ -38641,6 +40218,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOauthIdentitiesInput = {
@@ -38673,6 +40251,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOauthIdentitiesInput = {
@@ -38721,6 +40300,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOauthIdentitiesInput = {
@@ -38753,6 +40333,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserRoleCreateWithoutRoleInput = {
@@ -38895,6 +40476,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutRolesInput = {
@@ -38927,6 +40509,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutRolesInput = {
@@ -38993,6 +40576,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRolesInput = {
@@ -39025,6 +40609,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type RoleUpsertWithoutUsersInput = {
@@ -39161,6 +40746,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -39193,6 +40779,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -39241,6 +40828,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -39273,6 +40861,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutTokensInput = {
@@ -39305,6 +40894,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTokensInput = {
@@ -39337,6 +40927,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTokensInput = {
@@ -39385,6 +40976,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTokensInput = {
@@ -39417,6 +41009,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutApiKeysInput = {
@@ -39449,6 +41042,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutApiKeysInput = {
@@ -39481,6 +41075,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutApiKeysInput = {
@@ -39496,6 +41091,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -39508,6 +41104,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestCreateNestedManyWithoutProjectInput
     notifications?: NotificationCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutApiKeysInput = {
@@ -39518,6 +41115,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -39530,6 +41128,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUncheckedCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestUncheckedCreateNestedManyWithoutProjectInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutApiKeysInput = {
@@ -39578,6 +41177,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutApiKeysInput = {
@@ -39610,6 +41210,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ProjectUpsertWithoutApiKeysInput = {
@@ -39631,6 +41232,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -39643,6 +41245,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutApiKeysInput = {
@@ -39653,6 +41256,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -39665,6 +41269,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUncheckedUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUncheckedUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type UserCreateWithoutSecurityLogsInput = {
@@ -39697,6 +41302,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSecurityLogsInput = {
@@ -39729,6 +41335,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSecurityLogsInput = {
@@ -39777,6 +41384,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSecurityLogsInput = {
@@ -39809,6 +41417,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutOwnedProjectsInput = {
@@ -39841,6 +41450,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOwnedProjectsInput = {
@@ -39873,6 +41483,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOwnedProjectsInput = {
@@ -40068,6 +41679,28 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ProjectUpvoteCreateWithoutProjectInput = {
+    id?: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutProjectUpvotesInput
+  }
+
+  export type ProjectUpvoteUncheckedCreateWithoutProjectInput = {
+    id?: string
+    userId: string
+    createdAt?: Date | string
+  }
+
+  export type ProjectUpvoteCreateOrConnectWithoutProjectInput = {
+    where: ProjectUpvoteWhereUniqueInput
+    create: XOR<ProjectUpvoteCreateWithoutProjectInput, ProjectUpvoteUncheckedCreateWithoutProjectInput>
+  }
+
+  export type ProjectUpvoteCreateManyProjectInputEnvelope = {
+    data: ProjectUpvoteCreateManyProjectInput | ProjectUpvoteCreateManyProjectInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutOwnedProjectsInput = {
     update: XOR<UserUpdateWithoutOwnedProjectsInput, UserUncheckedUpdateWithoutOwnedProjectsInput>
     create: XOR<UserCreateWithoutOwnedProjectsInput, UserUncheckedCreateWithoutOwnedProjectsInput>
@@ -40109,6 +41742,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOwnedProjectsInput = {
@@ -40141,6 +41775,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ProjectMemberUpsertWithWhereUniqueWithoutProjectInput = {
@@ -40239,6 +41874,282 @@ export namespace Prisma {
     data: XOR<NotificationUpdateManyMutationInput, NotificationUncheckedUpdateManyWithoutProjectInput>
   }
 
+  export type ProjectUpvoteUpsertWithWhereUniqueWithoutProjectInput = {
+    where: ProjectUpvoteWhereUniqueInput
+    update: XOR<ProjectUpvoteUpdateWithoutProjectInput, ProjectUpvoteUncheckedUpdateWithoutProjectInput>
+    create: XOR<ProjectUpvoteCreateWithoutProjectInput, ProjectUpvoteUncheckedCreateWithoutProjectInput>
+  }
+
+  export type ProjectUpvoteUpdateWithWhereUniqueWithoutProjectInput = {
+    where: ProjectUpvoteWhereUniqueInput
+    data: XOR<ProjectUpvoteUpdateWithoutProjectInput, ProjectUpvoteUncheckedUpdateWithoutProjectInput>
+  }
+
+  export type ProjectUpvoteUpdateManyWithWhereWithoutProjectInput = {
+    where: ProjectUpvoteScalarWhereInput
+    data: XOR<ProjectUpvoteUpdateManyMutationInput, ProjectUpvoteUncheckedUpdateManyWithoutProjectInput>
+  }
+
+  export type UserCreateWithoutProjectUpvotesInput = {
+    id?: string
+    email: string
+    passwordHash?: string | null
+    isVerified?: boolean
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: UserProfileCreateNestedOneWithoutUserInput
+    roles?: UserRoleCreateNestedManyWithoutUserInput
+    oauthIdentities?: OAuthIdentityCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    securityLogs?: SecurityLogCreateNestedManyWithoutUserInput
+    tokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    apiKeys?: ApiKeyCreateNestedManyWithoutUserInput
+    ownedProjects?: ProjectCreateNestedManyWithoutOwnerInput
+    projectMembers?: ProjectMemberCreateNestedManyWithoutUserInput
+    createdIssues?: IssueCreateNestedManyWithoutCreatorInput
+    assignedIssues?: IssueCreateNestedManyWithoutAssigneeInput
+    joinRequestsSent?: JoinRequestCreateNestedManyWithoutUserInput
+    joinRequestsReceived?: JoinRequestCreateNestedManyWithoutOwnerInput
+    meetingsRequested?: MeetingRequestCreateNestedManyWithoutUserInput
+    meetingsReceived?: MeetingRequestCreateNestedManyWithoutOwnerInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    actorNotifications?: NotificationCreateNestedManyWithoutActorInput
+    lookingForPosts?: LookingForCreateNestedManyWithoutUserInput
+    ledTeams?: TeamCreateNestedManyWithoutLeadInput
+    teamMemberships?: TeamMemberCreateNestedManyWithoutUserInput
+    teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
+    ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
+    organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutProjectUpvotesInput = {
+    id?: string
+    email: string
+    passwordHash?: string | null
+    isVerified?: boolean
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: UserProfileUncheckedCreateNestedOneWithoutUserInput
+    roles?: UserRoleUncheckedCreateNestedManyWithoutUserInput
+    oauthIdentities?: OAuthIdentityUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    securityLogs?: SecurityLogUncheckedCreateNestedManyWithoutUserInput
+    tokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutUserInput
+    ownedProjects?: ProjectUncheckedCreateNestedManyWithoutOwnerInput
+    projectMembers?: ProjectMemberUncheckedCreateNestedManyWithoutUserInput
+    createdIssues?: IssueUncheckedCreateNestedManyWithoutCreatorInput
+    assignedIssues?: IssueUncheckedCreateNestedManyWithoutAssigneeInput
+    joinRequestsSent?: JoinRequestUncheckedCreateNestedManyWithoutUserInput
+    joinRequestsReceived?: JoinRequestUncheckedCreateNestedManyWithoutOwnerInput
+    meetingsRequested?: MeetingRequestUncheckedCreateNestedManyWithoutUserInput
+    meetingsReceived?: MeetingRequestUncheckedCreateNestedManyWithoutOwnerInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    actorNotifications?: NotificationUncheckedCreateNestedManyWithoutActorInput
+    lookingForPosts?: LookingForUncheckedCreateNestedManyWithoutUserInput
+    ledTeams?: TeamUncheckedCreateNestedManyWithoutLeadInput
+    teamMemberships?: TeamMemberUncheckedCreateNestedManyWithoutUserInput
+    teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
+    ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
+    organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutProjectUpvotesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutProjectUpvotesInput, UserUncheckedCreateWithoutProjectUpvotesInput>
+  }
+
+  export type ProjectCreateWithoutProjectUpvotesInput = {
+    id?: string
+    title: string
+    category: string
+    difficulty: string
+    techStack?: ProjectCreatetechStackInput | string[]
+    image: string
+    description: string
+    readme?: string | null
+    githubUrl: string
+    isPinned?: boolean
+    isDemo?: boolean
+    progress?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner?: UserCreateNestedOneWithoutOwnedProjectsInput
+    members?: ProjectMemberCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
+    issues?: IssueCreateNestedManyWithoutProjectInput
+    joinRequests?: JoinRequestCreateNestedManyWithoutProjectInput
+    meetingRequests?: MeetingRequestCreateNestedManyWithoutProjectInput
+    notifications?: NotificationCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutProjectUpvotesInput = {
+    id?: string
+    title: string
+    category: string
+    difficulty: string
+    techStack?: ProjectCreatetechStackInput | string[]
+    image: string
+    description: string
+    readme?: string | null
+    githubUrl: string
+    isPinned?: boolean
+    isDemo?: boolean
+    progress?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    ownerId?: string | null
+    members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
+    issues?: IssueUncheckedCreateNestedManyWithoutProjectInput
+    joinRequests?: JoinRequestUncheckedCreateNestedManyWithoutProjectInput
+    meetingRequests?: MeetingRequestUncheckedCreateNestedManyWithoutProjectInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutProjectUpvotesInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutProjectUpvotesInput, ProjectUncheckedCreateWithoutProjectUpvotesInput>
+  }
+
+  export type UserUpsertWithoutProjectUpvotesInput = {
+    update: XOR<UserUpdateWithoutProjectUpvotesInput, UserUncheckedUpdateWithoutProjectUpvotesInput>
+    create: XOR<UserCreateWithoutProjectUpvotesInput, UserUncheckedCreateWithoutProjectUpvotesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutProjectUpvotesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutProjectUpvotesInput, UserUncheckedUpdateWithoutProjectUpvotesInput>
+  }
+
+  export type UserUpdateWithoutProjectUpvotesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: UserProfileUpdateOneWithoutUserNestedInput
+    roles?: UserRoleUpdateManyWithoutUserNestedInput
+    oauthIdentities?: OAuthIdentityUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    securityLogs?: SecurityLogUpdateManyWithoutUserNestedInput
+    tokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    apiKeys?: ApiKeyUpdateManyWithoutUserNestedInput
+    ownedProjects?: ProjectUpdateManyWithoutOwnerNestedInput
+    projectMembers?: ProjectMemberUpdateManyWithoutUserNestedInput
+    createdIssues?: IssueUpdateManyWithoutCreatorNestedInput
+    assignedIssues?: IssueUpdateManyWithoutAssigneeNestedInput
+    joinRequestsSent?: JoinRequestUpdateManyWithoutUserNestedInput
+    joinRequestsReceived?: JoinRequestUpdateManyWithoutOwnerNestedInput
+    meetingsRequested?: MeetingRequestUpdateManyWithoutUserNestedInput
+    meetingsReceived?: MeetingRequestUpdateManyWithoutOwnerNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    actorNotifications?: NotificationUpdateManyWithoutActorNestedInput
+    lookingForPosts?: LookingForUpdateManyWithoutUserNestedInput
+    ledTeams?: TeamUpdateManyWithoutLeadNestedInput
+    teamMemberships?: TeamMemberUpdateManyWithoutUserNestedInput
+    teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
+    ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
+    organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutProjectUpvotesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: UserProfileUncheckedUpdateOneWithoutUserNestedInput
+    roles?: UserRoleUncheckedUpdateManyWithoutUserNestedInput
+    oauthIdentities?: OAuthIdentityUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    securityLogs?: SecurityLogUncheckedUpdateManyWithoutUserNestedInput
+    tokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    apiKeys?: ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+    ownedProjects?: ProjectUncheckedUpdateManyWithoutOwnerNestedInput
+    projectMembers?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput
+    createdIssues?: IssueUncheckedUpdateManyWithoutCreatorNestedInput
+    assignedIssues?: IssueUncheckedUpdateManyWithoutAssigneeNestedInput
+    joinRequestsSent?: JoinRequestUncheckedUpdateManyWithoutUserNestedInput
+    joinRequestsReceived?: JoinRequestUncheckedUpdateManyWithoutOwnerNestedInput
+    meetingsRequested?: MeetingRequestUncheckedUpdateManyWithoutUserNestedInput
+    meetingsReceived?: MeetingRequestUncheckedUpdateManyWithoutOwnerNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    actorNotifications?: NotificationUncheckedUpdateManyWithoutActorNestedInput
+    lookingForPosts?: LookingForUncheckedUpdateManyWithoutUserNestedInput
+    ledTeams?: TeamUncheckedUpdateManyWithoutLeadNestedInput
+    teamMemberships?: TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+    teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
+    ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
+    organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ProjectUpsertWithoutProjectUpvotesInput = {
+    update: XOR<ProjectUpdateWithoutProjectUpvotesInput, ProjectUncheckedUpdateWithoutProjectUpvotesInput>
+    create: XOR<ProjectCreateWithoutProjectUpvotesInput, ProjectUncheckedCreateWithoutProjectUpvotesInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutProjectUpvotesInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutProjectUpvotesInput, ProjectUncheckedUpdateWithoutProjectUpvotesInput>
+  }
+
+  export type ProjectUpdateWithoutProjectUpvotesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    difficulty?: StringFieldUpdateOperationsInput | string
+    techStack?: ProjectUpdatetechStackInput | string[]
+    image?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
+    githubUrl?: StringFieldUpdateOperationsInput | string
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneWithoutOwnedProjectsNestedInput
+    members?: ProjectMemberUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
+    issues?: IssueUpdateManyWithoutProjectNestedInput
+    joinRequests?: JoinRequestUpdateManyWithoutProjectNestedInput
+    meetingRequests?: MeetingRequestUpdateManyWithoutProjectNestedInput
+    notifications?: NotificationUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutProjectUpvotesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    difficulty?: StringFieldUpdateOperationsInput | string
+    techStack?: ProjectUpdatetechStackInput | string[]
+    image?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
+    githubUrl?: StringFieldUpdateOperationsInput | string
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
+    progress?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ownerId?: NullableStringFieldUpdateOperationsInput | string | null
+    members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
+    issues?: IssueUncheckedUpdateManyWithoutProjectNestedInput
+    joinRequests?: JoinRequestUncheckedUpdateManyWithoutProjectNestedInput
+    meetingRequests?: MeetingRequestUncheckedUpdateManyWithoutProjectNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
   export type ProjectCreateWithoutMembersInput = {
     id?: string
     title: string
@@ -40247,6 +42158,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -40259,6 +42171,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestCreateNestedManyWithoutProjectInput
     notifications?: NotificationCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutMembersInput = {
@@ -40269,6 +42182,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -40281,6 +42195,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUncheckedCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestUncheckedCreateNestedManyWithoutProjectInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutMembersInput = {
@@ -40318,6 +42233,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutProjectMembersInput = {
@@ -40350,6 +42266,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutProjectMembersInput = {
@@ -40376,6 +42293,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -40388,6 +42306,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutMembersInput = {
@@ -40398,6 +42317,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -40410,6 +42330,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUncheckedUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUncheckedUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type UserUpsertWithoutProjectMembersInput = {
@@ -40453,6 +42374,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProjectMembersInput = {
@@ -40485,6 +42407,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ProjectCreateWithoutIssuesInput = {
@@ -40495,6 +42418,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -40507,6 +42431,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestCreateNestedManyWithoutProjectInput
     notifications?: NotificationCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutIssuesInput = {
@@ -40517,6 +42442,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -40529,6 +42455,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUncheckedCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestUncheckedCreateNestedManyWithoutProjectInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutIssuesInput = {
@@ -40566,6 +42493,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCreatedIssuesInput = {
@@ -40598,6 +42526,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCreatedIssuesInput = {
@@ -40635,6 +42564,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAssignedIssuesInput = {
@@ -40667,6 +42597,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAssignedIssuesInput = {
@@ -40693,6 +42624,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -40705,6 +42637,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutIssuesInput = {
@@ -40715,6 +42648,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -40727,6 +42661,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUncheckedUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUncheckedUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type UserUpsertWithoutCreatedIssuesInput = {
@@ -40770,6 +42705,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedIssuesInput = {
@@ -40802,6 +42738,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutAssignedIssuesInput = {
@@ -40845,6 +42782,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAssignedIssuesInput = {
@@ -40877,6 +42815,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutJoinRequestsSentInput = {
@@ -40909,6 +42848,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutJoinRequestsSentInput = {
@@ -40941,6 +42881,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutJoinRequestsSentInput = {
@@ -40956,6 +42897,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -40968,6 +42910,7 @@ export namespace Prisma {
     issues?: IssueCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestCreateNestedManyWithoutProjectInput
     notifications?: NotificationCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutJoinRequestsInput = {
@@ -40978,6 +42921,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -40990,6 +42934,7 @@ export namespace Prisma {
     issues?: IssueUncheckedCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestUncheckedCreateNestedManyWithoutProjectInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutJoinRequestsInput = {
@@ -41027,6 +42972,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutJoinRequestsReceivedInput = {
@@ -41059,6 +43005,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutJoinRequestsReceivedInput = {
@@ -41107,6 +43054,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutJoinRequestsSentInput = {
@@ -41139,6 +43087,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ProjectUpsertWithoutJoinRequestsInput = {
@@ -41160,6 +43109,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -41172,6 +43122,7 @@ export namespace Prisma {
     issues?: IssueUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutJoinRequestsInput = {
@@ -41182,6 +43133,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -41194,6 +43146,7 @@ export namespace Prisma {
     issues?: IssueUncheckedUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUncheckedUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type UserUpsertWithoutJoinRequestsReceivedInput = {
@@ -41237,6 +43190,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutJoinRequestsReceivedInput = {
@@ -41269,6 +43223,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutMeetingsRequestedInput = {
@@ -41301,6 +43256,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMeetingsRequestedInput = {
@@ -41333,6 +43289,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMeetingsRequestedInput = {
@@ -41348,6 +43305,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -41360,6 +43318,7 @@ export namespace Prisma {
     issues?: IssueCreateNestedManyWithoutProjectInput
     joinRequests?: JoinRequestCreateNestedManyWithoutProjectInput
     notifications?: NotificationCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutMeetingRequestsInput = {
@@ -41370,6 +43329,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -41382,6 +43342,7 @@ export namespace Prisma {
     issues?: IssueUncheckedCreateNestedManyWithoutProjectInput
     joinRequests?: JoinRequestUncheckedCreateNestedManyWithoutProjectInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutMeetingRequestsInput = {
@@ -41419,6 +43380,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMeetingsReceivedInput = {
@@ -41451,6 +43413,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMeetingsReceivedInput = {
@@ -41499,6 +43462,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMeetingsRequestedInput = {
@@ -41531,6 +43495,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ProjectUpsertWithoutMeetingRequestsInput = {
@@ -41552,6 +43517,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -41564,6 +43530,7 @@ export namespace Prisma {
     issues?: IssueUpdateManyWithoutProjectNestedInput
     joinRequests?: JoinRequestUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutMeetingRequestsInput = {
@@ -41574,6 +43541,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -41586,6 +43554,7 @@ export namespace Prisma {
     issues?: IssueUncheckedUpdateManyWithoutProjectNestedInput
     joinRequests?: JoinRequestUncheckedUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type UserUpsertWithoutMeetingsReceivedInput = {
@@ -41629,6 +43598,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMeetingsReceivedInput = {
@@ -41661,6 +43631,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutNotificationsInput = {
@@ -41693,6 +43664,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -41725,6 +43697,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -41762,6 +43735,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutActorNotificationsInput = {
@@ -41794,6 +43768,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutActorNotificationsInput = {
@@ -41809,6 +43784,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -41821,6 +43797,7 @@ export namespace Prisma {
     issues?: IssueCreateNestedManyWithoutProjectInput
     joinRequests?: JoinRequestCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutNotificationsInput = {
@@ -41831,6 +43808,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -41843,6 +43821,7 @@ export namespace Prisma {
     issues?: IssueUncheckedCreateNestedManyWithoutProjectInput
     joinRequests?: JoinRequestUncheckedCreateNestedManyWithoutProjectInput
     meetingRequests?: MeetingRequestUncheckedCreateNestedManyWithoutProjectInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutNotificationsInput = {
@@ -41891,6 +43870,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -41923,6 +43903,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutActorNotificationsInput = {
@@ -41966,6 +43947,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActorNotificationsInput = {
@@ -41998,6 +43980,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ProjectUpsertWithoutNotificationsInput = {
@@ -42019,6 +44002,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -42031,6 +44015,7 @@ export namespace Prisma {
     issues?: IssueUpdateManyWithoutProjectNestedInput
     joinRequests?: JoinRequestUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutNotificationsInput = {
@@ -42041,6 +44026,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -42053,6 +44039,7 @@ export namespace Prisma {
     issues?: IssueUncheckedUpdateManyWithoutProjectNestedInput
     joinRequests?: JoinRequestUncheckedUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUncheckedUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type UserCreateWithoutLookingForPostsInput = {
@@ -42085,6 +44072,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutLookingForPostsInput = {
@@ -42117,6 +44105,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutLookingForPostsInput = {
@@ -42165,6 +44154,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutLookingForPostsInput = {
@@ -42197,6 +44187,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutLedTeamsInput = {
@@ -42229,6 +44220,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutLedTeamsInput = {
@@ -42261,6 +44253,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutLedTeamsInput = {
@@ -42361,6 +44354,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutLedTeamsInput = {
@@ -42393,6 +44387,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type TeamMemberUpsertWithWhereUniqueWithoutTeamInput = {
@@ -42498,6 +44493,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTeamMembershipsInput = {
@@ -42530,6 +44526,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTeamMembershipsInput = {
@@ -42625,6 +44622,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
@@ -42657,6 +44655,7 @@ export namespace Prisma {
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type TeamCreateWithoutApplicationsInput = {
@@ -42730,6 +44729,7 @@ export namespace Prisma {
     teamMemberships?: TeamMemberCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTeamApplicationsInput = {
@@ -42762,6 +44762,7 @@ export namespace Prisma {
     teamMemberships?: TeamMemberUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTeamApplicationsInput = {
@@ -42857,6 +44858,7 @@ export namespace Prisma {
     teamMemberships?: TeamMemberUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTeamApplicationsInput = {
@@ -42889,6 +44891,7 @@ export namespace Prisma {
     teamMemberships?: TeamMemberUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutOwnedOrganizationsInput = {
@@ -42921,6 +44924,7 @@ export namespace Prisma {
     teamMemberships?: TeamMemberCreateNestedManyWithoutUserInput
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     organizationMemberships?: OrganizationMemberCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOwnedOrganizationsInput = {
@@ -42953,6 +44957,7 @@ export namespace Prisma {
     teamMemberships?: TeamMemberUncheckedCreateNestedManyWithoutUserInput
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     organizationMemberships?: OrganizationMemberUncheckedCreateNestedManyWithoutUserInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOwnedOrganizationsInput = {
@@ -43023,6 +45028,7 @@ export namespace Prisma {
     teamMemberships?: TeamMemberUpdateManyWithoutUserNestedInput
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     organizationMemberships?: OrganizationMemberUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOwnedOrganizationsInput = {
@@ -43055,6 +45061,7 @@ export namespace Prisma {
     teamMemberships?: TeamMemberUncheckedUpdateManyWithoutUserNestedInput
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     organizationMemberships?: OrganizationMemberUncheckedUpdateManyWithoutUserNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type OrganizationMemberUpsertWithWhereUniqueWithoutOrganizationInput = {
@@ -43134,6 +45141,7 @@ export namespace Prisma {
     teamMemberships?: TeamMemberCreateNestedManyWithoutUserInput
     teamApplications?: TeamApplicationCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationCreateNestedManyWithoutOwnerInput
+    projectUpvotes?: ProjectUpvoteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOrganizationMembershipsInput = {
@@ -43166,6 +45174,7 @@ export namespace Prisma {
     teamMemberships?: TeamMemberUncheckedCreateNestedManyWithoutUserInput
     teamApplications?: TeamApplicationUncheckedCreateNestedManyWithoutUserInput
     ownedOrganizations?: OrganizationUncheckedCreateNestedManyWithoutOwnerInput
+    projectUpvotes?: ProjectUpvoteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOrganizationMembershipsInput = {
@@ -43251,6 +45260,7 @@ export namespace Prisma {
     teamMemberships?: TeamMemberUpdateManyWithoutUserNestedInput
     teamApplications?: TeamApplicationUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUpdateManyWithoutOwnerNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOrganizationMembershipsInput = {
@@ -43283,6 +45293,7 @@ export namespace Prisma {
     teamMemberships?: TeamMemberUncheckedUpdateManyWithoutUserNestedInput
     teamApplications?: TeamApplicationUncheckedUpdateManyWithoutUserNestedInput
     ownedOrganizations?: OrganizationUncheckedUpdateManyWithoutOwnerNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserRoleCreateManyUserInput = {
@@ -43339,6 +45350,7 @@ export namespace Prisma {
     techStack?: ProjectCreatetechStackInput | string[]
     image: string
     description: string
+    readme?: string | null
     githubUrl: string
     isPinned?: boolean
     isDemo?: boolean
@@ -43511,6 +45523,12 @@ export namespace Prisma {
     joinedAt?: Date | string
   }
 
+  export type ProjectUpvoteCreateManyUserInput = {
+    id?: string
+    projectId: string
+    createdAt?: Date | string
+  }
+
   export type UserRoleUpdateWithoutUserInput = {
     role?: RoleUpdateOneRequiredWithoutUsersNestedInput
   }
@@ -43657,6 +45675,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -43669,6 +45688,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutOwnerInput = {
@@ -43679,6 +45699,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -43691,6 +45712,7 @@ export namespace Prisma {
     joinRequests?: JoinRequestUncheckedUpdateManyWithoutProjectNestedInput
     meetingRequests?: MeetingRequestUncheckedUpdateManyWithoutProjectNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutProjectNestedInput
+    projectUpvotes?: ProjectUpvoteUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateManyWithoutOwnerInput = {
@@ -43701,6 +45723,7 @@ export namespace Prisma {
     techStack?: ProjectUpdatetechStackInput | string[]
     image?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    readme?: NullableStringFieldUpdateOperationsInput | string | null
     githubUrl?: StringFieldUpdateOperationsInput | string
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isDemo?: BoolFieldUpdateOperationsInput | boolean
@@ -44207,6 +46230,24 @@ export namespace Prisma {
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ProjectUpvoteUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutProjectUpvotesNestedInput
+  }
+
+  export type ProjectUpvoteUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectUpvoteUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserRoleCreateManyRoleInput = {
     userId: string
   }
@@ -44316,6 +46357,12 @@ export namespace Prisma {
     message: string
     data?: NullableJsonNullValueInput | InputJsonValue
     read?: boolean
+    createdAt?: Date | string
+  }
+
+  export type ProjectUpvoteCreateManyProjectInput = {
+    id?: string
+    userId: string
     createdAt?: Date | string
   }
 
@@ -44508,6 +46555,24 @@ export namespace Prisma {
     message?: StringFieldUpdateOperationsInput | string
     data?: NullableJsonNullValueInput | InputJsonValue
     read?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectUpvoteUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutProjectUpvotesNestedInput
+  }
+
+  export type ProjectUpvoteUncheckedUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectUpvoteUncheckedUpdateManyWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

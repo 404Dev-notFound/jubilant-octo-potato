@@ -216,6 +216,7 @@ exports.Prisma.ProjectScalarFieldEnum = {
   techStack: 'techStack',
   image: 'image',
   description: 'description',
+  readme: 'readme',
   githubUrl: 'githubUrl',
   isPinned: 'isPinned',
   isDemo: 'isDemo',
@@ -223,6 +224,13 @@ exports.Prisma.ProjectScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   ownerId: 'ownerId'
+};
+
+exports.Prisma.ProjectUpvoteScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  projectId: 'projectId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.ProjectMemberScalarFieldEnum = {
@@ -409,6 +417,7 @@ exports.Prisma.ModelName = {
   ApiKey: 'ApiKey',
   SecurityLog: 'SecurityLog',
   Project: 'Project',
+  ProjectUpvote: 'ProjectUpvote',
   ProjectMember: 'ProjectMember',
   Issue: 'Issue',
   JoinRequest: 'JoinRequest',

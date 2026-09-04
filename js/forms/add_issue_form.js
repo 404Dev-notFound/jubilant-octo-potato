@@ -118,7 +118,7 @@ export function render_add_issue_form(defaultStatus = 'TODO', projectId = '', pr
                     <div class="flex flex-wrap items-center gap-1.5 mt-2">
                         <span class="text-[10px] text-on-surface-variant/60 mr-1">Suggestions:</span>
                         ${['bug', 'feature', 'frontend', 'backend', 'ui/ux', 'docs', 'urgent'].map(tag => `
-                            <button type="button" onclick="window.appendTag('${tag}')" class="px-2 py-0.5 bg-white/5 hover:bg-primary/20 text-on-surface-variant hover:text-primary rounded text-[11px] font-mono transition-colors border border-white/5">
+                            <button type="button" data-tag="${tag}" class="px-2 py-0.5 bg-white/5 hover:bg-primary/20 text-on-surface-variant hover:text-primary rounded text-[11px] font-mono transition-colors border border-white/5">
                                 +${tag}
                             </button>
                         `).join('')}
@@ -150,7 +150,7 @@ export function render_add_issue_form(defaultStatus = 'TODO', projectId = '', pr
     </div>`;
 }
 
-// Quick Tag helper
+// Quick Tag helper with event delegation
 if (typeof window !== 'undefined') {
     window.appendTag = function(tag) {
         const input = document.getElementById('issue-tags-input');
@@ -161,6 +161,20 @@ if (typeof window !== 'undefined') {
             input.value = existing.join(', ');
         }
     };
+
+    if (!window.__hasTagDelegation) {
+        window.__hasTagDelegation = true;
+        document.addEventListener('click', (e) => {
+            const tagBtn = e.target.closest('[data-tag]');
+            if (tagBtn) {
+                e.preventDefault();
+                const tag = tagBtn.getAttribute('data-tag');
+                if (tag && window.appendTag) {
+                    window.appendTag(tag);
+                }
+            }
+        });
+    }
 
     window.handleAddIssue = async function(event) {
         event.preventDefault();

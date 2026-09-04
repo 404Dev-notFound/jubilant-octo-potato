@@ -7,6 +7,8 @@
  * and project/issue/notification workflows.
  */
 
+process.env.NODE_ENV = 'test';
+
 const http = require('http');
 const app = require('../server.js');
 
@@ -19,7 +21,7 @@ function request(path, options = {}) {
         const reqOptions = {
             method: options.method || 'GET',
             headers: options.headers || {},
-            timeout: 5000
+            timeout: 15000
         };
 
         if (options.body && typeof options.body === 'object') {

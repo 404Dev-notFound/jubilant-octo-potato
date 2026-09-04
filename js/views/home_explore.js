@@ -1103,19 +1103,5 @@ export function render_home_explore() {
 <div class="text-center mt-8 text-outline text-xs">
             © 2024 CODECOLLAB. Built with passion for Open Source.
         </div>
-</footer>
-<script class="">
-        // Simulate Loading State for Skeleton Loader Demonstration
-        window.addEventListener('DOMContentLoaded', () => {
-            const skeletons = document.getElementById('project-grid');
-            const content = document.getElementById('real-content');
-
-            setTimeout(() => {
-                if(skeletons && content) {
-                    skeletons.classList.add('hidden');
-                    content.classList.remove('hidden');
-                }
-            }, 800);
-        });
-    </script>`;
+</footer>`;
 }

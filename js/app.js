@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const appContent = document.getElementById('app-content');
     const nebulaBg = document.getElementById('nebula-bg');
     const viewCache = {};
+    const viewModuleCache = new Map();
+    const formModuleCache = new Map();
 
     // Canonical HTML escape helper in app scope
     const escapeHtml = window.escapeHtml = window.UI?.escapeHtml || function (str) {
@@ -137,74 +139,204 @@ document.addEventListener('DOMContentLoaded', () => {
         return diagnostic;
     };
 
+    // --------------------------------------------------------------------------
+    // URL Security & Link Sanitizer (Phases 2.2 & 2.7)
+    // --------------------------------------------------------------------------
+    function isSafeLinkUrl(url) {
+        if (!url || typeof url !== 'string') return false;
+        const trimmed = url.trim().toLowerCase();
+        if (/[\x00-\x1f\x7f\s]/.test(trimmed)) return false;
+        return trimmed.startsWith('https://') || trimmed.startsWith('http://');
+    }
+
+    window.safeUrl = function (url, fallback = '#') {
+        if (!url || typeof url !== 'string') return fallback;
+        const trimmed = url.trim();
+        if (/[\x00-\x1f\x7f\s]/.test(trimmed)) return fallback;
+        const lower = trimmed.toLowerCase();
+        if (lower.startsWith('https://') || lower.startsWith('http://')) return trimmed;
+        return fallback;
+    };
+
+    // --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
+    // Single-Flight Auto Refresh on 401 TOKEN_EXPIRED (Phase 4.1 + Cookie-Auth)
+    // --------------------------------------------------------------------------
+    let refreshPromise = null;
+    async function singleFlightRefresh() {
+        if (!refreshPromise) {
+            refreshPromise = (async () => {
+                const session = (window.Session && window.Session.getSession) ? window.Session.getSession() : null;
+                const refreshToken = session ? session.refreshToken : null;
+                const baseUrl = window.getApiBaseUrl();
+
+                const res = await fetch(`${baseUrl}/api/auth/refresh`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(refreshToken ? { refreshToken } : {})
+                });
+
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    const err = new Error(errData.error || 'TOKEN_REFRESH_FAILED');
+                    err.status = res.status;
+                    throw err;
+                }
+
+                const data = await res.json();
+                if (window.Session && window.Session.updateTokens) {
+                    window.Session.updateTokens(data.token, data.refreshToken);
+                }
+                return data.token;
+            })().finally(() => {
+                refreshPromise = null;
+            });
+        }
+        return refreshPromise;
+    }
+
+    // In-flight GET request deduplication map to prevent redundant concurrent queries
+    const inFlightGetRequests = new Map();
+
     window.apiFetch = async function (endpoint, options = {}) {
         const baseUrl = window.getApiBaseUrl();
         const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
         const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${cleanEndpoint}`;
+        const method = (options.method || 'GET').toUpperCase();
 
         const headers = { ...options.headers };
-        if (!headers['Content-Type'] && !(options.body instanceof FormData) && options.method && options.method.toUpperCase() !== 'GET') {
+        if (!headers['Content-Type'] && !(options.body instanceof FormData) && method !== 'GET') {
             headers['Content-Type'] = 'application/json';
         }
+        if (!headers['X-Requested-With']) {
+            headers['X-Requested-With'] = 'XMLHttpRequest';
+        }
 
-        // Attach Authorization header if user is logged in
-        const currentUserStr = localStorage.getItem('currentUser');
-        if (currentUserStr && !url.includes('/api/auth/')) {
+        // Attach Authorization header if available (hybrid Bearer + Cookie support)
+        const session = (window.Session && window.Session.getSession) ? window.Session.getSession() : null;
+        const currentToken = session ? (session.token || session.accessToken) : null;
+        if (currentToken && !headers['Authorization'] && !url.includes('/api/auth/login') && !url.includes('/api/auth/signup')) {
+            headers['Authorization'] = `Bearer ${currentToken}`;
+        }
+
+        const fetchOptions = {
+            credentials: 'include', // Send and receive HttpOnly cookies across origins & localhost
+            cache: 'no-store',
+            ...options,
+            headers
+        };
+
+        // Deduplicate identical concurrent in-flight GET requests
+        const isGet = method === 'GET' && !options.body && !options._isRetry;
+        const dedupKey = isGet ? `${url}|${headers['Authorization'] || ''}` : null;
+
+        if (isGet && inFlightGetRequests.has(dedupKey)) {
+            const sharedPromise = inFlightGetRequests.get(dedupKey);
+            const clonedResponse = await sharedPromise;
+            return clonedResponse.clone();
+        }
+
+        const executeFetch = async () => {
+            let response;
             try {
-                const currentUser = JSON.parse(currentUserStr);
-                if (currentUser.token) {
-                    headers['Authorization'] = `Bearer ${currentUser.token}`;
+                response = await fetch(url, fetchOptions);
+            } catch (fetchErr) {
+                if (fetchErr.name === 'AbortError') throw fetchErr;
+                const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+                const errCategory = isOffline ? 'ERR_OFFLINE' : 'ERR_CORS_OR_NETWORK';
+                const userFriendlyMsg = isOffline
+                    ? 'You are offline. Please check your internet connection.'
+                    : 'Unable to reach backend server. Please check connection or try again.';
+
+                console.warn(`[CodeCollab API Diagnostic] Request to ${cleanEndpoint} failed.`, {
+                    endpoint: cleanEndpoint,
+                    category: errCategory,
+                    online: !isOffline,
+                    error: fetchErr.message
+                });
+
+                const enrichedError = new Error(userFriendlyMsg);
+                enrichedError.code = errCategory;
+                enrichedError.originalError = fetchErr;
+                throw enrichedError;
+            }
+
+            if (response.status === 401) {
+                // Attempt single-flight refresh for expired tokens if not already retried
+                const isAuthRoute = cleanEndpoint.includes('/api/auth/refresh') || cleanEndpoint.includes('/api/auth/login') || cleanEndpoint.includes('/api/auth/signup') || cleanEndpoint.includes('/api/auth/me');
+                if (!options._isRetry && !isAuthRoute) {
+                    try {
+                        const newToken = await singleFlightRefresh();
+                        return window.apiFetch(endpoint, {
+                            ...options,
+                            _isRetry: true,
+                            headers: {
+                                ...options.headers,
+                                ...(newToken ? { 'Authorization': `Bearer ${newToken}` } : {})
+                            }
+                        });
+                    } catch (refreshErr) {
+                        if (refreshErr.status === 401 || refreshErr.status === 403 || refreshErr.message === 'NO_REFRESH_TOKEN') {
+                            if (window.Session && window.Session.clearSession) {
+                                window.Session.clearSession();
+                            } else {
+                                localStorage.removeItem('currentUser');
+                            }
+                            if (window.updateAuthUI) window.updateAuthUI();
+                            if (window.UI && window.UI.showToast) {
+                                window.UI.showToast('Session expired. Please log in again.', 'error');
+                            }
+                            throw new Error('Session expired');
+                        }
+                        throw refreshErr;
+                    }
+                } else if (isAuthRoute) {
+                    return response;
                 }
-            } catch (e) { }
-        }
 
-        const fetchOptions = { cache: 'no-store', ...options, headers };
-        
-        let response;
-        try {
-            response = await fetch(url, fetchOptions);
-        } catch (fetchErr) {
-            const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
-            const errCategory = isOffline ? 'ERR_OFFLINE' : 'ERR_CORS_OR_NETWORK';
-            const userFriendlyMsg = isOffline
-                ? 'You are offline. Please check your internet connection.'
-                : 'Unable to reach backend server (CORS / Network restriction). Please check connection or try again.';
+                if (window.Session && window.Session.clearSession) {
+                    window.Session.clearSession();
+                } else {
+                    localStorage.removeItem('currentUser');
+                }
+                if (window.updateAuthUI) window.updateAuthUI();
+                if (window.UI && window.UI.showToast) {
+                    window.UI.showToast('Session expired. Please log in again.', 'error');
+                }
+                throw new Error('Session expired');
+            } else if (response.status === 403) {
+                if (window.UI && window.UI.showToast) {
+                    window.UI.showToast('You do not have permission to perform this action.', 'error');
+                }
+                throw new Error('Forbidden');
+            }
 
-            console.warn(`[CodeCollab API Diagnostic] Request to ${cleanEndpoint} failed. Target: ${baseUrl}. Category: ${errCategory}.`, {
-                endpoint: cleanEndpoint,
-                category: errCategory,
-                online: !isOffline,
-                error: fetchErr.message
+            return response;
+        };
+
+        if (isGet) {
+            const promise = executeFetch().finally(() => {
+                inFlightGetRequests.delete(dedupKey);
             });
-
-            const enrichedError = new Error(userFriendlyMsg);
-            enrichedError.code = errCategory;
-            enrichedError.originalError = fetchErr;
-            throw enrichedError;
+            inFlightGetRequests.set(dedupKey, promise);
+            const res = await promise;
+            return res.clone();
         }
 
-        if (response.status === 401) {
-            localStorage.removeItem('currentUser');
-            if (window.updateAuthUI) window.updateAuthUI();
-            if (window.UI && window.UI.showToast) {
-                window.UI.showToast('Session expired. Please log in again.', 'error');
-            }
-            throw new Error('Session expired');
-        } else if (response.status === 403) {
-            if (window.UI && window.UI.showToast) {
-                window.UI.showToast('You do not have permission to perform this action.', 'error');
-            }
-            throw new Error('Forbidden');
-        }
-
-        return response;
+        return executeFetch();
     };
 
     window.updateNotificationBadge = async function () {
         const dot = document.getElementById('nav-notifications-dot');
         if (!dot) return;
-        const currentUserStr = localStorage.getItem('currentUser');
-        if (!currentUserStr) {
+        const isAuthed = (window.Session && window.Session.isAuthenticated)
+            ? window.Session.isAuthenticated()
+            : Boolean(localStorage.getItem('currentUser'));
+        if (!isAuthed) {
             dot.classList.add('hidden');
             return;
         }
@@ -222,25 +354,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 dot.classList.add('hidden');
             }
         } catch (e) {
-            dot.classList.add('hidden');
+            if (e.name !== 'AbortError') {
+                dot.classList.add('hidden');
+            }
         }
     };
 
     window.updateAuthUI = function () {
-        // Update UI based on authentication status (show/hide login, profile, hero CTA, etc.)
-        const currentUserStr = localStorage.getItem('currentUser');
+        const session = (window.Session && window.Session.getSession) ? window.Session.getSession() : null;
+        const user = session ? (session.user || (session.id ? session : null)) : null;
         const authButtons = document.getElementById('auth-buttons-container');
         const profileDropdown = document.getElementById('profile-dropdown-container');
         const profileAvatar = document.getElementById('profile-avatar');
         const heroCtaBtn = document.getElementById('hero-cta-btn');
-        let user = null;
-        if (currentUserStr) {
-            try {
-                user = JSON.parse(currentUserStr);
-            } catch (e) {
-                localStorage.removeItem('currentUser');
-            }
-        }
 
         if (user) {
             if (authButtons) {
@@ -251,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (profileAvatar) profileAvatar.textContent = (user.name ? user.name.charAt(0) : 'U').toUpperCase();
             if (heroCtaBtn) {
                 heroCtaBtn.removeAttribute('data-form');
-                heroCtaBtn.setAttribute('onclick', "window.location.hash='dashboard'");
+                heroCtaBtn.setAttribute('data-navigate-hash', 'dashboard');
                 heroCtaBtn.setAttribute('title', 'Dashboard');
                 heroCtaBtn.innerHTML = `
                     <span class="material-symbols-outlined text-[20px] text-secondary transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">dashboard</span>
@@ -266,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (profileDropdown) profileDropdown.classList.add('hidden');
             if (profileAvatar) profileAvatar.textContent = 'U';
             if (heroCtaBtn) {
-                heroCtaBtn.removeAttribute('onclick');
+                heroCtaBtn.removeAttribute('data-navigate-hash');
                 heroCtaBtn.setAttribute('data-form', 'sign_up_form');
                 heroCtaBtn.setAttribute('title', 'Sign Up');
                 heroCtaBtn.innerHTML = `
@@ -279,31 +405,206 @@ document.addEventListener('DOMContentLoaded', () => {
         window.updateNotificationBadge();
     };
 
+    // Session restore from cookie on startup/reload
+    window.restoreSession = async function () {
+        try {
+            const res = await window.apiFetch('/api/auth/me', { method: 'GET' });
+            if (res && res.ok) {
+                const data = await res.json();
+                if (data && data.authenticated && data.user) {
+                    const currentSession = (window.Session && window.Session.getSession) ? window.Session.getSession() : {};
+                    const merged = {
+                        ...currentSession,
+                        ...data.user,
+                        user: data.user
+                    };
+                    if (window.Session && window.Session.setSession) {
+                        window.Session.setSession(merged);
+                    } else {
+                        localStorage.setItem('currentUser', JSON.stringify(merged));
+                    }
+                    window.updateAuthUI();
+                    return merged;
+                }
+            }
+        } catch (e) {
+            // Unauthenticated or network error, let updateAuthUI reflect state
+        }
+        return null;
+    };
+
+    window.logout = async function () {
+        try {
+            const sess = (window.Session && window.Session.getSession) ? window.Session.getSession() : null;
+            const refreshToken = sess?.refreshToken;
+            const baseUrl = window.getApiBaseUrl();
+            await fetch(`${baseUrl}/api/auth/logout`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(refreshToken ? { refreshToken } : {}),
+                keepalive: true
+            }).catch(() => {});
+        } catch {}
+
+        if (window.Session && window.Session.clearSession) {
+            window.Session.clearSession();
+        } else {
+            localStorage.removeItem('currentUser');
+        }
+        window.updateAuthUI();
+        window.UI.showToast('Successfully logged out', 'success');
+        if (window.location.hash.includes('dashboard') || window.location.hash.includes('security') || window.location.hash.includes('user_profile') || window.location.hash.includes('settings')) {
+            window.location.hash = 'home';
+        }
+    };
+
+    // Event delegation for data-navigate-hash buttons
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-navigate-hash]');
+        if (btn) {
+            e.preventDefault();
+            const target = btn.getAttribute('data-navigate-hash');
+            if (target) window.location.hash = target;
+        }
+    });
+
+    // Event delegation for OAuth buttons (Third-Party Integration)
+    document.addEventListener('click', async (e) => {
+        const oauthBtn = e.target.closest('[data-oauth]');
+        if (!oauthBtn) return;
+        e.preventDefault();
+        const provider = oauthBtn.getAttribute('data-oauth');
+
+        if (provider === 'github') {
+            try {
+                if (window.UI && window.UI.showToast) {
+                    window.UI.showToast('Connecting to GitHub...', 'info');
+                }
+                const redirectUri = window.location.origin + window.location.pathname;
+                const res = await window.apiFetch(`/api/auth/github/url?redirect_uri=${encodeURIComponent(redirectUri)}`);
+                if (res && res.ok) {
+                    const data = await res.json();
+                    if (data.url) {
+                        if (data.state) sessionStorage.setItem('cc_oauth_state', data.state);
+                        window.location.href = data.url;
+                        return;
+                    }
+                }
+                const errData = res ? await res.json().catch(() => ({})) : {};
+                const errorMsg = errData.error || 'GitHub OAuth is not configured on this server.';
+                if (window.UI && window.UI.showToast) {
+                    window.UI.showToast(errorMsg, 'warning');
+                }
+            } catch {
+                if (window.UI && window.UI.showToast) {
+                    window.UI.showToast('Unable to initiate GitHub login. Please use email & password.', 'warning');
+                }
+            }
+        } else if (provider === 'google') {
+            if (window.UI && window.UI.showToast) {
+                window.UI.showToast('Google Sign-In is not configured on this domain. Please use email & password.', 'info');
+            }
+        }
+    });
+
+    // Check for incoming OAuth redirect callback (e.g. ?code=...)
+    async function handleOAuthCallback() {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        if (!code) return;
+
+        try {
+            if (window.UI && window.UI.showToast) {
+                window.UI.showToast('Authenticating with GitHub...', 'info');
+            }
+            const res = await window.apiFetch('/api/auth/github', {
+                method: 'POST',
+                body: JSON.stringify({ code })
+            });
+
+            if (res && res.ok) {
+                const data = await res.json();
+                if (window.Session && window.Session.setSession) {
+                    window.Session.setSession(data);
+                }
+                window.updateAuthUI();
+                window.history.replaceState({}, document.title, window.location.pathname + (window.location.hash || '#explore'));
+                if (window.UI && window.UI.showToast) {
+                    window.UI.showToast(`Welcome, ${data.user?.name || 'Developer'}!`, 'success');
+                }
+                if (window.loadView) {
+                    window.loadView('explore');
+                }
+            } else {
+                const err = res ? await res.json().catch(() => ({})) : {};
+                if (window.UI && window.UI.showToast) {
+                    window.UI.showToast(err.error || 'GitHub authentication failed', 'error');
+                }
+            }
+        } catch (err) {
+            console.error('OAuth callback error:', err);
+        }
+    }
+
     // Call it initially
     window.updateAuthUI();
+    // Check incoming OAuth code callback
+    handleOAuthCallback().catch(() => {});
+    // Seamless session restore from HttpOnly cookie on page startup
+    if (window.restoreSession) {
+        window.restoreSession().catch(() => {});
+    }
 
-    // Live periodic check for notifications every 15 seconds
-    setInterval(() => {
-        if (localStorage.getItem('currentUser')) {
-            window.updateNotificationBadge();
+    // Background Polling Management (Phase 9)
+    let pollIntervalId = null;
+    function startPolling() {
+        if (pollIntervalId) return;
+        pollIntervalId = setInterval(() => {
+            if (!document.hidden && window.Session && window.Session.isAuthenticated && window.Session.isAuthenticated()) {
+                window.updateNotificationBadge().catch(() => {});
+            }
+        }, 15000);
+    }
+    function stopPolling() {
+        if (pollIntervalId) {
+            clearInterval(pollIntervalId);
+            pollIntervalId = null;
         }
-    }, 15000);
+    }
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopPolling();
+        } else {
+            if (window.Session && window.Session.isAuthenticated && window.Session.isAuthenticated()) {
+                window.updateNotificationBadge().catch(() => {});
+            }
+            startPolling();
+        }
+    });
+    startPolling();
 
     window.renderProjectCard = function (p) {
+        if (!p) return '';
         const safeTechStack = Array.isArray(p.techStack) ? p.techStack : (typeof p.techStack === 'string' ? p.techStack.split(',').map(s => s.trim()) : []);
         const techBadges = safeTechStack.map(tech =>
-            `<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5">${tech}</span>`
+            `<span class="px-2.5 py-1 bg-surface-container-highest rounded-full text-[11px] font-medium text-on-surface-variant border border-white/5">${escapeHtml(tech)}</span>`
         ).join('');
         const demoBadge = p.isDemo ? `<span class="ml-2 px-2 py-0.5 bg-primary/15 text-primary border border-primary/30 rounded-md text-[10px] font-bold uppercase tracking-wider">Demo</span>` : '';
         const ownerName = p.owner?.name || (p.ownerId ? `Developer #${p.ownerId}` : 'Open Source');
-        const ownerInitial = ownerName.charAt(0).toUpperCase();
-        const ownerDisplay = `<div class="flex items-center gap-2 text-xs text-on-surface-variant mb-3"><div class="w-5 h-5 rounded-full bg-secondary/20 text-secondary text-[11px] font-bold flex items-center justify-center border border-secondary/30">${ownerInitial}</div><span class="truncate font-medium">By ${escapeHtml(ownerName)}</span></div>`;
+        const ownerInitial = (ownerName.charAt(0) || 'U').toUpperCase();
+        const ownerDisplay = `<div class="flex items-center gap-2 text-xs text-on-surface-variant mb-3"><div class="w-5 h-5 rounded-full bg-secondary/20 text-secondary text-[11px] font-bold flex items-center justify-center border border-secondary/30">${escapeHtml(ownerInitial)}</div><span class="truncate font-medium">By ${escapeHtml(ownerName)}</span></div>`;
 
         const upvotesCount = typeof p.upvotes === 'number' ? p.upvotes : 0;
         const hasUpvoted = Boolean(p.hasUpvoted);
+        const safeGithubUrl = (p.githubUrl && isSafeLinkUrl(p.githubUrl)) ? p.githubUrl : '';
+        const pId = escapeHtml(p.id || '');
 
         return `
-        <div class="glass-card bg-surface-container-low/50 backdrop-blur-md rounded-[22px] border border-white/10 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:-translate-y-1.5 p-6" data-project-id="${p.id || ''}">
+        <div class="glass-card bg-surface-container-low/50 backdrop-blur-md rounded-[22px] border border-white/10 flex flex-col group overflow-hidden transition-all duration-300 hover:border-primary/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:-translate-y-1.5 p-6" data-project-id="${pId}">
             <div class="flex items-center justify-between gap-2 mb-4">
                 <div class="flex items-center gap-2 flex-wrap">
                     <span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-bold uppercase tracking-wider">
@@ -331,16 +632,16 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="flex flex-wrap gap-1.5 mb-6">${techBadges}</div>
 
             <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-2">
-                ${p.githubUrl ? `
-                    <a href="${escapeHtml(p.githubUrl)}" target="_blank" rel="noopener noreferrer" class="flex-1 flex justify-center items-center gap-1.5 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors">
+                ${safeGithubUrl ? `
+                    <a href="${escapeHtml(safeGithubUrl)}" target="_blank" rel="noopener noreferrer" class="flex-1 flex justify-center items-center gap-1.5 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-colors">
                         <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
                         <span>Code</span>
                     </a>
                 ` : ''}
-                <a href="#issues?projectId=${p.id}" class="flex-1 flex justify-center items-center gap-1 px-3 py-2.5 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-xs font-bold hover:bg-secondary hover:text-on-secondary transition-all active:scale-95">
+                <a href="#issues?projectId=${encodeURIComponent(p.id || '')}" class="flex-1 flex justify-center items-center gap-1 px-3 py-2.5 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-xs font-bold hover:bg-secondary hover:text-on-secondary transition-all active:scale-95">
                     <span class="material-symbols-outlined text-[14px]">view_kanban</span> Issues
                 </a>
-                <a href="#project_details?projectId=${p.id}" class="flex-1 flex justify-center items-center gap-1 px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                <a href="#project_details?projectId=${encodeURIComponent(p.id || '')}" class="flex-1 flex justify-center items-center gap-1 px-3 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
                     <span class="material-symbols-outlined text-[14px]">visibility</span> View
                 </a>
             </div>
@@ -400,14 +701,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            let module;
-            try {
-                module = await import(`./views/${viewName}.js?t=${Date.now()}`);
-            } catch (e) {
+            let module = viewModuleCache.get(viewName);
+            if (!module) {
                 try {
                     module = await import(`./views/${viewName}.js`);
-                } catch (e2) {
-                    console.warn(`Module import error for view '${viewName}'`, e2);
+                    viewModuleCache.set(viewName, module);
+                } catch (e) {
+                    console.warn(`Module import error for view '${viewName}'`, e);
                 }
             }
 
@@ -430,78 +730,70 @@ document.addEventListener('DOMContentLoaded', () => {
             appContent.innerHTML = html;
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // Initialize Home view
-            if (viewName === 'home' && module && module.initHome) {
-                await module.initHome();
-            }
+            // Convention-based dynamic view initializer resolution (Phase 10)
+            const pascalName = viewName.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
+            const candidateInitNames = [
+                `init${pascalName}`,
+                `init${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`,
+                `init_${viewName}`,
+                `init${viewName}`,
+                'init'
+            ];
 
-            // Initialize Explore view
-            if ((viewName === 'explore' || viewName === 'home_explore') && module && module.initExplore) {
-                await module.initExplore();
+            let initMethod = null;
+            if (module) {
+                for (const candidate of candidateInitNames) {
+                    if (typeof module[candidate] === 'function') {
+                        initMethod = module[candidate];
+                        break;
+                    }
+                }
             }
-
-            // Initialize Add Project view
-            if (viewName === 'add_project' && module && module.initAddProject) {
-                await module.initAddProject();
-            }
-
-            // Initialize Organizations view
-            if (viewName === 'organizations' && module && module.initOrganizations) {
-                await module.initOrganizations();
-            }
-
-            // Initialize Issues view
-            if (viewName === 'issues' && module && module.initIssues) {
-                await module.initIssues(projectId);
-            }
-
-            // Initialize Project Details view
-            if ((viewName === 'project_details' || viewName === 'project-details') && module && module.initProjectDetails) {
-                await module.initProjectDetails(projectId);
-            }
-
-            // Initialize Dashboard view
-            if (viewName === 'dashboard') {
-                if (module && module.initDashboard) {
-                    await module.initDashboard();
-                } else if (window.initDashboard) {
-                    await window.initDashboard();
+            if (!initMethod) {
+                for (const candidate of candidateInitNames) {
+                    if (typeof window[candidate] === 'function') {
+                        initMethod = window[candidate];
+                        break;
+                    }
                 }
             }
 
-            // Initialize Community view
-            if (viewName === 'community' && module && module.initCommunity) {
-                await module.initCommunity();
+            if (initMethod) {
+                try {
+                    if (viewName === 'issues' || viewName === 'project_details') {
+                        await initMethod(projectId);
+                    } else if (viewName === 'user_profile') {
+                        await initMethod(urlParams.get('id') || urlParams.get('userId') || projectId);
+                    } else {
+                        await initMethod(projectId, urlParams);
+                    }
+                } catch (initErr) {
+                    console.error(`[CodeCollab View Init Error] ${viewName}:`, initErr);
+                }
             }
 
-            // Initialize Settings view
-            if (viewName === 'settings' && module && module.initSettings) {
-                await module.initSettings();
-            }
+            // Accessibility: Update document title and live region (Phase 13 & 16)
+            const humanReadableTitle = viewName
+                .split('_')
+                .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(' ');
+            document.title = `${humanReadableTitle} | CodeCollab - Open Source Collaboration`;
 
-            // Initialize User Profile view
-            if ((viewName === 'user_profile' || viewName === 'user-profile' || viewName === 'profile') && module && module.initUserProfile) {
-                await module.initUserProfile(urlParams.get('id') || urlParams.get('userId') || projectId);
+            let announcer = document.getElementById('route-announcer');
+            if (!announcer) {
+                announcer = document.createElement('div');
+                announcer.id = 'route-announcer';
+                announcer.setAttribute('aria-live', 'polite');
+                announcer.setAttribute('aria-atomic', 'true');
+                announcer.className = 'sr-only';
+                document.body.appendChild(announcer);
             }
+            announcer.textContent = `Navigated to ${humanReadableTitle} page`;
 
-            // Initialize Notifications view
-            if (viewName === 'notifications' && module && module.initNotifications) {
-                await module.initNotifications();
-            }
-
-            // Initialize Leaderboard view
-            if (viewName === 'leaderboard' && module && module.initLeaderboard) {
-                await module.initLeaderboard();
-            }
-
-            // Initialize Team Collaboration view
-            if (viewName === 'team_collaboration' && module && module.initTeam_collaboration) {
-                await module.initTeam_collaboration();
-            }
-
-            // Initialize Three.js simulation view
-            if (viewName === 'three_js' && module && module.initThree_js) {
-                await module.initThree_js();
+            // Accessibility: Move focus to main app container (Phase 13)
+            if (appContent) {
+                appContent.setAttribute('tabindex', '-1');
+                appContent.focus({ preventScroll: true });
             }
 
             // Update notification badge on navigation
@@ -511,25 +803,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.PageLoadState) {
                 window.PageLoadState.clearTimer();
             }
-
-            // Execute inline scripts if any
-            appContent.querySelectorAll('script').forEach(script => {
-                const newScript = document.createElement('script');
-                if (script.src) newScript.src = script.src;
-                else newScript.textContent = script.textContent;
-                document.body.appendChild(newScript);
-            });
         } catch (error) {
             console.warn(`[CodeCollab Router] Error navigating to '${viewName}':`, error.message || error);
             if (window.PageLoadState) {
                 window.PageLoadState.renderFallback(appContent, viewName, 'error', error);
             } else {
                 appContent.innerHTML = `
-                    <div class="flex flex-col items-center justify-center min-h-[60vh] text-error">
-                        <span class="material-symbols-outlined text-[64px] mb-md">sentiment_dissatisfied</span>
-                        <h2 class="text-headline-lg font-display mb-sm">Page Not Found</h2>
-                        <p class="text-on-surface-variant mb-lg">The requested view '${viewName}' does not exist.</p>
-                        <button onclick="window.location.hash='home'" class="px-xl py-sm bg-primary text-on-primary rounded-lg font-bold shadow-lg hover:bg-primary-container transition-colors">Return Home</button>
+                    <div class="flex flex-col items-center justify-center min-h-[60vh] text-error p-8">
+                        <span class="material-symbols-outlined text-[64px] mb-4">sentiment_dissatisfied</span>
+                        <h2 class="text-2xl font-bold mb-2">Page Not Found</h2>
+                        <p class="text-on-surface-variant mb-6 text-sm">The requested view '${escapeHtml(viewName)}' could not be loaded.</p>
+                        <button data-navigate-hash="home" class="px-6 py-3 bg-primary text-on-primary rounded-xl font-bold shadow-lg hover:bg-primary-container transition-colors">Return Home</button>
                     </div>
                 `;
             }
@@ -561,10 +845,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (link.id === 'logout-btn') {
                 e.preventDefault();
-                localStorage.removeItem('currentUser');
-                window.updateAuthUI();
-                window.UI.showToast('Successfully logged out', 'success');
-                if (window.location.hash.includes('dashboard')) window.location.hash = 'home';
+                if (window.logout) {
+                    window.logout();
+                } else {
+                    localStorage.removeItem('currentUser');
+                    window.updateAuthUI();
+                    window.UI.showToast('Successfully logged out', 'success');
+                    window.location.hash = 'home';
+                }
                 return;
             }
 
@@ -583,9 +871,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 'add_issue_form', 'create_team_form', 'update_availability_form',
                 'create_looking_for_form', 'join_team_form'
             ];
-            if (protectedForms.includes(formName) && !localStorage.getItem('currentUser')) {
+            const isUserLoggedIn = (window.Session && window.Session.isAuthenticated)
+                ? window.Session.isAuthenticated()
+                : Boolean(localStorage.getItem('currentUser'));
+
+            if (protectedForms.includes(formName) && !isUserLoggedIn) {
                 window.UI.showToast('Please log in to access this feature', 'error');
                 return;
+            }
+
+            async function getFormModule(name) {
+                if (formModuleCache.has(name)) {
+                    return formModuleCache.get(name);
+                }
+                try {
+                    const mod = await import(`./forms/${name}.js`);
+                    formModuleCache.set(name, mod);
+                    return mod;
+                } catch (e) {
+                    console.warn(`Form module import failed for ${name}:`, e);
+                    return null;
+                }
             }
 
             if (formName === 'edit_profile_form') {
@@ -596,10 +902,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (res.ok) {
                             userData = await res.json();
                         } else {
-                            const curStr = localStorage.getItem('currentUser');
-                            if (curStr) userData = JSON.parse(curStr);
+                            const cur = (window.Session && window.Session.getSession) ? window.Session.getSession() : null;
+                            if (cur) userData = cur;
                         }
-                        const module = await import(`./forms/edit_profile_form.js?t=${Date.now()}`);
+                        const module = await getFormModule('edit_profile_form');
+                        if (!module) throw new Error('Could not load edit profile form module');
                         const html = module.render_edit_profile_form(userData);
                         window.UI.openModal(html);
                         if (module.initEditProfileForm) {
@@ -616,13 +923,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (formName === 'update_availability_form') {
                 (async () => {
                     try {
-                        const curStr = localStorage.getItem('currentUser');
-                        let userData = curStr ? JSON.parse(curStr) : {};
+                        const cur = (window.Session && window.Session.getSession) ? window.Session.getSession() : null;
+                        let userData = cur || {};
                         const res = await window.apiFetch('/api/users/profile');
                         if (res.ok) {
                             userData = await res.json();
                         }
-                        const module = await import(`./forms/update_availability_form.js?t=${Date.now()}`);
+                        const module = await getFormModule('update_availability_form');
+                        if (!module) throw new Error('Could not load availability form module');
                         const html = module.render_update_availability_form(userData);
                         window.UI.openModal(html);
                         if (module.initUpdateAvailabilityForm) {
@@ -639,7 +947,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (formName === 'create_team_form') {
                 (async () => {
                     try {
-                        const module = await import(`./forms/create_team_form.js?t=${Date.now()}`);
+                        const module = await getFormModule('create_team_form');
+                        if (!module) throw new Error('Could not load team form module');
                         const html = module.render_create_team_form();
                         window.UI.openModal(html);
                         if (module.initCreateTeamForm) {
@@ -656,7 +965,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (formName === 'create_looking_for_form') {
                 (async () => {
                     try {
-                        const module = await import(`./forms/create_looking_for_form.js?t=${Date.now()}`);
+                        const module = await getFormModule('create_looking_for_form');
+                        if (!module) throw new Error('Could not load looking-for form module');
                         const html = module.render_create_looking_for_form();
                         window.UI.openModal(html);
                         if (module.initCreateLookingForForm) {
@@ -678,7 +988,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         const position = formBtn.getAttribute('data-position') || '';
                         const leadName = formBtn.getAttribute('data-lead-name') || 'Team Lead';
 
-                        const module = await import(`./forms/join_team_form.js?t=${Date.now()}`);
+                        const module = await getFormModule('join_team_form');
+                        if (!module) throw new Error('Could not load join team form module');
                         const html = module.render_join_team_form({ teamId, teamName, position, leadName });
                         window.UI.openModal(html);
                         if (module.initJoinTeamForm) {
@@ -790,7 +1101,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
 
                 if (response.ok) {
-                    localStorage.setItem('currentUser', JSON.stringify(result));
+                    if (window.Session && window.Session.setSession) {
+                        window.Session.setSession(result);
+                    } else {
+                        localStorage.setItem('currentUser', JSON.stringify(result));
+                    }
                     window.updateAuthUI();
                     window.UI.closeModal();
                     window.UI.showToast(form.id === 'signUpForm' ? 'Account created!' : 'Welcome back!', 'success');
@@ -831,19 +1146,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (response.ok) {
-                    const updatedUser = await response.json();
-                    const curUserStr = localStorage.getItem('currentUser');
-                    if (curUserStr) {
-                        try {
-                            const cur = JSON.parse(curUserStr);
-                            localStorage.setItem('currentUser', JSON.stringify({
-                                ...cur,
-                                ...updatedUser,
-                                token: cur.token,
-                                refreshToken: cur.refreshToken
-                            }));
-                        } catch (e) {
-                            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                    const result = await response.json();
+                    const profileData = result.profile || result;
+                    if (window.Session && window.Session.updateProfileInSession) {
+                        window.Session.updateProfileInSession(profileData);
+                    } else {
+                        const curUserStr = localStorage.getItem('currentUser');
+                        if (curUserStr) {
+                            try {
+                                const cur = JSON.parse(curUserStr);
+                                localStorage.setItem('currentUser', JSON.stringify({
+                                    ...cur,
+                                    ...profileData,
+                                    token: cur.token,
+                                    refreshToken: cur.refreshToken
+                                }));
+                            } catch (e) {
+                                localStorage.setItem('currentUser', JSON.stringify(profileData));
+                            }
                         }
                     }
                     window.updateAuthUI();

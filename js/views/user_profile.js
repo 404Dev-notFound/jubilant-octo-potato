@@ -2,6 +2,17 @@ const escapeHtml = (typeof window !== 'undefined' && window.escapeHtml)
     ? window.escapeHtml 
     : (str => (str === null || str === undefined) ? '' : String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'));
 
+const safeUrl = (typeof window !== 'undefined' && window.safeUrl)
+    ? window.safeUrl
+    : ((url, fallback = '#') => {
+        if (!url || typeof url !== 'string') return fallback;
+        const trimmed = url.trim();
+        if (/[\x00-\x1f\x7f\s]/.test(trimmed)) return fallback;
+        const lower = trimmed.toLowerCase();
+        if (lower.startsWith('https://') || lower.startsWith('http://')) return trimmed;
+        return fallback;
+    });
+
 export function render_user_profile() {
     const curStr = localStorage.getItem('currentUser');
     let user = { name: 'Developer', username: 'developer', bio: 'Full-stack engineer passionate about open source and AI.', location: 'San Francisco, CA', skills: ['JavaScript', 'TypeScript', 'Rust', 'React'], socialLinks: {} };
@@ -63,7 +74,7 @@ export function render_user_profile() {
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="material-symbols-outlined text-[18px] text-secondary">link</span>
-                    <a id="profile-page-website" href="${user.website || user.socialLinks?.website || '#'}" target="_blank" class="text-primary hover:underline truncate">${user.website || user.socialLinks?.website || 'codecollab.dev'}</a>
+                    <a id="profile-page-website" href="${escapeHtml(safeUrl(user.website || user.socialLinks?.website || '#'))}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline truncate">${escapeHtml(user.website || user.socialLinks?.website || 'codecollab.dev')}</a>
                 </div>
             </div>
             
@@ -157,8 +168,9 @@ export async function initUserProfile(targetUserId = null) {
 
         const webEl = document.getElementById('profile-page-website');
         if (webEl) {
-            webEl.textContent = profile.website || profile.socialLinks?.website || 'codecollab.dev';
-            webEl.href = profile.website || profile.socialLinks?.website || '#';
+            const rawWeb = profile.website || profile.socialLinks?.website || '';
+            webEl.textContent = rawWeb || 'codecollab.dev';
+            webEl.href = safeUrl(rawWeb, '#');
         }
 
         const skillsEl = document.getElementById('profile-page-skills');
@@ -217,13 +229,13 @@ export async function initUserProfile(targetUserId = null) {
                         projContainer.innerHTML = `<div class="col-span-full p-6 text-center text-on-surface-variant text-xs bg-surface-container/50 rounded-xl border border-white/5">No public projects associated with this developer yet.</div>`;
                     } else {
                         projContainer.innerHTML = userProjects.map(p => `
-                        <div class="glass-panel p-4 rounded-xl border-l-4 border-l-primary cursor-pointer hover:bg-surface-variant transition-colors" onclick="window.location.hash='project_details?projectId=${p.id}'">
-                            <div class="font-bold text-sm text-on-surface">${escapeHtml(p.title || 'Untitled Project')}</div>
+                        <a href="#project_details?projectId=${encodeURIComponent(p.id)}" class="block glass-panel p-4 rounded-xl border-l-4 border-l-primary hover:bg-surface-variant transition-colors group">
+                            <div class="font-bold text-sm text-on-surface group-hover:text-primary transition-colors">${escapeHtml(p.title || 'Untitled Project')}</div>
                             <p class="text-xs text-on-surface-variant line-clamp-2 my-1">${escapeHtml(p.description || '')}</p>
                             <div class="flex flex-wrap gap-1 mt-2">
                                 ${(Array.isArray(p.techStack) ? p.techStack : []).slice(0, 3).map(t => `<span class="px-2 py-0.5 rounded-md bg-surface-container text-[10px] text-on-surface-variant">${escapeHtml(t)}</span>`).join('')}
                             </div>
-                        </div>`).join('');
+                        </a>`).join('');
                     }
                 }
             } catch (err) {

@@ -31,23 +31,23 @@ export function render_edit_profile_form(user = {}) {
                 <div class="p-md rounded-xl bg-surface-container border border-white/5 flex flex-col justify-between hover:border-primary/20 transition-all">
                     <div>
                         <div class="flex items-center justify-between gap-2 mb-2">
-                            <h5 class="font-bold text-sm text-on-surface truncate">${t.teamName}</h5>
+                            <h5 class="font-bold text-sm text-on-surface truncate">${escapeHtml(t.teamName)}</h5>
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${t.role === 'Team Lead' ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-secondary/15 text-secondary border border-secondary/30'}">
-                                ${t.role}
+                                ${escapeHtml(t.role)}
                             </span>
                         </div>
-                        <p class="text-xs text-on-surface-variant line-clamp-2 mb-3">${t.description || 'Collaborative development team'}</p>
+                        <p class="text-xs text-on-surface-variant line-clamp-2 mb-3">${escapeHtml(t.description || 'Collaborative development team')}</p>
                     </div>
                     <div>
                         ${Array.isArray(t.skills) && t.skills.length > 0 ? `
                             <div class="flex flex-wrap gap-1 mb-2">
-                                ${t.skills.slice(0, 3).map(s => `<span class="px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant text-[10px]">${s}</span>`).join('')}
+                                ${t.skills.slice(0, 3).map(s => `<span class="px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant text-[10px]">${escapeHtml(s)}</span>`).join('')}
                                 ${t.skills.length > 3 ? `<span class="px-1.5 py-0.5 rounded bg-surface-variant text-on-surface-variant text-[10px]">+${t.skills.length - 3}</span>` : ''}
                             </div>
                         ` : ''}
                         <div class="flex items-center justify-between text-[11px] text-on-surface-variant pt-2 border-t border-white/5">
-                            <span>⭐ ${t.rating || 4.8}</span>
-                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">group</span> ${t.membersCount || 1} members</span>
+                            <span>⭐ ${escapeHtml(t.rating || 4.8)}</span>
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">group</span> ${escapeHtml(t.membersCount || 1)} members</span>
                         </div>
                     </div>
                 </div>
@@ -88,7 +88,7 @@ export function render_edit_profile_form(user = {}) {
                             <label class="block text-xs font-bold font-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">Full Name <span class="text-primary">*</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">person</span>
-                                <input type="text" name="name" value="${name}" placeholder="e.g. Alex Rivera" required class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
+                                <input type="text" name="name" value="${escapeHtml(name)}" placeholder="e.g. Alex Rivera" required class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
                             </div>
                         </div>
 
@@ -96,7 +96,7 @@ export function render_edit_profile_form(user = {}) {
                             <label class="block text-xs font-bold font-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">Username <span class="text-primary">*</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">alternate_email</span>
-                                <input type="text" name="username" value="${username}" placeholder="e.g. alexrivera" required class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
+                                <input type="text" name="username" value="${escapeHtml(username)}" placeholder="e.g. alexrivera" required class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
                             </div>
                         </div>
                     </div>
@@ -106,7 +106,7 @@ export function render_edit_profile_form(user = {}) {
                             <label class="block text-xs font-bold font-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">Developer Role / Title</label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">work</span>
-                                <input type="text" name="title" value="${title}" placeholder="e.g. Senior Fullstack Engineer" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
+                                <input type="text" name="title" value="${escapeHtml(title)}" placeholder="e.g. Senior Fullstack Engineer" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
                             </div>
                         </div>
 
@@ -114,7 +114,7 @@ export function render_edit_profile_form(user = {}) {
                             <label class="block text-xs font-bold font-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">Location</label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">location_on</span>
-                                <input type="text" name="location" value="${location}" placeholder="e.g. San Francisco, CA" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
+                                <input type="text" name="location" value="${escapeHtml(location)}" placeholder="e.g. San Francisco, CA" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
                             </div>
                         </div>
                     </div>
@@ -127,7 +127,7 @@ export function render_edit_profile_form(user = {}) {
                         Bio & About
                     </h4>
                     <label class="block text-xs font-bold font-label-sm text-on-surface-variant uppercase tracking-wider">Bio</label>
-                    <textarea name="bio" rows="3" placeholder="Tell the community about what you build, your passions, and open source projects..." class="w-full bg-surface-container border border-white/10 rounded-xl p-md text-sm text-on-surface outline-none focus:border-primary transition-colors resize-none">${bio}</textarea>
+                    <textarea name="bio" rows="3" placeholder="Tell the community about what you build, your passions, and open source projects..." class="w-full bg-surface-container border border-white/10 rounded-xl p-md text-sm text-on-surface outline-none focus:border-primary transition-colors resize-none">${escapeHtml(bio)}</textarea>
                 </div>
 
                 <!-- Section: Skills & Interests -->
@@ -142,7 +142,7 @@ export function render_edit_profile_form(user = {}) {
                             <label class="block text-xs font-bold font-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">Skills <span class="text-[11px] text-on-surface-variant font-normal">(comma-separated)</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">code</span>
-                                <input type="text" name="skills" value="${skillsList}" placeholder="Rust, TypeScript, React, Docker, GraphQL" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
+                                <input type="text" name="skills" value="${escapeHtml(skillsList)}" placeholder="Rust, TypeScript, React, Docker, GraphQL" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
                             </div>
                         </div>
 
@@ -150,7 +150,7 @@ export function render_edit_profile_form(user = {}) {
                             <label class="block text-xs font-bold font-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">Interests <span class="text-[11px] text-on-surface-variant font-normal">(comma-separated)</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">interests</span>
-                                <input type="text" name="interests" value="${interestsList}" placeholder="AI/ML, Web3, Distributed Systems, Open Source" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
+                                <input type="text" name="interests" value="${escapeHtml(interestsList)}" placeholder="AI/ML, Web3, Distributed Systems, Open Source" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
                             </div>
                         </div>
                     </div>
@@ -168,7 +168,7 @@ export function render_edit_profile_form(user = {}) {
                             <label class="block text-xs font-bold font-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">Education</label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">school</span>
-                                <input type="text" name="education" value="${education}" placeholder="e.g. B.S. in Computer Science" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
+                                <input type="text" name="education" value="${escapeHtml(education)}" placeholder="e.g. B.S. in Computer Science" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
                             </div>
                         </div>
 
@@ -176,7 +176,7 @@ export function render_edit_profile_form(user = {}) {
                             <label class="block text-xs font-bold font-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">Experience</label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">history_edu</span>
-                                <input type="text" name="experience" value="${experience}" placeholder="e.g. 5+ years building distributed applications" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
+                                <input type="text" name="experience" value="${escapeHtml(experience)}" placeholder="e.g. 5+ years building distributed applications" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
                             </div>
                         </div>
                     </div>
@@ -194,7 +194,7 @@ export function render_edit_profile_form(user = {}) {
                             <label class="block text-xs font-bold font-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">GitHub</label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">terminal</span>
-                                <input type="url" name="github" value="${github}" placeholder="https://github.com/username" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
+                                <input type="url" name="github" value="${escapeHtml(github)}" placeholder="https://github.com/username" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
                             </div>
                         </div>
 
@@ -202,7 +202,7 @@ export function render_edit_profile_form(user = {}) {
                             <label class="block text-xs font-bold font-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">Twitter / X</label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">tag</span>
-                                <input type="url" name="twitter" value="${twitter}" placeholder="https://x.com/username" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
+                                <input type="url" name="twitter" value="${escapeHtml(twitter)}" placeholder="https://x.com/username" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
                             </div>
                         </div>
 
@@ -210,7 +210,7 @@ export function render_edit_profile_form(user = {}) {
                             <label class="block text-xs font-bold font-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">LinkedIn</label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">account_box</span>
-                                <input type="url" name="linkedin" value="${linkedin}" placeholder="https://linkedin.com/in/username" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
+                                <input type="url" name="linkedin" value="${escapeHtml(linkedin)}" placeholder="https://linkedin.com/in/username" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
                             </div>
                         </div>
 
@@ -218,7 +218,7 @@ export function render_edit_profile_form(user = {}) {
                             <label class="block text-xs font-bold font-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">Website / Portfolio</label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">language</span>
-                                <input type="url" name="website" value="${website}" placeholder="https://yourportfolio.dev" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
+                                <input type="url" name="website" value="${escapeHtml(website)}" placeholder="https://yourportfolio.dev" class="w-full bg-surface-container border border-white/10 rounded-xl pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-primary transition-colors">
                             </div>
                         </div>
                     </div>

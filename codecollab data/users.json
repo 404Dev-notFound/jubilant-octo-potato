@@ -1073,5 +1073,445 @@
     "lookingFor": "Looking for collaboration",
     "socialLinks": {},
     "createdAt": "2026-08-29T16:59:42.210Z"
+  },
+  {
+    "id": "1788552018229",
+    "name": "Alice Developer",
+    "email": "test_alice_1788552018098@example.com",
+    "password": "$2b$10$XX8c7O.4JMKdWyTVjUcwx.zJDmzo1QAAejLlLJXb1EuBKVUh4E7bO",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:00:18.231Z"
+  },
+  {
+    "id": "1788552018435",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1788552018098@example.com",
+    "password": "$2b$10$jfVzYEWfcaEpMU9xNXGjCegXmdvOG.xy5vVkTsRvcCZqwiyJTcH7e",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:00:18.436Z"
+  },
+  {
+    "id": "1788552018535",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1788552018098@example.com",
+    "password": "$2b$10$rY3XsjC3qsnyn/isyOxzoukjvTnu17lNxfksbudrslLR4NRrXIuk6",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:00:18.537Z"
+  },
+  {
+    "id": "1788552213566",
+    "name": "Alice Developer",
+    "email": "test_alice_1788552213430@example.com",
+    "password": "$2b$10$ElRiJRo.SaCC.Ha8LtSCruf/YCs9TMFw5O5bBSzt6TzlzXqoptXeO",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:03:33.569Z",
+    "upvoters": [
+      "1788552213799"
+    ],
+    "upvotes": 1,
+    "followers": [
+      "1788552213799"
+    ]
+  },
+  {
+    "id": "1788552213799",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1788552213430@example.com",
+    "password": "$2b$10$GBgvO2rhcbZj3UxGLSTeUOkf0YxNrRt5qH5VO9kMaNEIPjE8uW2iC",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:03:33.801Z"
+  },
+  {
+    "id": "1788552213904",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1788552213430@example.com",
+    "password": "$2b$10$1ExIZj2hKL3zEI7sfg3S6e6Fdfe7emqO6/tZoC1DeOpBwsUe.uFIO",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:03:33.906Z"
+  },
+  {
+    "id": "1788552244157",
+    "name": "Alice Developer",
+    "email": "test_alice_1788552244031@example.com",
+    "password": "$2b$10$x2MFoYONFDNycAJt.WAQm.bLgMYvJZDGJ/wMlFTNPolgvv1fGEHa2",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:04:04.160Z"
+  },
+  {
+    "id": "1788552244354",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1788552244031@example.com",
+    "password": "$2b$10$W1ydiwIJYDhEK/Ogm./p6eISk9UepfnWI7IX0geCN6dm1NBQAU2fS",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:04:04.356Z"
+  },
+  {
+    "id": "1788552244454",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1788552244031@example.com",
+    "password": "$2b$10$58bog3fZJq96BE6xu3Y5D.s6TzTRpXdlT3LI1e4lcjXmzDGlFDaSq",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:04:04.456Z"
+  },
+  {
+    "id": "1788552602100",
+    "name": "Alice Developer",
+    "email": "test_alice_1788552601984@example.com",
+    "password": "$2b$10$Aq7lg.76x041LAkMVQeWHucY8KF0axPrTCZaDB1QtznJkqM6weucW",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:10:02.104Z",
+    "upvoters": [
+      "1788552602365"
+    ],
+    "upvotes": 1,
+    "followers": [
+      "1788552602365"
+    ]
+  },
+  {
+    "id": "1788552602365",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1788552601984@example.com",
+    "password": "$2b$10$fXU6PJ0aJslyoBbsYvhnveP/A28RWZYXbitgcdELDRKr3wsVHSZ7y",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:10:02.367Z"
+  },
+  {
+    "id": "1788552602471",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1788552601984@example.com",
+    "password": "$2b$10$e6DbvZlYImMVygEV/3K6qOeCj0TAKcH3qxWV2jE3PTusXPJdIT6Qu",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:10:02.473Z"
+  },
+  {
+    "id": "1788552613109",
+    "name": "Alice Developer",
+    "email": "test_alice_1788552612995@example.com",
+    "password": "$2b$10$L0kvc1AwLCJgREuFvVsc..HM.GWufY.KeDvj1Xe2u8CjCdu1RAgrm",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:10:13.111Z",
+    "upvoters": [
+      "1788552613305"
+    ],
+    "upvotes": 1,
+    "followers": [
+      "1788552613305"
+    ]
+  },
+  {
+    "id": "1788552613305",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1788552612995@example.com",
+    "password": "$2b$10$AlqA5wDe8IkJ49o99uNjW.R2xsejX8KoATkwNFj05KQb64QqWB33u",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:10:13.307Z"
+  },
+  {
+    "id": "1788552613419",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1788552612995@example.com",
+    "password": "$2b$10$k8dGsiVz4QOFxpN.o7AbUOdQvwowxMYQt/sErGRGPQmtNdv.T.NJi",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:10:13.421Z"
+  },
+  {
+    "id": "1788553732492",
+    "name": "Alice Developer",
+    "email": "test_alice_1788553732227@example.com",
+    "password": "$2b$10$wrXra8d/o6gKw6be4Iyx6.hxicTdWY9tyzqXPcZUOZEwotJIxKhOq",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:28:52.540Z",
+    "upvoters": [
+      "1788553733220"
+    ],
+    "upvotes": 1,
+    "followers": [
+      "1788553733220"
+    ]
+  },
+  {
+    "id": "1788553733220",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1788553732227@example.com",
+    "password": "$2b$10$dw1F/jroeha.DqxFqa0lq.HiU4Ot/sd3.EOz.uqVeH2bd1OZtp5si",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:28:53.245Z"
+  },
+  {
+    "id": "1788553733680",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1788553732227@example.com",
+    "password": "$2b$10$qndfii9IKPM5Bwd720WDxux6ET69sY62CN.T00NvN.eKvkx1MlRQy",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-09-04T20:28:53.725Z"
+  },
+  {
+    "id": "1788558273666",
+    "name": "Cookie Test Developer",
+    "email": "cookie_user_1788558273543@example.com",
+    "password": "$2b$10$SEQTtWQ8/Wx8hsHazD5P6ubNSDTsaKtmNGtANFARRMJBTyw1nd/u2",
+    "phoneNumber": "+1234567890",
+    "role": "Developer",
+    "createdAt": "2026-09-04T21:44:33.669Z",
+    "bio": "Legitimate Cookie Authenticated Update",
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "preferences": {
+      "bio": "Legitimate Cookie Authenticated Update",
+      "upvotes": 0,
+      "upvoters": [],
+      "followers": []
+    },
+    "updatedAt": "2026-09-04T21:44:33.709Z"
+  },
+  {
+    "id": "1788558331642",
+    "name": "Cookie Test Developer",
+    "email": "cookie_user_1788558331535@example.com",
+    "password": "$2b$10$qoP1l.ayaes0v2cMnxXVIu7MlhifpGJqYtRsHPSEVTVR4yae1ArXa",
+    "phoneNumber": "+1234567890",
+    "role": "Developer",
+    "createdAt": "2026-09-04T21:45:31.644Z",
+    "bio": "Legitimate Cookie Authenticated Update",
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "preferences": {
+      "bio": "Legitimate Cookie Authenticated Update",
+      "upvotes": 0,
+      "upvoters": [],
+      "followers": []
+    },
+    "updatedAt": "2026-09-04T21:45:31.686Z"
+  },
+  {
+    "id": "1788558344495",
+    "name": "Alice Developer",
+    "email": "test_alice_1788558344369@example.com",
+    "password": "$2b$10$dzpclIs/u3Vr6JW530LZveDvXdR0djkvxodtNam521Lzhmu1fl6qS",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-09-04T21:45:44.498Z",
+    "upvoters": [
+      "1788558344696"
+    ],
+    "upvotes": 1,
+    "followers": [
+      "1788558344696"
+    ]
+  },
+  {
+    "id": "1788558344696",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1788558344369@example.com",
+    "password": "$2b$10$.BsbNJej0QV5V.M7mdfk8O27iuv/hT5OxdxxbB8DHEwB1MV662aP6",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-09-04T21:45:44.698Z"
+  },
+  {
+    "id": "1788558344916",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1788558344369@example.com",
+    "password": "$2b$10$Qsai9wMFTGQrO5lPwKRAFOGB6N1J78LSVs778DMluFaelO69/h9di",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-09-04T21:45:44.917Z"
+  },
+  {
+    "id": "1788558549042",
+    "name": "Cookie Test Developer",
+    "email": "cookie_user_1788558548937@example.com",
+    "password": "$2b$10$Q7.6Mq7mbjxC02qXauligOUc/xU0ViLiWWDKjkuQhVcWI7ZJ2zE1q",
+    "phoneNumber": "+1234567890",
+    "role": "Developer",
+    "createdAt": "2026-09-04T21:49:09.044Z",
+    "bio": "Legitimate Cookie Authenticated Update",
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "preferences": {
+      "bio": "Legitimate Cookie Authenticated Update",
+      "upvotes": 0,
+      "upvoters": [],
+      "followers": []
+    },
+    "updatedAt": "2026-09-04T21:49:09.085Z"
+  },
+  {
+    "id": "1788558553553",
+    "name": "Alice Developer",
+    "email": "test_alice_1788558553433@example.com",
+    "password": "$2b$10$i4p6JfmZlUuN/aBpVWTTZeNo5RYVSJv4gXRDG8zEAx7FZZ4/lmUwO",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-09-04T21:49:13.556Z",
+    "upvoters": [
+      "1788558553758"
+    ],
+    "upvotes": 1,
+    "followers": [
+      "1788558553758"
+    ]
+  },
+  {
+    "id": "1788558553758",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1788558553433@example.com",
+    "password": "$2b$10$/vO9WnslGoMHdi5IcVwz0u1dAWJQI/g/XB6fsltFZhfouGWAbhyvm",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-09-04T21:49:13.760Z"
+  },
+  {
+    "id": "1788558553859",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1788558553433@example.com",
+    "password": "$2b$10$gXW4jmQaHUwk7hZKXtvP5eGZwRmfdlkKEYt/N6cTqxu2kxvKloVQa",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-09-04T21:49:13.861Z"
+  },
+  {
+    "id": "1788558561971",
+    "name": "Alice Developer",
+    "email": "test_alice_1788558561864@example.com",
+    "password": "$2b$10$.wdS81.FlNq/qCGp5cYdtOIBS.VCtU4Qmok9NZAAjhRkpfPFReW4G",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-09-04T21:49:21.974Z",
+    "upvoters": [
+      "1788558562169"
+    ],
+    "upvotes": 1,
+    "followers": [
+      "1788558562169"
+    ]
+  },
+  {
+    "id": "1788558562169",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1788558561864@example.com",
+    "password": "$2b$10$F/HVbOnQjD4qVHpncqrpVeb5aw3AnHmSZaU1CRvyMTpB1/OCHAAZC",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-09-04T21:49:22.171Z"
+  },
+  {
+    "id": "1788558562271",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1788558561864@example.com",
+    "password": "$2b$10$YKFDSO02U3cjbnthVFUJ0u7/ccjqAAOwLNws/Mx4e.PaPoGBQFTBa",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-09-04T21:49:22.273Z"
+  },
+  {
+    "id": "1788559748687",
+    "name": "Alice Developer",
+    "email": "test_alice_1788559748573@example.com",
+    "password": "$2b$10$DsyGZRoIucidfuZ/mIrRXO89UUEXrAVKB3SmaAZBTw0ic90DN47bO",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-09-04T22:09:08.694Z",
+    "upvoters": [
+      "1788559748901"
+    ],
+    "upvotes": 1,
+    "followers": [
+      "1788559748901"
+    ]
+  },
+  {
+    "id": "1788559748901",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1788559748573@example.com",
+    "password": "$2b$10$A4PaF8jwGmAdnwzed1LAdupc/IxZnTfTB079TNba89IikTVWfEO4q",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-09-04T22:09:08.903Z"
+  },
+  {
+    "id": "1788559749004",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1788559748573@example.com",
+    "password": "$2b$10$ZFUC1OWWIePx1P.r07n95enenaWIPhxhlLK7vZETmlv.wptU/umYi",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-09-04T22:09:09.006Z"
+  },
+  {
+    "id": "1788559807039",
+    "name": "Alice Developer",
+    "email": "test_alice_1788559806922@example.com",
+    "password": "$2b$10$MD02eMIbv5n2njBSERzZ6.okNJUoIRGRsKLkP/w5pi7l696geEKn2",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-09-04T22:10:07.042Z",
+    "upvoters": [
+      "1788559807262"
+    ],
+    "upvotes": 1,
+    "followers": [
+      "1788559807262"
+    ]
+  },
+  {
+    "id": "1788559807262",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1788559806922@example.com",
+    "password": "$2b$10$UhzeDTvPuRVflWPegZ2yMOCNzPhCsiRl8U/8qWTFvXCcGXWr7Wsy6",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-09-04T22:10:07.263Z"
+  },
+  {
+    "id": "1788559807389",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1788559806922@example.com",
+    "password": "$2b$10$KLqou9.1.nwssARzMuFGdea2z/D9cU/Rf0Tz8CE0DnTVxT.aMG49m",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-09-04T22:10:07.391Z"
+  },
+  {
+    "id": "1788559809263",
+    "name": "Cookie Test Developer",
+    "email": "cookie_user_1788559809155@example.com",
+    "password": "$2b$10$ydB1uSnsEZ7RSAPlCMwm8OieoF6cTtte4Oxva7vlzXOnDFxUipH0S",
+    "phoneNumber": "+1234567890",
+    "role": "Developer",
+    "createdAt": "2026-09-04T22:10:09.265Z",
+    "bio": "Legitimate Cookie Authenticated Update",
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "preferences": {
+      "bio": "Legitimate Cookie Authenticated Update",
+      "upvotes": 0,
+      "upvoters": [],
+      "followers": []
+    },
+    "updatedAt": "2026-09-04T22:10:09.308Z"
   }
 ]

@@ -313,29 +313,5 @@ export function render_community_hub() {
 </div>
 </div>
 </footer>
-<script>
-        // Simple Carousel Logic
-        const container = document.getElementById('eventContainer');
-        const prevBtn = document.getElementById('prevEvent');
-        const nextBtn = document.getElementById('nextEvent');
-
-        prevBtn.addEventListener('click', () => {
-            container.scrollBy({ left: -400, behavior: 'smooth' });
-        });
-
-        nextBtn.addEventListener('click', () => {
-            container.scrollBy({ left: 400, behavior: 'smooth' });
-        });
-
-        // Hover animations for cards
-        document.querySelectorAll('.glass-card').forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-2px)';
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'translateY(0px)';
-            });
-        });
-    </script>
 `;
 }

@@ -5,13 +5,15 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "build": "node scripts/run-prisma.js generate",
+    "build": "node scripts/run-prisma.js generate && npx tailwindcss -i ./css/tailwind.src.css -o ./css/tailwind.prod.css --minify && node scripts/verify-build.js",
+    "build:css": "npx tailwindcss -i ./css/tailwind.src.css -o ./css/tailwind.prod.css --minify",
+    "verify-build": "node scripts/verify-build.js",
     "postinstall": "node scripts/run-prisma.js generate",
     "db:push": "node scripts/run-prisma.js db push",
     "db:migrate-data": "node scripts/migrate-data-to-postgres.js",
     "db:seed": "node prisma/seed.js",
     "db:studio": "node scripts/run-prisma.js studio",
-    "test": "node test/production-verification.test.js"
+    "test": "node test/production-verification.test.js && node test/security-and-hardening.test.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +33,7 @@
   "dependencies": {
     "@prisma/client": "^6.16.3",
     "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^16.4.5",
     "express": "^5.2.1",
@@ -43,5 +46,8 @@
     "prisma": "^6.16.3",
     "puppeteer": "^25.5.0",
     "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
   }
 }

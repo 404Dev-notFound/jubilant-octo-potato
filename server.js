@@ -22,6 +22,28 @@ const rateLimit = require('express-rate-limit');
 const fs = require('fs/promises');
 const path = require('path');
 
+// Modular hardening and security utilities
+const cookieParser = require('cookie-parser');
+const {
+    COOKIE_NAMES,
+    getCookieOptions,
+    setAuthCookies,
+    clearAuthCookies,
+    extractTokens,
+    csrfProtectionMiddleware
+} = require('./src/utils/cookieSecurity');
+const { SessionService } = require('./src/services/sessionService');
+const { NotificationService, sanitizeNotification } = require('./src/services/notificationService');
+const { OAuthService } = require('./src/services/oauthService');
+const { readJson, modifyJson, writeJson, JsonCorruptionError } = require('./src/storage/jsonStorage');
+const { safeMergePreferences, safeMergeUserRecord, EDITABLE_PREFERENCE_FIELDS, sanitizeLinkMap } = require('./src/utils/preferenceMerge');
+const { validateUrl, isSafeUrl, sanitizeSafeUrl } = require('./src/utils/urlSecurity');
+const { validateSchema, validateBody, PROJECT_SCHEMA, ISSUE_SCHEMA, SIGNUP_SCHEMA, LOGIN_SCHEMA, CHANGE_PASSWORD_SCHEMA, UPDATE_PROFILE_SCHEMA, GOOGLE_AUTH_SCHEMA, GITHUB_AUTH_SCHEMA } = require('./src/utils/validation');
+const { parsePagination, attachPaginationHeaders, paginateArray } = require('./src/utils/pagination');
+
+// Safe constant-time decoy hash to eliminate authentication timing enumeration (Phase 2.8)
+const DUMMY_BCRYPT_HASH = '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy';
+
 const PORT = process.env.PORT || 3000;
 let JWT_SECRET = (process.env.JWT_SECRET || '').trim();
 if (NODE_ENV === 'production') {
@@ -33,6 +55,8 @@ if (NODE_ENV === 'production') {
     JWT_SECRET = JWT_SECRET || 'codecollab-dev-jwt-secret-key-replace-in-prod';
 }
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '';
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '';
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
 const DATA_DIR = path.join(__dirname, 'codecollab data');
 
@@ -69,9 +93,54 @@ if (NODE_ENV === 'production') {
     app.set('trust proxy', 1);
 }
 
-// Security headers with Helmet (configured for cross-origin API accessibility)
+// ------------------------------------------------------------------------------
+// Request Correlation ID Middleware (Phases 2.10 & 2.5)
+// Strictly validates inbound X-Request-Id (alphanumeric, -, _, 1..64 chars)
+// Prevents log forging and newline injection, sets response header
+// ------------------------------------------------------------------------------
+app.use((req, res, next) => {
+    const inboundId = req.headers['x-request-id'];
+    if (typeof inboundId === 'string' && /^[a-zA-Z0-9_\-]{1,64}$/.test(inboundId.trim())) {
+        req.id = inboundId.trim();
+    } else {
+        req.id = uuidv4();
+    }
+    res.setHeader('X-Request-Id', req.id);
+    next();
+});
+
+// Security headers with Helmet (Strict CSP without unsafe-inline for scripts) (Phases 15 & 18)
 app.use(helmet({
-    contentSecurityPolicy: false, // Allows dynamic styles and SPA scripts while keeping XSS/Sniff protections
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: [
+                "'self'",
+                "'sha256-eGFYqAHm7QB8cassdFBbBxhusmh76P1pfh3ymxPZOUw='",
+                "https://unpkg.com",
+                "https://accounts.google.com"
+            ],
+            styleSrc: [
+                "'self'",
+                "'unsafe-inline'", // Allowed for CSS variables & theme styling
+                "https://fonts.googleapis.com"
+            ],
+            fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+            imgSrc: ["'self'", "data:", "https:", "blob:"],
+            connectSrc: [
+                "'self'",
+                "https://jubilant-octo-potato-production.up.railway.app",
+                "https://opensource-projects.netlify.app",
+                "https://*.supabase.co",
+                "https://unpkg.com",
+                "https://accounts.google.com"
+            ],
+            frameSrc: ["'self'", "https://accounts.google.com"],
+            frameAncestors: ["'none'"],
+            objectSrc: ["'none'"],
+            baseUri: ["'self'"]
+        }
+    },
     crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: { policy: "cross-origin" },
     crossOriginOpenerPolicy: false
@@ -131,45 +200,134 @@ const corsOptions = {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'X-Request-Id', 'X-Refresh-Token'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range', 'X-Request-Id', 'X-Total-Count', 'X-Page', 'X-Limit', 'X-Total-Pages'],
     maxAge: 86400 // Cache preflight response for 24 hours
 };
 
 app.use(cors(corsOptions));
 
-// Body parsers
+// Body parsers with payload limits
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
-// Serve static frontend assets
-app.use(express.static(__dirname));
+// Cookie parsing & anti-CSRF protection for ambient cookie session mutations
+app.use(cookieParser());
+app.use(csrfProtectionMiddleware(isOriginAllowed));
 
-// Rate Limiting for auth routes
+// ------------------------------------------------------------------------------
+// Malformed Request & Payload Error Handler (Phases 2.5 & 2.11)
+// Clean 400 for malformed JSON, 413 for oversized payloads, zero reflection of inputs
+// ------------------------------------------------------------------------------
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        return res.status(400).json({ error: 'Malformed JSON payload', requestId: req.id });
+    }
+    if (err.type === 'entity.too.large' || err.status === 413) {
+        return res.status(413).json({ error: 'Payload too large', requestId: req.id });
+    }
+    next(err);
+});
+
+// ------------------------------------------------------------------------------
+// HTTP Caching Policy Middleware (Phase 15)
+// API endpoints are private-by-default to prevent proxy/shared caching leaks
+// ------------------------------------------------------------------------------
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+        res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.setHeader('Vary', 'Authorization, Accept');
+    }
+    next();
+});
+
+// ------------------------------------------------------------------------------
+// Static Directory Shielding (Section 10.B)
+// Strictly blocks direct HTTP access to datastore, schema, backend code, and config
+// ------------------------------------------------------------------------------
+const BLOCKED_STATIC_REGEX = /^\/(codecollab\s+data|prisma|scripts|test|\.env|\.git|src)(\/|$)/i;
+app.use((req, res, next) => {
+    let decodedPath = req.path;
+    try {
+        decodedPath = decodeURIComponent(req.path);
+    } catch {
+        return res.status(400).json({ error: 'Malformed request path', requestId: req.id });
+    }
+    if (BLOCKED_STATIC_REGEX.test(decodedPath) || decodedPath.includes('..') || decodedPath.startsWith('/.env')) {
+        return res.status(403).json({ error: 'Access denied to restricted path', requestId: req.id });
+    }
+    next();
+});
+
+// Serve static frontend assets with appropriate caching
+app.use(express.static(__dirname, {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('index.html')) {
+            res.setHeader('Cache-Control', 'no-cache');
+        } else if (filePath.match(/\.(css|js|png|jpg|jpeg|svg|webp|woff2?|ico)$/)) {
+            res.setHeader('Cache-Control', 'public, max-age=86400');
+        }
+    }
+}));
+
+// Rate Limiting for auth routes (Phase 6 & Section 10.C)
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 500,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: () => process.env.NODE_ENV === 'test',
+    message: { error: 'Too many requests, please try again later.' }
+});
+app.use('/api/', apiLimiter);
+
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // limit each IP to 100 requests per windowMs
     standardHeaders: true,
     legacyHeaders: false,
+    skip: () => process.env.NODE_ENV === 'test',
     message: { error: 'Too many authentication attempts, please try again later.' }
 });
+const passwordChangeLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 15,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: () => process.env.NODE_ENV === 'test',
+    message: { error: 'Too many password change attempts, please try again later.' }
+});
+
 app.use('/api/auth/', authLimiter);
+app.use('/api/auth/change-password', passwordChangeLimiter);
 
 let isDatabaseAvailable = false;
 let lastDbCheckTime = 0;
+
+// Centralized Session Service instance (Phases 4.2 & 2.9)
+const sessionService = new SessionService(prisma, isDbConnected, refreshTokenStore);
 
 async function isDbConnected(forceCheck = false) {
     if (NODE_ENV === 'production') {
         return true; // In production, database is strictly required
     }
+    if ((process.env.NODE_ENV === 'test' || NODE_ENV === 'test') && !process.env.TEST_WITH_DB) {
+        return false;
+    }
     if (!prisma) return false;
+    // In non-production, maintain datastore stability: do not flip from file fallback to DB mid-session
+    if (!isDatabaseAvailable && !forceCheck) {
+        return false;
+    }
     const now = Date.now();
     if (!forceCheck && (now - lastDbCheckTime < 10000)) {
         return isDatabaseAvailable;
     }
     lastDbCheckTime = now;
     try {
-        await withTimeout(prisma.$queryRaw`SELECT 1`, 3000);
+        await withTimeout(prisma.$queryRaw`SELECT 1`, 2000);
         isDatabaseAvailable = true;
     } catch {
         isDatabaseAvailable = false;
@@ -202,7 +360,7 @@ async function verifyDatabaseConnectivity() {
     } else {
         if (prisma) {
             try {
-                await withTimeout(prisma.$queryRaw`SELECT 1`, 800);
+                await withTimeout(prisma.$queryRaw`SELECT 1`, 2000);
                 isDatabaseAvailable = true;
                 console.log('✅ PostgreSQL database connected (Dual Storage Active).');
             } catch {
@@ -233,25 +391,80 @@ app.get(['/health', '/healthz'], async (req, res) => {
 });
 
 // ------------------------------------------------------------------------------
-// Authentication Middleware
+// Authentication Middleware (Dual Bearer Header + HttpOnly Cookie Support)
 // ------------------------------------------------------------------------------
 function authMiddleware(req, res, next) {
     const authHeader = req.headers['authorization'];
-    if (!authHeader) {
+    let token = null;
+
+    if (authHeader) {
+        const parts = authHeader.split(' ');
+        if (parts.length !== 2 || parts[0] !== 'Bearer') {
+            return res.status(401).json({ error: 'Invalid token format. Expected Bearer <token>' });
+        }
+        token = parts[1];
+    } else {
+        const { accessToken } = extractTokens(req);
+        token = accessToken;
+    }
+
+    if (!token) {
         return res.status(401).json({ error: 'No authorization token provided' });
     }
-    const parts = authHeader.split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer') {
-        return res.status(401).json({ error: 'Invalid token format. Expected Bearer <token>' });
-    }
-    const token = parts[1];
+
     jwt.verify(token, JWT_SECRET, (err, decoded) => {
         if (err) {
-            return res.status(401).json({ error: 'Invalid or expired session token' });
+            if (err.name === 'TokenExpiredError') {
+                return res.status(401).json({ error: 'Session token has expired', code: 'TOKEN_EXPIRED' });
+            }
+            return res.status(401).json({ error: 'Invalid or expired session token', code: 'TOKEN_INVALID' });
         }
-        req.user = decoded; // { id, email, role }
+        req.user = decoded; // { id, email, role, name }
         next();
     });
+}
+
+// Authoritative user display-name resolver (Phase 4.3)
+async function resolveUserName(userId, fallback = 'Developer') {
+    if (!userId) return fallback;
+    const cleanId = String(userId);
+    if (NODE_ENV === 'production' || (await isDbConnected())) {
+        try {
+            const u = await prisma.user.findUnique({
+                where: { id: cleanId },
+                include: { profile: true }
+            });
+            if (u) {
+                if (u.profile?.firstName) {
+                    return `${u.profile.firstName} ${u.profile.lastName || ''}`.trim();
+                }
+                if (u.name) return u.name;
+            }
+        } catch {}
+    }
+    try {
+        const users = await readJson(getFilePath('users'), []);
+        const u = (Array.isArray(users) ? users : []).find(x => String(x.id) === cleanId);
+        if (u) {
+            if (u.name) return u.name;
+            if (u.profile?.firstName) return `${u.profile.firstName} ${u.profile.lastName || ''}`.trim();
+        }
+    } catch {}
+    return fallback;
+}
+
+// Project privacy helper (Phase 2.1)
+async function checkProjectPrivate(projectId) {
+    if (!projectId) return false;
+    const cleanProjectId = String(projectId);
+    try {
+        const rawProjects = await readJson(getFilePath('projects'), []);
+        const p = (Array.isArray(rawProjects) ? rawProjects : []).find(x => String(x.id) === cleanProjectId);
+        if (p) {
+            return p.isPrivate === true || (typeof p.visibility === 'string' && p.visibility.toLowerCase() === 'private');
+        }
+    } catch {}
+    return false;
 }
 
 // ------------------------------------------------------------------------------
@@ -272,13 +485,13 @@ function sanitizeUserObj(u, fallbackName = 'Developer') {
         id: String(safeUser.id || ''),
         name: safeUser.name || (safeUser.profile?.firstName ? `${safeUser.profile.firstName} ${safeUser.profile.lastName || ''}`.trim() : fallbackName),
         title: safeUser.title || prefs.title || safeUser.role || 'Developer',
-        avatarUrl: safeUser.avatarUrl || safeUser.profile?.avatarUrl || '',
+        avatarUrl: sanitizeSafeUrl(safeUser.avatarUrl || safeUser.profile?.avatarUrl || '', ''),
         verifiedSkills: Array.isArray(safeUser.verifiedSkills) ? safeUser.verifiedSkills : (Array.isArray(prefs.verifiedSkills) ? prefs.verifiedSkills : []),
         skills: Array.isArray(safeUser.skills) ? safeUser.skills : (Array.isArray(prefs.skills) ? prefs.skills : []),
         bio: safeUser.bio || prefs.bio || '',
         availability: safeUser.availability || prefs.availability || 'Available Now',
         lookingFor: safeUser.lookingFor || prefs.lookingFor || 'Open for collaboration',
-        socialLinks: safeUser.socialLinks || prefs.socialLinks || {},
+        socialLinks: sanitizeLinkMap(safeUser.socialLinks || prefs.socialLinks || {}),
         location: safeUser.location || prefs.location || '',
         rating: typeof safeUser.rating === 'number' ? safeUser.rating : (typeof prefs.rating === 'number' ? prefs.rating : 5.0),
         upvotes: typeof safeUser.upvotes === 'number' ? safeUser.upvotes : (typeof prefs.upvotes === 'number' ? prefs.upvotes : 0),
@@ -286,6 +499,22 @@ function sanitizeUserObj(u, fallbackName = 'Developer') {
         followers: Array.isArray(safeUser.followers) ? safeUser.followers : (Array.isArray(prefs.followers) ? prefs.followers : [])
     };
 }
+
+// ------------------------------------------------------------------------------
+// Centralized Domain Services (Notification & OAuth)
+// ------------------------------------------------------------------------------
+const notificationService = new NotificationService(prisma, isDbConnected);
+const oauthService = new OAuthService({
+    prismaClient: prisma,
+    isDbConnectedFn: isDbConnected,
+    sessionService,
+    jwtSecret: JWT_SECRET,
+    googleClientId: GOOGLE_CLIENT_ID,
+    githubClientId: GITHUB_CLIENT_ID,
+    githubClientSecret: GITHUB_CLIENT_SECRET,
+    usersFilePath: getFilePath('users'),
+    sanitizeUserFn: sanitizeUserObj
+});
 
 // Sanitizes issue objects for client consumption
 function formatIssue(issue, fileUsersMap = new Map()) {
@@ -411,29 +640,6 @@ function sanitizeMeetingRequest(m, fileUsersMap = new Map()) {
     };
 }
 
-// Sanitizes notifications (Zero Email Leakage)
-function sanitizeNotification(n) {
-    if (!n) return null;
-    return {
-        id: n.id,
-        userId: String(n.userId),
-        actorId: n.actorId ? String(n.actorId) : null,
-        actor: n.actor ? {
-            id: String(n.actor.id),
-            name: n.actor.profile?.firstName ? `${n.actor.profile.firstName} ${n.actor.profile.lastName || ''}`.trim() : 'Collaborator',
-            avatarUrl: n.actor.profile?.avatarUrl || ''
-        } : null,
-        projectId: n.projectId ? String(n.projectId) : null,
-        project: n.project ? { id: n.project.id, title: n.project.title } : undefined,
-        type: n.type || 'SYSTEM',
-        title: n.title || 'Notification',
-        message: n.message || n.content || '',
-        data: n.data || {},
-        read: Boolean(n.read),
-        createdAt: n.createdAt
-    };
-}
-
 // Authorization check helper: checks if user is owner or member of project
 async function isProjectAuthorized(projectId, userId) {
     if (!projectId || !userId) return false;
@@ -473,59 +679,10 @@ async function isProjectAuthorized(projectId, userId) {
     return false;
 }
 
-// Reusable helper to send and persist notifications
+// Reusable helper to send and persist notifications via NotificationService
 async function sendNotification({ userId, actorId, projectId, type, title, message, data = {} }) {
     if (!userId) return null;
-    const targetUserId = String(userId);
-    const notificationRecord = {
-        id: `notif_${Date.now()}_${uuidv4().substring(0, 8)}`,
-        userId: targetUserId,
-        actorId: actorId ? String(actorId) : null,
-        projectId: projectId ? String(projectId) : null,
-        type: type || 'SYSTEM',
-        title: title || 'Notification',
-        message: message || '',
-        data: data || {},
-        read: false,
-        createdAt: new Date().toISOString()
-    };
-
-    if (NODE_ENV === 'production' || (await isDbConnected())) {
-        try {
-            await prisma.notification.create({
-                data: {
-                    id: notificationRecord.id,
-                    userId: targetUserId,
-                    actorId: notificationRecord.actorId,
-                    projectId: notificationRecord.projectId,
-                    type: notificationRecord.type,
-                    title: notificationRecord.title,
-                    message: notificationRecord.message,
-                    data: notificationRecord.data,
-                    read: false
-                }
-            });
-            return notificationRecord;
-        } catch (e) {
-            if (NODE_ENV === 'production') {
-                console.error('[Notification DB Error]:', e.message);
-                return null;
-            }
-        }
-    }
-
-    try {
-        const notifPath = getFilePath('notifications');
-        let notifs = [];
-        try {
-            notifs = JSON.parse(await fs.readFile(notifPath, 'utf-8'));
-        } catch { notifs = []; }
-        notifs.unshift(notificationRecord);
-        await fs.writeFile(notifPath, JSON.stringify(notifs, null, 2));
-    } catch (err) {
-        console.error('Failed to save notification fallback:', err.message);
-    }
-    return notificationRecord;
+    return notificationService.createNotification({ userId, actorId, projectId, type, title, message, data });
 }
 
 // Stats helper
@@ -555,6 +712,49 @@ async function saveStats(stats) {
 // ------------------------------------------------------------------------------
 
 /*
+ * Session Restore & Verification Endpoint
+ * Validates either cookie or Bearer token and returns sanitized user session
+ */
+app.get('/api/auth/me', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        if (NODE_ENV === 'production' || (await isDbConnected())) {
+            try {
+                const user = await prisma.user.findUnique({
+                    where: { id: userId },
+                    include: { profile: true }
+                });
+                if (user) {
+                    const sanitized = sanitizeUserObj(user);
+                    return res.json({
+                        authenticated: true,
+                        user: { ...sanitized, email: user.email }
+                    });
+                }
+            } catch (err) {
+                if (NODE_ENV === 'production') throw err;
+            }
+        }
+
+        const filePath = getFilePath('users');
+        const users = await readJson(filePath, []);
+        const user = users.find(u => String(u.id) === userId);
+        if (user) {
+            const sanitized = sanitizeUserObj(user);
+            return res.json({
+                authenticated: true,
+                user: { ...sanitized, email: user.email }
+            });
+        }
+
+        return res.status(404).json({ authenticated: false, error: 'User not found' });
+    } catch (err) {
+        console.error('Auth check error (/api/auth/me):', err);
+        return res.status(500).json({ authenticated: false, error: 'Failed to verify session' });
+    }
+});
+
+/*
  * Signup Endpoint
  */
 app.post('/api/auth/signup', async (req, res) => {
@@ -579,6 +779,7 @@ app.post('/api/auth/signup', async (req, res) => {
         const names = name.trim().split(' ');
         const firstName = names[0] || '';
         const lastName = names.slice(1).join(' ') || '';
+        const trimmedName = name.trim();
 
         if (NODE_ENV === 'production' || (await isDbConnected())) {
             try {
@@ -612,10 +813,11 @@ app.post('/api/auth/signup', async (req, res) => {
                     include: { profile: true }
                 });
 
-                const token = jwt.sign({ id: newUser.id, email: newUser.email, role: role || 'Developer' }, JWT_SECRET, { expiresIn: '7d' });
+                const token = jwt.sign({ id: newUser.id, email: newUser.email, role: role || 'Developer', name: trimmedName }, JWT_SECRET, { expiresIn: '7d' });
                 const refreshToken = uuidv4();
-                refreshTokenStore.set(refreshToken, newUser.id);
+                await sessionService.createSession({ userId: newUser.id, refreshToken, ipAddress: req.ip, userAgent: req.get('User-Agent') });
 
+                setAuthCookies(res, req, { accessToken: token, refreshToken });
                 const sanitized = sanitizeUserObj(newUser);
                 return res.status(201).json({
                     token,
@@ -629,18 +831,17 @@ app.post('/api/auth/signup', async (req, res) => {
             }
         }
 
-        // Offline / Dev File Fallback
-        const filePath = path.join(DATA_DIR, 'users.json');
-        let users = [];
-        try { users = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch { users = []; }
+        // Offline / Dev File Fallback with atomic storage
+        const filePath = getFilePath('users');
+        const users = await readJson(filePath, []);
 
-        if (users.some(u => u.email.toLowerCase() === normalizedEmail)) {
+        if (users.some(u => u.email && u.email.toLowerCase() === normalizedEmail)) {
             return res.status(400).json({ error: 'Email already registered' });
         }
 
         const newUser = {
             id: userId,
-            name: name.trim(),
+            name: trimmedName,
             email: normalizedEmail,
             password: hashedPassword,
             phoneNumber: rawMobile,
@@ -648,13 +849,17 @@ app.post('/api/auth/signup', async (req, res) => {
             createdAt: new Date().toISOString()
         };
 
-        users.push(newUser);
-        await fs.writeFile(filePath, JSON.stringify(users, null, 2));
+        await modifyJson(filePath, (uList = []) => {
+            const list = Array.isArray(uList) ? uList : [];
+            list.push(newUser);
+            return list;
+        }, []);
 
-        const token = jwt.sign({ id: newUser.id, email: newUser.email, role: newUser.role }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ id: newUser.id, email: newUser.email, role: newUser.role, name: trimmedName }, JWT_SECRET, { expiresIn: '7d' });
         const refreshToken = uuidv4();
-        refreshTokenStore.set(refreshToken, newUser.id);
+        await sessionService.createSession({ userId: newUser.id, refreshToken, ipAddress: req.ip, userAgent: req.get('User-Agent') });
 
+        setAuthCookies(res, req, { accessToken: token, refreshToken });
         const sanitized = sanitizeUserObj(newUser);
         return res.status(201).json({
             token,
@@ -670,7 +875,7 @@ app.post('/api/auth/signup', async (req, res) => {
 });
 
 /*
- * Login Endpoint
+ * Login Endpoint (Timing-Attack Hardened & Session-Aware)
  */
 app.post('/api/auth/login', async (req, res) => {
     try {
@@ -692,6 +897,8 @@ app.post('/api/auth/login', async (req, res) => {
                 });
 
                 if (!user || !user.passwordHash) {
+                    // Timing mitigation: perform dummy hash comparison (Phase 2.8)
+                    await bcrypt.compare(password, DUMMY_BCRYPT_HASH);
                     return res.status(401).json({ error: 'Invalid email or password' });
                 }
 
@@ -713,9 +920,12 @@ app.post('/api/auth/login', async (req, res) => {
                     });
                 }
 
-                const token = jwt.sign({ id: user.id, email: user.email, role: 'Developer' }, JWT_SECRET, { expiresIn: '7d' });
+                const resolvedName = await resolveUserName(user.id, 'Developer');
+                const token = jwt.sign({ id: user.id, email: user.email, role: 'Developer', name: resolvedName }, JWT_SECRET, { expiresIn: '7d' });
                 const refreshToken = uuidv4();
-                refreshTokenStore.set(refreshToken, user.id);
+                await sessionService.createSession({ userId: user.id, refreshToken, ipAddress: req.ip, userAgent: req.get('User-Agent') });
+
+                setAuthCookies(res, req, { accessToken: token, refreshToken });
                 const sanitized = sanitizeUserObj(user);
 
                 return res.json({
@@ -734,23 +944,34 @@ app.post('/api/auth/login', async (req, res) => {
 
         // Offline Non-Production Fallback
         const filePath = getFilePath('users');
-        let users = [];
-        try { users = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch { users = []; }
+        const users = await readJson(filePath, []);
 
-        const userIndex = users.findIndex(u => u.email.toLowerCase() === normalizedEmail);
-        if (userIndex === -1) return res.status(401).json({ error: 'Invalid email or password' });
+        const userIndex = users.findIndex(u => u.email && u.email.toLowerCase() === normalizedEmail);
+        if (userIndex === -1) {
+            // Timing mitigation: perform dummy hash comparison (Phase 2.8)
+            await bcrypt.compare(password, DUMMY_BCRYPT_HASH);
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }
 
         const user = users[userIndex];
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).json({ error: 'Invalid email or password' });
 
-        // Update mobile number in fallback record
-        users[userIndex].phoneNumber = rawMobile;
-        await fs.writeFile(filePath, JSON.stringify(users, null, 2));
+        // Update mobile number in fallback record atomically
+        if (rawMobile) {
+            await modifyJson(filePath, (uList = []) => {
+                const target = (Array.isArray(uList) ? uList : []).find(u => String(u.id) === String(user.id));
+                if (target) target.phoneNumber = rawMobile;
+                return uList;
+            }, []);
+        }
 
-        const token = jwt.sign({ id: user.id, email: user.email, role: user.role || 'Developer' }, JWT_SECRET, { expiresIn: '7d' });
+        const resolvedName = user.name || (user.profile?.firstName ? `${user.profile.firstName} ${user.profile.lastName || ''}`.trim() : 'Developer');
+        const token = jwt.sign({ id: user.id, email: user.email, role: user.role || 'Developer', name: resolvedName }, JWT_SECRET, { expiresIn: '7d' });
         const refreshToken = uuidv4();
-        refreshTokenStore.set(refreshToken, user.id);
+        await sessionService.createSession({ userId: user.id, refreshToken, ipAddress: req.ip, userAgent: req.get('User-Agent') });
+
+        setAuthCookies(res, req, { accessToken: token, refreshToken });
         const sanitized = sanitizeUserObj(user);
 
         res.json({
@@ -766,151 +987,219 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 /*
- * Refresh Token Exchange
+ * Refresh Token Exchange (Rotates Token & Preserves Full Session Identity)
  */
 app.post('/api/auth/refresh', async (req, res) => {
     try {
-        const { refreshToken } = req.body;
-        if (!refreshToken || !refreshTokenStore.has(refreshToken)) {
+        const { refreshToken: cookieRefreshToken } = extractTokens(req);
+        const refreshToken = req.body?.refreshToken || cookieRefreshToken;
+        if (!refreshToken) {
+            return res.status(401).json({ error: 'Refresh token is required' });
+        }
+
+        const userId = await sessionService.findUserIdByRefreshToken(refreshToken);
+        if (!userId) {
             return res.status(401).json({ error: 'Invalid or expired refresh token' });
         }
 
-        const userId = refreshTokenStore.get(refreshToken);
-        refreshTokenStore.delete(refreshToken);
+        // Revoke old refresh token (single-flight token rotation)
+        await sessionService.revokeByRefreshToken(refreshToken);
 
-        const newAccessToken = jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: '7d' });
+        // Resolve identity
+        const userName = await resolveUserName(userId, 'Developer');
+        const newAccessToken = jwt.sign({ id: userId, name: userName }, JWT_SECRET, { expiresIn: '7d' });
         const newRefreshToken = uuidv4();
-        refreshTokenStore.set(newRefreshToken, userId);
+        await sessionService.createSession({ userId, refreshToken: newRefreshToken, ipAddress: req.ip, userAgent: req.get('User-Agent') });
 
+        setAuthCookies(res, req, { accessToken: newAccessToken, refreshToken: newRefreshToken });
         res.json({ token: newAccessToken, refreshToken: newRefreshToken });
     } catch (error) {
+        console.error('Token refresh error:', error);
         res.status(500).json({ error: 'Token refresh failed' });
     }
 });
 
 /*
- * Logout Endpoint
+ * Logout Endpoint (Revokes Server-Side Session & Clears Cookies)
  */
 app.post('/api/auth/logout', async (req, res) => {
     try {
-        const { refreshToken } = req.body;
-        if (refreshToken) refreshTokenStore.delete(refreshToken);
+        const { refreshToken: cookieRefreshToken } = extractTokens(req);
+        const refreshToken = req.body?.refreshToken || cookieRefreshToken;
+        if (refreshToken) {
+            await sessionService.revokeByRefreshToken(refreshToken);
+        }
+        clearAuthCookies(res, req);
         res.json({ success: true, message: 'Logged out successfully' });
     } catch {
+        clearAuthCookies(res, req);
         res.json({ success: true });
+    }
+});
+
+/*
+ * List Active User Sessions (Phase 4.2)
+ */
+app.get('/api/auth/sessions', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        const { refreshToken: cookieRefreshToken } = extractTokens(req);
+        const currentRefreshToken = req.headers['x-refresh-token'] || cookieRefreshToken || req.body?.refreshToken || null;
+        const sessions = await sessionService.listSessions(userId, currentRefreshToken);
+        res.json({ sessions });
+    } catch (err) {
+        console.error('List sessions error:', err);
+        res.status(500).json({ error: 'Failed to list active sessions' });
+    }
+});
+
+/*
+ * Revoke Individual Session (Phase 4.2 - User Scoped)
+ */
+app.delete('/api/auth/sessions/:id', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        const sessionId = String(req.params.id);
+        await sessionService.revokeSession(userId, sessionId);
+        res.json({ success: true, message: 'Session revoked successfully' });
+    } catch (err) {
+        console.error('Revoke session error:', err);
+        res.status(500).json({ error: 'Failed to revoke session' });
+    }
+});
+
+/*
+ * Logout Everywhere / Revoke All Sessions (Phase 4.2)
+ */
+app.post('/api/auth/logout-all', authMiddleware, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        await sessionService.revokeAllUserSessions(userId);
+        clearAuthCookies(res, req);
+        res.json({ success: true, message: 'All active sessions have been revoked' });
+    } catch (err) {
+        console.error('Logout all error:', err);
+        res.status(500).json({ error: 'Failed to revoke all sessions' });
+    }
+});
+
+/*
+ * Change Password with Session Revocation & Credential Reissuance (Phase 4.2)
+ */
+app.post('/api/auth/change-password', authMiddleware, passwordChangeLimiter, async (req, res) => {
+    try {
+        const userId = String(req.user.id);
+        const { currentPassword, newPassword } = req.body;
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ error: 'Both current password and new password are required' });
+        }
+        if (newPassword.length < 6) {
+            return res.status(400).json({ error: 'New password must be at least 6 characters long' });
+        }
+
+        let passwordVerified = false;
+
+        if (NODE_ENV === 'production' || (await isDbConnected())) {
+            try {
+                const userRecord = await prisma.user.findUnique({ where: { id: userId } });
+                if (userRecord && userRecord.passwordHash) {
+                    const isMatch = await bcrypt.compare(currentPassword, userRecord.passwordHash);
+                    if (!isMatch) {
+                        return res.status(401).json({ error: 'Current password is incorrect' });
+                    }
+                    const newHashed = await bcrypt.hash(newPassword, 10);
+                    await prisma.user.update({
+                        where: { id: userId },
+                        data: { passwordHash: newHashed }
+                    });
+                    passwordVerified = true;
+                }
+            } catch (err) {
+                if (NODE_ENV === 'production') throw err;
+            }
+        }
+
+        if (!passwordVerified) {
+            const users = await readJson(getFilePath('users'), []);
+            const user = users.find(u => String(u.id) === userId);
+            if (!user) return res.status(404).json({ error: 'User not found' });
+
+            const isMatch = await bcrypt.compare(currentPassword, user.password);
+            if (!isMatch) {
+                return res.status(401).json({ error: 'Current password is incorrect' });
+            }
+
+            const newHashed = await bcrypt.hash(newPassword, 10);
+            await modifyJson(getFilePath('users'), (uList) => {
+                const target = (Array.isArray(uList) ? uList : []).find(x => String(x.id) === userId);
+                if (target) target.password = newHashed;
+                return uList;
+            }, []);
+        }
+
+        // Revoke all existing sessions for safety
+        await sessionService.revokeAllUserSessions(userId);
+
+        // Reissue new credential pair for the current client
+        const userName = await resolveUserName(userId, 'Developer');
+        const token = jwt.sign({ id: userId, email: req.user.email, role: req.user.role || 'Developer', name: userName }, JWT_SECRET, { expiresIn: '7d' });
+        const refreshToken = uuidv4();
+        await sessionService.createSession({ userId, refreshToken, ipAddress: req.ip, userAgent: req.get('User-Agent') });
+
+        setAuthCookies(res, req, { accessToken: token, refreshToken });
+
+        res.json({
+            success: true,
+            message: 'Password changed successfully. All previous sessions revoked.',
+            token,
+            refreshToken
+        });
+    } catch (err) {
+        console.error('Change password error:', err);
+        res.status(500).json({ error: 'Failed to change password' });
     }
 });
 
 /*
  * Google OAuth Endpoint
  */
-app.post('/api/auth/google', async (req, res) => {
+app.post('/api/auth/google', validateBody(GOOGLE_AUTH_SCHEMA), async (req, res) => {
     try {
-        const { credential } = req.body;
-        if (!credential) return res.status(400).json({ error: 'Google credential token is required' });
-
-        if (!oauthClient) {
-            return res.status(500).json({ error: 'Google OAuth is not configured on this server' });
-        }
-
-        const ticket = await oauthClient.verifyIdToken({
-            idToken: credential,
-            audience: GOOGLE_CLIENT_ID
-        });
-        const payload = ticket.getPayload();
-        const { sub: googleId, email, name, picture } = payload;
-        const normalizedEmail = email.toLowerCase();
-        const names = (name || '').trim().split(' ');
-        const firstName = names[0] || 'Developer';
-        const lastName = names.slice(1).join(' ') || '';
-
-        if (NODE_ENV === 'production' || (await isDbConnected())) {
-            try {
-                let user = await prisma.user.findUnique({
-                    where: { email: normalizedEmail },
-                    include: { profile: true }
-                });
-
-                if (!user) {
-                    const userId = String(Date.now());
-                    user = await prisma.user.create({
-                        data: {
-                            id: userId,
-                            email: normalizedEmail,
-                            isVerified: true,
-                            status: 'active',
-                            profile: {
-                                create: {
-                                    firstName,
-                                    lastName,
-                                    avatarUrl: picture || '',
-                                    preferences: {
-                                        title: 'Full Stack Engineer',
-                                        bio: 'Joined via Google',
-                                        skills: ['JavaScript', 'React'],
-                                        availability: 'Available Now'
-                                    }
-                                }
-                            },
-                            oauthIdentities: {
-                                create: {
-                                    provider: 'google',
-                                    providerUserId: googleId,
-                                    email: normalizedEmail
-                                }
-                            }
-                        },
-                        include: { profile: true }
-                    });
-                }
-
-                const token = jwt.sign({ id: user.id, email: user.email, role: 'Developer' }, JWT_SECRET, { expiresIn: '7d' });
-                const refreshToken = uuidv4();
-                refreshTokenStore.set(refreshToken, user.id);
-                const sanitized = sanitizeUserObj(user);
-
-                return res.json({ token, refreshToken, ...sanitized, user: sanitized });
-            } catch (err) {
-                if (NODE_ENV === 'production') {
-                    console.error('[Google OAuth DB Error]:', err.message);
-                    return res.status(500).json({ error: 'OAuth authentication failed' });
-                }
-            }
-        }
-
-        // Offline Non-Production Fallback
-        const filePath = getFilePath('users');
-        let users = [];
-        try { users = JSON.parse(await fs.readFile(filePath, 'utf-8')); } catch { users = []; }
-
-        let user = users.find(u => u.email.toLowerCase() === normalizedEmail);
-        if (!user) {
-            user = {
-                id: String(Date.now()),
-                name: name || 'Developer',
-                email: normalizedEmail,
-                role: 'Developer',
-                avatarUrl: picture || '',
-                skills: [],
-                verifiedSkills: [],
-                bio: 'Joined via Google',
-                availability: 'Available Now',
-                socialLinks: {},
-                createdAt: new Date().toISOString()
-            };
-            users.push(user);
-            await fs.writeFile(filePath, JSON.stringify(users, null, 2));
-        }
-
-        const token = jwt.sign({ id: user.id, email: user.email, role: user.role || 'Developer' }, JWT_SECRET, { expiresIn: '7d' });
-        const refreshToken = uuidv4();
-        refreshTokenStore.set(refreshToken, user.id);
-        const sanitized = sanitizeUserObj(user);
-
-        res.json({ token, refreshToken, ...sanitized, user: sanitized });
+        const { credential } = req.validatedBody || req.body || {};
+        const result = await oauthService.handleGoogleAuth({ credential, req, res });
+        return res.status(result.status).json(result.data);
     } catch (error) {
-        console.error('Google OAuth error:', error);
-        res.status(401).json({ error: 'Failed to verify Google token' });
+        console.error('Google OAuth route error:', error);
+        res.status(500).json({ error: 'Failed to authenticate with Google' });
+    }
+});
+
+/*
+ * GitHub OAuth Authorization URL
+ */
+app.get('/api/auth/github/url', (req, res) => {
+    try {
+        const redirectUri = req.query.redirect_uri ? String(req.query.redirect_uri) : undefined;
+        const result = oauthService.getGitHubAuthUrl(redirectUri);
+        return res.status(result.status).json(result.data);
+    } catch (error) {
+        console.error('GitHub OAuth URL error:', error);
+        res.status(500).json({ error: 'Failed to generate GitHub authorization URL' });
+    }
+});
+
+/*
+ * GitHub OAuth Code Exchange & Login
+ */
+app.post('/api/auth/github', validateBody(GITHUB_AUTH_SCHEMA), async (req, res) => {
+    try {
+        const { code } = req.validatedBody || req.body || {};
+        const result = await oauthService.handleGitHubAuth({ code, req, res });
+        return res.status(result.status).json(result.data);
+    } catch (error) {
+        console.error('GitHub OAuth route error:', error);
+        res.status(500).json({ error: 'Failed to authenticate with GitHub' });
     }
 });
 
@@ -960,50 +1249,47 @@ app.get('/api/users/profile', authMiddleware, async (req, res) => {
 });
 
 /*
- * Update Profile
+ * Update Profile (Preserves Social Metrics & Internal Metadata)
  */
 const handleUpdateProfile = async (req, res) => {
     try {
         const userId = String(req.user.id);
-        const { name, title, bio, skills, verifiedSkills, avatarUrl, availability, lookingFor, socialLinks, location } = req.body;
+        const payload = req.validatedBody || req.body || {};
+        const { name, avatarUrl } = payload;
         const names = (name || '').trim().split(' ');
         const firstName = names[0] || '';
         const lastName = names.slice(1).join(' ') || '';
+        const safeAvatar = avatarUrl ? sanitizeSafeUrl(avatarUrl, '') : undefined;
+
+        if (payload.socialLinks) {
+            payload.socialLinks = sanitizeLinkMap(payload.socialLinks);
+        }
+        if (safeAvatar !== undefined) {
+            payload.avatarUrl = safeAvatar;
+        }
 
         if (NODE_ENV === 'production' || (await isDbConnected())) {
             try {
+                const existingProfile = await prisma.userProfile.findUnique({ where: { userId } });
+                const currentPrefs = (typeof existingProfile?.preferences === 'object' && existingProfile?.preferences !== null)
+                    ? existingProfile.preferences
+                    : {};
+                const mergedPrefs = safeMergePreferences(currentPrefs, payload);
+
                 const updatedProfile = await prisma.userProfile.upsert({
                     where: { userId },
                     update: {
                         firstName: firstName || undefined,
                         lastName: lastName || undefined,
-                        avatarUrl: avatarUrl || undefined,
-                        preferences: {
-                            title: title || undefined,
-                            bio: bio || undefined,
-                            skills: Array.isArray(skills) ? skills : undefined,
-                            verifiedSkills: Array.isArray(verifiedSkills) ? verifiedSkills : undefined,
-                            availability: availability || undefined,
-                            lookingFor: lookingFor || undefined,
-                            socialLinks: socialLinks || undefined,
-                            location: location || undefined
-                        }
+                        avatarUrl: safeAvatar || undefined,
+                        preferences: mergedPrefs
                     },
                     create: {
                         userId,
                         firstName,
                         lastName,
-                        avatarUrl: avatarUrl || '',
-                        preferences: {
-                            title: title || 'Developer',
-                            bio: bio || '',
-                            skills: Array.isArray(skills) ? skills : [],
-                            verifiedSkills: Array.isArray(verifiedSkills) ? verifiedSkills : [],
-                            availability: availability || 'Available Now',
-                            lookingFor: lookingFor || '',
-                            socialLinks: socialLinks || {},
-                            location: location || ''
-                        }
+                        avatarUrl: safeAvatar || '',
+                        preferences: mergedPrefs
                     },
                     include: { user: true }
                 });
@@ -1021,34 +1307,25 @@ const handleUpdateProfile = async (req, res) => {
         }
 
         const filePath = getFilePath('users');
-        let users = JSON.parse(await fs.readFile(filePath, 'utf-8'));
-        const index = users.findIndex(u => String(u.id) === userId);
-        if (index === -1) return res.status(404).json({ error: 'User not found' });
+        let updatedUser = null;
+        await modifyJson(filePath, (users = []) => {
+            const list = Array.isArray(users) ? users : [];
+            const index = list.findIndex(u => String(u.id) === userId);
+            if (index === -1) return list;
+            list[index] = safeMergeUserRecord(list[index], payload);
+            updatedUser = list[index];
+            return list;
+        }, []);
 
-        users[index] = {
-            ...users[index],
-            name: name !== undefined ? name.trim() : users[index].name,
-            title: title !== undefined ? title.trim() : users[index].title,
-            bio: bio !== undefined ? bio.trim() : users[index].bio,
-            skills: Array.isArray(skills) ? skills : users[index].skills,
-            verifiedSkills: Array.isArray(verifiedSkills) ? verifiedSkills : users[index].verifiedSkills,
-            avatarUrl: avatarUrl !== undefined ? avatarUrl : users[index].avatarUrl,
-            availability: availability !== undefined ? availability : users[index].availability,
-            lookingFor: lookingFor !== undefined ? lookingFor : users[index].lookingFor,
-            socialLinks: socialLinks !== undefined ? socialLinks : users[index].socialLinks,
-            location: location !== undefined ? location : users[index].location,
-            updatedAt: new Date().toISOString()
-        };
-
-        await fs.writeFile(filePath, JSON.stringify(users, null, 2));
-        res.json({ success: true, profile: sanitizeUserObj(users[index]) });
+        if (!updatedUser) return res.status(404).json({ error: 'User not found' });
+        res.json({ success: true, profile: sanitizeUserObj(updatedUser) });
     } catch (error) {
         console.error('Error updating profile:', error);
         res.status(500).json({ error: 'Failed to update profile' });
     }
 };
-app.put('/api/users/profile', authMiddleware, handleUpdateProfile);
-app.post('/api/users/profile', authMiddleware, handleUpdateProfile);
+app.put('/api/users/profile', authMiddleware, validateBody(UPDATE_PROFILE_SCHEMA, { isUpdate: true }), handleUpdateProfile);
+app.post('/api/users/profile', authMiddleware, validateBody(UPDATE_PROFILE_SCHEMA, { isUpdate: true }), handleUpdateProfile);
 
 /*
  * List Users / Developers (CRITICAL PRIVACY: Zero Email & Password Leakage)
@@ -1087,7 +1364,11 @@ app.get(['/api/users', '/api/community/developers'], async (req, res) => {
  */
 app.get('/api/users/:id', async (req, res) => {
     try {
-        const userId = String(req.params.id);
+        const rawId = req.params.id;
+        if (!rawId || typeof rawId !== 'string' || !rawId.trim()) {
+            return res.status(400).json({ error: 'Valid user ID is required' });
+        }
+        const userId = String(rawId).trim();
         if (NODE_ENV === 'production' || (await isDbConnected())) {
             try {
                 const user = await prisma.user.findUnique({
@@ -1352,7 +1633,7 @@ app.post('/api/users/availability', authMiddleware, handleUpdateAvailability);
 // ------------------------------------------------------------------------------
 
 /*
- * List Projects
+ * List Projects (Server-side Search & Pagination)
  */
 app.get('/api/projects', async (req, res) => {
     try {
@@ -1366,16 +1647,41 @@ app.get('/api/projects', async (req, res) => {
             } catch {}
         }
 
+        const pagination = parsePagination(req.query, {
+            defaultLimit: 50,
+            maxLimit: 100,
+            allowedSortFields: ['createdAt', 'updatedAt', 'title', 'progress'],
+            defaultSort: 'createdAt',
+            defaultOrder: 'desc'
+        });
+
+        const searchTerm = (req.query.search || req.query.q || '').trim().toLowerCase();
+
         if (NODE_ENV === 'production' || (await isDbConnected())) {
             try {
-                const projects = await prisma.project.findMany({
-                    include: {
-                        owner: { include: { profile: true } },
-                        members: true,
-                        projectUpvotes: true
-                    },
-                    orderBy: { createdAt: 'desc' }
-                });
+                const whereClause = {};
+                if (searchTerm) {
+                    whereClause.OR = [
+                        { title: { contains: searchTerm, mode: 'insensitive' } },
+                        { description: { contains: searchTerm, mode: 'insensitive' } },
+                        { category: { contains: searchTerm, mode: 'insensitive' } }
+                    ];
+                }
+
+                const [totalCount, projects] = await Promise.all([
+                    prisma.project.count({ where: whereClause }),
+                    prisma.project.findMany({
+                        where: whereClause,
+                        include: {
+                            owner: { include: { profile: true } },
+                            members: true,
+                            projectUpvotes: true
+                        },
+                        orderBy: { [pagination.sortBy]: pagination.order },
+                        skip: pagination.skip,
+                        take: pagination.limit
+                    })
+                ]);
 
                 const formatted = projects.map(p => {
                     const upvotesList = Array.isArray(p.projectUpvotes) ? p.projectUpvotes : [];
@@ -1402,6 +1708,13 @@ app.get('/api/projects', async (req, res) => {
                     };
                 });
 
+                attachPaginationHeaders(res, {
+                    page: pagination.page,
+                    limit: pagination.limit,
+                    total: totalCount,
+                    totalPages: Math.ceil(totalCount / pagination.limit) || 1
+                });
+
                 return res.json(formatted);
             } catch (err) {
                 if (NODE_ENV === 'production') {
@@ -1411,21 +1724,18 @@ app.get('/api/projects', async (req, res) => {
             }
         }
 
-        const rawProjects = JSON.parse(await fs.readFile(getFilePath('projects'), 'utf-8'));
-        let rawUsers = [];
-        let rawMembers = [];
-        let rawUpvotes = [];
-        try { rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8')); } catch {}
-        try { rawMembers = JSON.parse(await fs.readFile(getFilePath('projectMembers'), 'utf-8')); } catch {}
-        try { rawUpvotes = JSON.parse(await fs.readFile(getFilePath('projectUpvotes'), 'utf-8')); } catch {}
+        const rawProjects = await readJson(getFilePath('projects'), []);
+        let rawUsers = await readJson(getFilePath('users'), []);
+        let rawMembers = await readJson(getFilePath('projectMembers'), []);
+        let rawUpvotes = await readJson(getFilePath('projectUpvotes'), []);
 
         const usersMap = new Map();
-        rawUsers.forEach(u => usersMap.set(String(u.id), u));
+        (Array.isArray(rawUsers) ? rawUsers : []).forEach(u => usersMap.set(String(u.id), u));
 
-        const formatted = rawProjects.map(p => {
+        let formatted = (Array.isArray(rawProjects) ? rawProjects : []).map(p => {
             const owner = p.ownerId ? usersMap.get(String(p.ownerId)) : null;
-            const projectMembers = rawMembers.filter(m => String(m.projectId) === String(p.id));
-            const projUpvotes = rawUpvotes.filter(u => String(u.projectId) === String(p.id));
+            const projectMembers = (Array.isArray(rawMembers) ? rawMembers : []).filter(m => String(m.projectId) === String(p.id));
+            const projUpvotes = (Array.isArray(rawUpvotes) ? rawUpvotes : []).filter(u => String(u.projectId) === String(p.id));
             return {
                 ...p,
                 progress: typeof p.progress === 'number' ? p.progress : (p.completionPercentage || 0),
@@ -1437,7 +1747,28 @@ app.get('/api/projects', async (req, res) => {
             };
         });
 
-        res.json(formatted);
+        if (searchTerm) {
+            formatted = formatted.filter(p => 
+                (p.title && p.title.toLowerCase().includes(searchTerm)) ||
+                (p.description && p.description.toLowerCase().includes(searchTerm)) ||
+                (p.category && p.category.toLowerCase().includes(searchTerm))
+            );
+        }
+
+        // Safe sorting
+        formatted.sort((a, b) => {
+            let valA = a[pagination.sortBy] || '';
+            let valB = b[pagination.sortBy] || '';
+            if (pagination.order === 'desc') {
+                return valA < valB ? 1 : (valA > valB ? -1 : 0);
+            }
+            return valA > valB ? 1 : (valA < valB ? -1 : 0);
+        });
+
+        const paged = paginateArray(formatted, pagination.page, pagination.limit);
+        attachPaginationHeaders(res, paged.pagination);
+
+        res.json(paged.data);
     } catch (error) {
         console.error('Error fetching projects:', error);
         res.status(500).json({ error: 'Failed to fetch projects' });
@@ -1513,29 +1844,25 @@ app.get('/api/projects/:id', async (req, res) => {
             }
         }
 
-        const rawProjects = JSON.parse(await fs.readFile(getFilePath('projects'), 'utf-8'));
-        const project = rawProjects.find(p => String(p.id) === projectId);
+        const rawProjects = await readJson(getFilePath('projects'), []);
+        const project = (Array.isArray(rawProjects) ? rawProjects : []).find(p => String(p.id) === projectId);
         if (!project) return res.status(404).json({ error: 'Project not found' });
 
-        let rawUsers = [];
-        let rawMembers = [];
-        let rawTasks = [];
-        let rawUpvotes = [];
-        try { rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8')); } catch {}
-        try { rawMembers = JSON.parse(await fs.readFile(getFilePath('projectMembers'), 'utf-8')); } catch {}
-        try { rawTasks = JSON.parse(await fs.readFile(getFilePath('tasks'), 'utf-8')); } catch {}
-        try { rawUpvotes = JSON.parse(await fs.readFile(getFilePath('projectUpvotes'), 'utf-8')); } catch {}
+        let rawUsers = await readJson(getFilePath('users'), []);
+        let rawMembers = await readJson(getFilePath('projectMembers'), []);
+        let rawTasks = await readJson(getFilePath('tasks'), []);
+        let rawUpvotes = await readJson(getFilePath('projectUpvotes'), []);
 
         const usersMap = new Map();
-        rawUsers.forEach(u => usersMap.set(String(u.id), u));
+        (Array.isArray(rawUsers) ? rawUsers : []).forEach(u => usersMap.set(String(u.id), u));
 
         const owner = project.ownerId ? usersMap.get(String(project.ownerId)) : null;
-        const projectMembers = rawMembers.filter(m => String(m.projectId) === projectId).map(m => ({
+        const projectMembers = (Array.isArray(rawMembers) ? rawMembers : []).filter(m => String(m.projectId) === projectId).map(m => ({
             ...m,
             user: sanitizeUserObj(usersMap.get(String(m.userId)))
         }));
-        const projectTasks = rawTasks.filter(t => String(t.projectId) === projectId).map(t => formatIssue(t, usersMap));
-        const projUpvotes = rawUpvotes.filter(u => String(u.projectId) === projectId);
+        const projectTasks = (Array.isArray(rawTasks) ? rawTasks : []).filter(t => String(t.projectId) === projectId).map(t => formatIssue(t, usersMap));
+        const projUpvotes = (Array.isArray(rawUpvotes) ? rawUpvotes : []).filter(u => String(u.projectId) === projectId);
 
         res.json({
             ...project,
@@ -1554,7 +1881,7 @@ app.get('/api/projects/:id', async (req, res) => {
 });
 
 /*
- * Create Project (Authenticated)
+ * Create Project (Authenticated & URL-Validated)
  */
 app.post('/api/projects', authMiddleware, async (req, res) => {
     try {
@@ -1562,6 +1889,14 @@ app.post('/api/projects', authMiddleware, async (req, res) => {
         const currentUserId = String(req.user.id);
 
         if (!title || !title.trim()) return res.status(400).json({ error: 'Project title is required' });
+
+        // Safe URL validation (Phase 2.7)
+        if (githubUrl && !validateUrl(githubUrl)) {
+            return res.status(400).json({ error: 'Invalid or unsafe githubUrl provided' });
+        }
+        if (image && !validateUrl(image)) {
+            return res.status(400).json({ error: 'Invalid or unsafe image URL provided' });
+        }
 
         const rawProgress = parseInt(progress, 10);
         const validProgress = (!isNaN(rawProgress) && rawProgress >= 0 && rawProgress <= 100) ? rawProgress : 0;
@@ -1616,27 +1951,27 @@ app.post('/api/projects', authMiddleware, async (req, res) => {
         }
 
         const projectsPath = getFilePath('projects');
-        let projects = [];
-        try { projects = JSON.parse(await fs.readFile(projectsPath, 'utf-8')); } catch { projects = []; }
-
-        projects.unshift(projectPayload);
-        await fs.writeFile(projectsPath, JSON.stringify(projects, null, 2));
+        await modifyJson(projectsPath, (projects = []) => {
+            const list = Array.isArray(projects) ? projects : [];
+            list.unshift(projectPayload);
+            return list;
+        }, []);
 
         // Add owner as first member
         const membersPath = getFilePath('projectMembers');
-        let members = [];
-        try { members = JSON.parse(await fs.readFile(membersPath, 'utf-8')); } catch { members = []; }
-        members.push({
-            projectId,
-            userId: currentUserId,
-            projectRole: 'owner',
-            joinedAt: new Date().toISOString()
-        });
-        await fs.writeFile(membersPath, JSON.stringify(members, null, 2));
+        await modifyJson(membersPath, (members = []) => {
+            const list = Array.isArray(members) ? members : [];
+            list.push({
+                projectId,
+                userId: currentUserId,
+                projectRole: 'owner',
+                joinedAt: new Date().toISOString()
+            });
+            return list;
+        }, []);
 
-        let rawUsers = [];
-        try { rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8')); } catch {}
-        const owner = rawUsers.find(u => String(u.id) === currentUserId);
+        let rawUsers = await readJson(getFilePath('users'), []);
+        const owner = (Array.isArray(rawUsers) ? rawUsers : []).find(u => String(u.id) === currentUserId);
 
         res.status(201).json({
             ...projectPayload,
@@ -1651,13 +1986,21 @@ app.post('/api/projects', authMiddleware, async (req, res) => {
 });
 
 /*
- * Update Project (Owner-Only Authorization)
+ * Update Project (Owner-Only Authorization & Mass Assignment Prevention)
  */
 const handleUpdateProject = async (req, res) => {
     try {
         const projectId = String(req.params.id);
         const currentUserId = String(req.user.id);
         const updates = req.body;
+
+        // Safe URL validation (Phase 2.7)
+        if (updates.githubUrl !== undefined && updates.githubUrl !== '' && !validateUrl(updates.githubUrl)) {
+            return res.status(400).json({ error: 'Invalid or unsafe githubUrl provided' });
+        }
+        if (updates.image !== undefined && updates.image !== '' && !validateUrl(updates.image)) {
+            return res.status(400).json({ error: 'Invalid or unsafe image URL provided' });
+        }
 
         let progressVal = undefined;
         if (updates.progress !== undefined) {
@@ -1682,6 +2025,7 @@ const handleUpdateProject = async (req, res) => {
                     return res.status(403).json({ error: 'Only the project owner can edit this project' });
                 }
 
+                // Explicit allowlist update - zero mass assignment (Phase 2.6)
                 const updated = await prisma.project.update({
                     where: { id: projectId },
                     data: {
@@ -1699,9 +2043,7 @@ const handleUpdateProject = async (req, res) => {
                     },
                     include: {
                         owner: { include: { profile: true } },
-                        projectUpvotes: true,
-                        members: { include: { user: { include: { profile: true } } } },
-                        issues: { include: { creator: { include: { profile: true } }, assignee: { include: { profile: true } } } }
+                        projectUpvotes: true
                     }
                 });
 
@@ -1722,36 +2064,49 @@ const handleUpdateProject = async (req, res) => {
         }
 
         const projectsPath = getFilePath('projects');
-        let projects = JSON.parse(await fs.readFile(projectsPath, 'utf-8'));
-        const index = projects.findIndex(p => String(p.id) === projectId);
-        if (index === -1) return res.status(404).json({ error: 'Project not found' });
+        let updatedProj = null;
+        let authForbidden = false;
 
-        if (String(projects[index].ownerId) !== currentUserId) {
+        await modifyJson(projectsPath, (projects = []) => {
+            const list = Array.isArray(projects) ? projects : [];
+            const index = list.findIndex(p => String(p.id) === projectId);
+            if (index === -1) return list;
+
+            if (String(list[index].ownerId) !== currentUserId) {
+                authForbidden = true;
+                return list;
+            }
+
+            // Explicit allowlist update - NO raw spread of updates! (Phase 2.6)
+            list[index] = { 
+                ...list[index],
+                title: updates.title !== undefined ? updates.title.trim() : list[index].title,
+                description: updates.description !== undefined ? updates.description : list[index].description,
+                readme: updates.readme !== undefined ? updates.readme : list[index].readme,
+                category: updates.category !== undefined ? updates.category : list[index].category,
+                difficulty: updates.difficulty !== undefined ? updates.difficulty : list[index].difficulty,
+                techStack: Array.isArray(updates.techStack) ? updates.techStack : list[index].techStack,
+                githubUrl: updates.githubUrl !== undefined ? updates.githubUrl : list[index].githubUrl,
+                image: updates.image !== undefined ? updates.image : list[index].image,
+                isPinned: updates.isPinned !== undefined ? Boolean(updates.isPinned) : list[index].isPinned,
+                isDemo: updates.isDemo !== undefined ? Boolean(updates.isDemo) : list[index].isDemo,
+                progress: progressVal !== undefined ? progressVal : (typeof list[index].progress === 'number' ? list[index].progress : 0),
+                updatedAt: new Date().toISOString() 
+            };
+            updatedProj = list[index];
+            return list;
+        }, []);
+
+        if (authForbidden) {
             return res.status(403).json({ error: 'Only the project owner can edit this project' });
         }
+        if (!updatedProj) return res.status(404).json({ error: 'Project not found' });
 
-        projects[index] = { 
-            ...projects[index], 
-            ...updates,
-            title: updates.title !== undefined ? updates.title.trim() : projects[index].title,
-            description: updates.description !== undefined ? updates.description : projects[index].description,
-            readme: updates.readme !== undefined ? updates.readme : projects[index].readme,
-            category: updates.category !== undefined ? updates.category : projects[index].category,
-            difficulty: updates.difficulty !== undefined ? updates.difficulty : projects[index].difficulty,
-            techStack: Array.isArray(updates.techStack) ? updates.techStack : projects[index].techStack,
-            githubUrl: updates.githubUrl !== undefined ? updates.githubUrl : projects[index].githubUrl,
-            image: updates.image !== undefined ? updates.image : projects[index].image,
-            progress: progressVal !== undefined ? progressVal : (typeof projects[index].progress === 'number' ? projects[index].progress : 0),
-            updatedAt: new Date().toISOString() 
-        };
-        await fs.writeFile(projectsPath, JSON.stringify(projects, null, 2));
-
-        let rawUpvotes = [];
-        try { rawUpvotes = JSON.parse(await fs.readFile(getFilePath('projectUpvotes'), 'utf-8')); } catch {}
-        const projUpvotes = rawUpvotes.filter(u => String(u.projectId) === projectId);
+        const rawUpvotes = await readJson(getFilePath('projectUpvotes'), []);
+        const projUpvotes = (Array.isArray(rawUpvotes) ? rawUpvotes : []).filter(u => String(u.projectId) === projectId);
 
         res.json({
-            ...projects[index],
+            ...updatedProj,
             upvotes: projUpvotes.length,
             hasUpvoted: projUpvotes.some(u => String(u.userId) === currentUserId)
         });
@@ -2096,7 +2451,7 @@ app.delete('/api/projects/:projectId/members/:userId', authMiddleware, async (re
 });
 
 // ------------------------------------------------------------------------------
-// Issues / Tasks Endpoints
+// Issues / Tasks Endpoints (Authorization Hardened - Phase 2.1 & Pagination - Phase 7)
 // ------------------------------------------------------------------------------
 
 /*
@@ -2104,9 +2459,29 @@ app.delete('/api/projects/:projectId/members/:userId', authMiddleware, async (re
  */
 app.get('/api/issues', authMiddleware, async (req, res) => {
     try {
+        const currentUserId = String(req.user.id);
         const targetProjectId = (req.query.projectId && String(req.query.projectId).trim() !== '' && String(req.query.projectId) !== 'all') 
             ? String(req.query.projectId).trim() 
             : null;
+
+        const pagination = parsePagination(req.query, {
+            defaultLimit: 50,
+            maxLimit: 100,
+            allowedSortFields: ['createdAt', 'updatedAt', 'title', 'priority', 'status'],
+            defaultSort: 'createdAt',
+            defaultOrder: 'desc'
+        });
+
+        // 1. If targetProjectId provided, verify authorization if private
+        if (targetProjectId) {
+            const isPrivate = await checkProjectPrivate(targetProjectId);
+            if (isPrivate) {
+                const authorized = await isProjectAuthorized(targetProjectId, currentUserId);
+                if (!authorized) {
+                    return res.status(403).json({ error: 'Forbidden: You do not have permission to view issues for this private project' });
+                }
+            }
+        }
 
         if (NODE_ENV === 'production' || (await isDbConnected())) {
             try {
@@ -2114,16 +2489,31 @@ app.get('/api/issues', authMiddleware, async (req, res) => {
                 const issues = await prisma.issue.findMany({
                     where: whereClause,
                     include: {
-                        project: { select: { id: true, title: true } },
+                        project: { select: { id: true, title: true, ownerId: true } },
                         creator: { include: { profile: true } },
                         assignee: { include: { profile: true } }
                     },
-                    orderBy: { createdAt: 'desc' }
+                    orderBy: { [pagination.sortBy]: pagination.order }
                 });
-                return res.json(issues.map(i => formatIssue(i)));
+
+                // Filter out issues belonging to private projects user has no access to (Phase 2.1)
+                const accessible = [];
+                for (const i of issues) {
+                    const isPrivate = await checkProjectPrivate(i.projectId);
+                    if (!isPrivate) {
+                        accessible.push(i);
+                    } else {
+                        const authorized = await isProjectAuthorized(i.projectId, currentUserId);
+                        if (authorized) accessible.push(i);
+                    }
+                }
+
+                const paged = paginateArray(accessible.map(i => formatIssue(i)), pagination);
+                attachPaginationHeaders(res, paged);
+                return res.json(paged.data);
             } catch (err) {
+                console.error('[Issues List DB Error]:', err);
                 if (NODE_ENV === 'production') {
-                    console.error('[Issues List DB Error]:', err.message);
                     return res.status(500).json({ error: 'Failed to fetch issues' });
                 }
             }
@@ -2131,18 +2521,31 @@ app.get('/api/issues', authMiddleware, async (req, res) => {
 
         let fileUsersMap = new Map();
         try {
-            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
-            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+            const rawUsers = await readJson(getFilePath('users'), []);
+            (Array.isArray(rawUsers) ? rawUsers : []).forEach(u => fileUsersMap.set(String(u.id), u));
         } catch {}
 
         const tasksPath = getFilePath('tasks');
-        const data = await fs.readFile(tasksPath, 'utf-8');
-        const tasks = JSON.parse(data);
+        const tasks = await readJson(tasksPath, []);
         const filteredTasks = targetProjectId 
-            ? tasks.filter(t => String(t.projectId) === targetProjectId)
-            : tasks;
+            ? (Array.isArray(tasks) ? tasks : []).filter(t => String(t.projectId) === targetProjectId)
+            : (Array.isArray(tasks) ? tasks : []);
 
-        res.json(filteredTasks.map(t => formatIssue(t, fileUsersMap)));
+        // Filter out private project issues (Phase 2.1)
+        const accessibleTasks = [];
+        for (const t of filteredTasks) {
+            const isPrivate = await checkProjectPrivate(t.projectId);
+            if (!isPrivate) {
+                accessibleTasks.push(t);
+            } else {
+                const authorized = await isProjectAuthorized(t.projectId, currentUserId);
+                if (authorized) accessibleTasks.push(t);
+            }
+        }
+
+        const paged = paginateArray(accessibleTasks.map(t => formatIssue(t, fileUsersMap)), pagination);
+        attachPaginationHeaders(res, paged);
+        res.json(paged.data);
     } catch (error) {
         console.error('Error fetching issues:', error);
         res.status(500).json({ error: 'Failed to fetch issues' });
@@ -2150,23 +2553,53 @@ app.get('/api/issues', authMiddleware, async (req, res) => {
 });
 
 /*
- * List Issues for Specific Project
+ * List Issues for Specific Project (Authorization Enforced)
  */
 app.get('/api/projects/:projectId/issues', authMiddleware, async (req, res) => {
     try {
         const projectId = String(req.params.projectId);
+        const currentUserId = String(req.user.id);
+
+        const isPrivate = await checkProjectPrivate(projectId);
+        if (isPrivate) {
+            const authorized = await isProjectAuthorized(projectId, currentUserId);
+            if (!authorized) {
+                return res.status(403).json({ error: 'Forbidden: You do not have permission to view issues for this private project' });
+            }
+        }
+
+        const pagination = parsePagination(req.query, {
+            defaultLimit: 50,
+            maxLimit: 100,
+            allowedSortFields: ['createdAt', 'updatedAt', 'title', 'priority', 'status'],
+            defaultSort: 'createdAt',
+            defaultOrder: 'desc'
+        });
 
         if (NODE_ENV === 'production' || (await isDbConnected())) {
             try {
-                const issues = await prisma.issue.findMany({
-                    where: { projectId },
-                    include: {
-                        project: { select: { id: true, title: true } },
-                        creator: { include: { profile: true } },
-                        assignee: { include: { profile: true } }
-                    },
-                    orderBy: { createdAt: 'desc' }
+                const [totalCount, issues] = await Promise.all([
+                    prisma.issue.count({ where: { projectId } }),
+                    prisma.issue.findMany({
+                        where: { projectId },
+                        include: {
+                            project: { select: { id: true, title: true } },
+                            creator: { include: { profile: true } },
+                            assignee: { include: { profile: true } }
+                        },
+                        orderBy: { [pagination.sortBy]: pagination.order },
+                        skip: pagination.skip,
+                        take: pagination.limit
+                    })
+                ]);
+
+                attachPaginationHeaders(res, {
+                    page: pagination.page,
+                    limit: pagination.limit,
+                    total: totalCount,
+                    totalPages: Math.ceil(totalCount / pagination.limit) || 1
                 });
+
                 return res.json(issues.map(i => formatIssue(i)));
             } catch (err) {
                 if (NODE_ENV === 'production') {
@@ -2178,15 +2611,17 @@ app.get('/api/projects/:projectId/issues', authMiddleware, async (req, res) => {
 
         let fileUsersMap = new Map();
         try {
-            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
-            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+            const rawUsers = await readJson(getFilePath('users'), []);
+            (Array.isArray(rawUsers) ? rawUsers : []).forEach(u => fileUsersMap.set(String(u.id), u));
         } catch {}
 
         const tasksPath = getFilePath('tasks');
-        const data = await fs.readFile(tasksPath, 'utf-8');
-        const tasks = JSON.parse(data);
-        const projectTasks = tasks.filter(t => String(t.projectId) === projectId);
-        res.json(projectTasks.map(t => formatIssue(t, fileUsersMap)));
+        const tasks = await readJson(tasksPath, []);
+        const projectTasks = (Array.isArray(tasks) ? tasks : []).filter(t => String(t.projectId) === projectId);
+
+        const paged = paginateArray(projectTasks.map(t => formatIssue(t, fileUsersMap)), pagination);
+        attachPaginationHeaders(res, paged);
+        res.json(paged.data);
     } catch (error) {
         console.error('Error fetching project issues:', error);
         res.status(500).json({ error: 'Failed to fetch project issues' });
@@ -2196,11 +2631,15 @@ app.get('/api/projects/:projectId/issues', authMiddleware, async (req, res) => {
 /*
  * Create Issue (Restricted to Project Owner and Confirmed Members)
  */
-app.post('/api/projects/:projectId/issues', authMiddleware, async (req, res) => {
+app.post(['/api/projects/:projectId/issues', '/api/issues'], authMiddleware, async (req, res) => {
     try {
-        const projectId = String(req.params.projectId);
+        const projectId = String(req.params.projectId || req.body.projectId);
         const currentUserId = String(req.user.id);
         const { title, description, status, priority, tags, assigneeId } = req.body;
+
+        if (!projectId) {
+            return res.status(400).json({ error: 'Project ID is required' });
+        }
 
         if (!title || !title.trim()) {
             return res.status(400).json({ error: 'Issue title is required' });
@@ -2253,13 +2692,14 @@ app.post('/api/projects/:projectId/issues', authMiddleware, async (req, res) => 
                 });
 
                 if (issuePayload.assigneeId && issuePayload.assigneeId !== currentUserId) {
+                    const actorName = await resolveUserName(currentUserId, 'A developer');
                     await sendNotification({
                         userId: issuePayload.assigneeId,
                         actorId: currentUserId,
                         projectId: projectId,
                         type: 'ISSUE_ASSIGNED',
                         title: 'New Issue Assignment 📋',
-                        message: `You were assigned to issue "${createdIssue.title}"`,
+                        message: `${actorName} assigned you to issue "${createdIssue.title}"`,
                         data: { issueId: createdIssue.id, projectId }
                     });
                 }
@@ -2274,23 +2714,38 @@ app.post('/api/projects/:projectId/issues', authMiddleware, async (req, res) => 
         }
 
         const tasksPath = getFilePath('tasks');
-        let tasks = [];
-        try { tasks = JSON.parse(await fs.readFile(tasksPath, 'utf-8')); } catch { tasks = []; }
-
-        tasks.unshift({
+        const newRecord = {
             ...issuePayload,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
-        });
-        await fs.writeFile(tasksPath, JSON.stringify(tasks, null, 2));
+        };
+
+        await modifyJson(tasksPath, (tasks = []) => {
+            const list = Array.isArray(tasks) ? tasks : [];
+            list.unshift(newRecord);
+            return list;
+        }, []);
 
         let fileUsersMap = new Map();
         try {
-            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
-            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+            const rawUsers = await readJson(getFilePath('users'), []);
+            (Array.isArray(rawUsers) ? rawUsers : []).forEach(u => fileUsersMap.set(String(u.id), u));
         } catch {}
 
-        res.status(201).json(formatIssue(issuePayload, fileUsersMap));
+        if (issuePayload.assigneeId && issuePayload.assigneeId !== currentUserId) {
+            const actorName = await resolveUserName(currentUserId, 'A developer');
+            await sendNotification({
+                userId: issuePayload.assigneeId,
+                actorId: currentUserId,
+                projectId: projectId,
+                type: 'ISSUE_ASSIGNED',
+                title: 'New Issue Assignment 📋',
+                message: `${actorName} assigned you to issue "${issuePayload.title}"`,
+                data: { issueId: issuePayload.id, projectId }
+            });
+        }
+
+        res.status(201).json(formatIssue(newRecord, fileUsersMap));
     } catch (error) {
         console.error('Error creating issue:', error);
         res.status(500).json({ error: 'Failed to create issue' });
@@ -2349,46 +2804,54 @@ const handleUpdateIssue = async (req, res) => {
         }
 
         const tasksPath = getFilePath('tasks');
-        let tasks = JSON.parse(await fs.readFile(tasksPath, 'utf-8'));
-        const index = tasks.findIndex(t => String(t.id) === issueId);
-        if (index === -1) return res.status(404).json({ error: 'Issue not found' });
+        let updatedTask = null;
+        let authForbidden = false;
 
-        const issue = tasks[index];
-        const isCreator = String(issue.creatorId) === currentUserId;
-        const isAssignee = String(issue.assigneeId) === currentUserId;
+        let projects = [];
+        try { projects = await readJson(getFilePath('projects'), []); } catch {}
 
-        // Check project ownership
-        let isProjectOwner = false;
-        try {
-            const projects = JSON.parse(await fs.readFile(getFilePath('projects'), 'utf-8'));
-            const project = projects.find(p => String(p.id) === String(issue.projectId));
-            if (project && String(project.ownerId) === currentUserId) isProjectOwner = true;
-        } catch {}
+        await modifyJson(tasksPath, (tasks = []) => {
+            const list = Array.isArray(tasks) ? tasks : [];
+            const index = list.findIndex(t => String(t.id) === issueId);
+            if (index === -1) return list;
 
-        if (!isProjectOwner && !isCreator && !isAssignee) {
+            const issue = list[index];
+            const project = (Array.isArray(projects) ? projects : []).find(p => String(p.id) === String(issue.projectId));
+            const isProjectOwner = project && String(project.ownerId) === currentUserId;
+            const isCreator = String(issue.creatorId) === currentUserId;
+            const isAssignee = String(issue.assigneeId) === currentUserId;
+
+            if (!isProjectOwner && !isCreator && !isAssignee) {
+                authForbidden = true;
+                return list;
+            }
+
+            tasks[index] = {
+                ...tasks[index],
+                title: title !== undefined ? title.trim() : tasks[index].title,
+                description: description !== undefined ? description.trim() : tasks[index].description,
+                status: status !== undefined ? String(status).toUpperCase() : tasks[index].status,
+                priority: priority !== undefined ? String(priority).toUpperCase() : tasks[index].priority,
+                tags: Array.isArray(tags) ? tags : tasks[index].tags,
+                assigneeId: assigneeId !== undefined ? (assigneeId ? String(assigneeId) : null) : tasks[index].assigneeId,
+                updatedAt: new Date().toISOString()
+            };
+            updatedTask = tasks[index];
+            return list;
+        }, []);
+
+        if (authForbidden) {
             return res.status(403).json({ error: 'Unauthorized to modify this issue' });
         }
-
-        tasks[index] = {
-            ...tasks[index],
-            title: title !== undefined ? title.trim() : tasks[index].title,
-            description: description !== undefined ? description.trim() : tasks[index].description,
-            status: status !== undefined ? String(status).toUpperCase() : tasks[index].status,
-            priority: priority !== undefined ? String(priority).toUpperCase() : tasks[index].priority,
-            tags: Array.isArray(tags) ? tags : tasks[index].tags,
-            assigneeId: assigneeId !== undefined ? (assigneeId ? String(assigneeId) : null) : tasks[index].assigneeId,
-            updatedAt: new Date().toISOString()
-        };
-
-        await fs.writeFile(tasksPath, JSON.stringify(tasks, null, 2));
+        if (!updatedTask) return res.status(404).json({ error: 'Issue not found' });
 
         let fileUsersMap = new Map();
         try {
-            const rawUsers = JSON.parse(await fs.readFile(getFilePath('users'), 'utf-8'));
-            rawUsers.forEach(u => fileUsersMap.set(String(u.id), u));
+            const rawUsers = await readJson(getFilePath('users'), []);
+            (Array.isArray(rawUsers) ? rawUsers : []).forEach(u => fileUsersMap.set(String(u.id), u));
         } catch {}
 
-        res.json(formatIssue(tasks[index], fileUsersMap));
+        res.json(formatIssue(updatedTask, fileUsersMap));
     } catch (error) {
         console.error('Error updating issue:', error);
         res.status(500).json({ error: 'Failed to update issue' });
@@ -2431,27 +2894,36 @@ const handleDeleteIssue = async (req, res) => {
         }
 
         const tasksPath = getFilePath('tasks');
-        let tasks = JSON.parse(await fs.readFile(tasksPath, 'utf-8'));
-        const index = tasks.findIndex(t => String(t.id) === issueId);
-        if (index === -1) return res.status(404).json({ error: 'Issue not found' });
+        let deleted = false;
+        let authForbidden = false;
 
-        const issue = tasks[index];
-        const isCreator = String(issue.creatorId) === currentUserId;
+        let projects = [];
+        try { projects = await readJson(getFilePath('projects'), []); } catch {}
 
-        let isProjectOwner = false;
-        try {
-            const projects = JSON.parse(await fs.readFile(getFilePath('projects'), 'utf-8'));
-            const project = projects.find(p => String(p.id) === String(issue.projectId));
-            if (project && String(project.ownerId) === currentUserId) isProjectOwner = true;
-        } catch {}
+        await modifyJson(tasksPath, (tasks = []) => {
+            const list = Array.isArray(tasks) ? tasks : [];
+            const idx = list.findIndex(t => String(t.id) === issueId);
+            if (idx === -1) return list;
 
-        if (!isProjectOwner && !isCreator) {
+            const issue = list[idx];
+            const project = (Array.isArray(projects) ? projects : []).find(p => String(p.id) === String(issue.projectId));
+            const isProjectOwner = project && String(project.ownerId) === currentUserId;
+            const isCreator = String(issue.creatorId) === currentUserId;
+
+            if (!isProjectOwner && !isCreator) {
+                authForbidden = true;
+                return list;
+            }
+
+            list.splice(idx, 1);
+            deleted = true;
+            return list;
+        }, []);
+
+        if (authForbidden) {
             return res.status(403).json({ error: 'Unauthorized to delete this issue' });
         }
-
-        tasks = tasks.filter(t => String(t.id) !== issueId);
-        await fs.writeFile(tasksPath, JSON.stringify(tasks, null, 2));
-
+        if (!deleted) return res.status(404).json({ error: 'Issue not found' });
         res.json({ success: true, message: 'Issue deleted successfully' });
     } catch (error) {
         console.error('Error deleting issue:', error);
@@ -3115,32 +3587,8 @@ app.patch('/api/meetings/:id', authMiddleware, async (req, res) => {
  */
 app.get('/api/notifications', authMiddleware, async (req, res) => {
     try {
-        const userId = String(req.user.id);
-
-        if (NODE_ENV === 'production' || (await isDbConnected())) {
-            try {
-                const dbNotifs = await prisma.notification.findMany({
-                    where: { userId },
-                    include: {
-                        actor: { include: { profile: true } },
-                        project: { select: { id: true, title: true } }
-                    },
-                    orderBy: { createdAt: 'desc' }
-                });
-                return res.json(dbNotifs.map(sanitizeNotification));
-            } catch (err) {
-                if (NODE_ENV === 'production') {
-                    console.error('[Notifications DB Error]:', err.message);
-                    return res.status(500).json({ error: 'Failed to fetch notifications' });
-                }
-            }
-        }
-
-        const notifPath = getFilePath('notifications');
-        let notifs = [];
-        try { notifs = JSON.parse(await fs.readFile(notifPath, 'utf-8')); } catch {}
-        const userNotifs = notifs.filter(n => String(n.userId) === userId);
-        res.json(userNotifs.map(sanitizeNotification));
+        const notifs = await notificationService.getUserNotifications(req.user.id);
+        res.json(notifs);
     } catch (error) {
         console.error('Error fetching notifications:', error);
         res.status(500).json({ error: 'Failed to fetch notifications' });
@@ -3152,33 +3600,10 @@ app.get('/api/notifications', authMiddleware, async (req, res) => {
  */
 app.get('/api/notifications/unread', authMiddleware, async (req, res) => {
     try {
-        const userId = String(req.user.id);
-
-        if (NODE_ENV === 'production' || (await isDbConnected())) {
-            try {
-                const unread = await prisma.notification.findMany({
-                    where: { userId, read: false },
-                    include: {
-                        actor: { include: { profile: true } },
-                        project: { select: { id: true, title: true } }
-                    },
-                    orderBy: { createdAt: 'desc' }
-                });
-                return res.json({ count: unread.length, unreadCount: unread.length, notifications: unread.map(sanitizeNotification) });
-            } catch (err) {
-                if (NODE_ENV === 'production') {
-                    console.error('[Unread Notifications DB Error]:', err.message);
-                    return res.status(500).json({ error: 'Failed to fetch unread notifications' });
-                }
-            }
-        }
-
-        const notifPath = getFilePath('notifications');
-        let notifs = [];
-        try { notifs = JSON.parse(await fs.readFile(notifPath, 'utf-8')); } catch {}
-        const userUnread = notifs.filter(n => String(n.userId) === userId && !n.read);
-        res.json({ count: userUnread.length, unreadCount: userUnread.length, notifications: userUnread.map(sanitizeNotification) });
+        const unread = await notificationService.getUnreadNotifications(req.user.id);
+        res.json({ count: unread.length, unreadCount: unread.length, notifications: unread });
     } catch (error) {
+        console.error('Error fetching unread notifications:', error);
         res.status(500).json({ error: 'Failed to fetch unread notifications' });
     }
 });
@@ -3188,41 +3613,11 @@ app.get('/api/notifications/unread', authMiddleware, async (req, res) => {
  */
 app.patch('/api/notifications/:id/read', authMiddleware, async (req, res) => {
     try {
-        const notifId = String(req.params.id);
-        const userId = String(req.user.id);
-
-        if (NODE_ENV === 'production' || (await isDbConnected())) {
-            try {
-                const notif = await prisma.notification.findUnique({ where: { id: notifId } });
-                if (!notif) return res.status(404).json({ error: 'Notification not found' });
-                if (String(notif.userId) !== userId) {
-                    return res.status(403).json({ error: 'Not authorized to modify this notification' });
-                }
-                const updated = await prisma.notification.update({
-                    where: { id: notifId },
-                    data: { read: true }
-                });
-                return res.json(sanitizeNotification(updated));
-            } catch (err) {
-                if (NODE_ENV === 'production') {
-                    console.error('[Mark Read DB Error]:', err.message);
-                    return res.status(500).json({ error: 'Failed to mark notification read' });
-                }
-            }
-        }
-
-        const notifPath = getFilePath('notifications');
-        let notifs = JSON.parse(await fs.readFile(notifPath, 'utf-8'));
-        const idx = notifs.findIndex(n => String(n.id) === notifId);
-        if (idx === -1) return res.status(404).json({ error: 'Notification not found' });
-        if (String(notifs[idx].userId) !== userId) {
-            return res.status(403).json({ error: 'Not authorized to modify this notification' });
-        }
-
-        notifs[idx].read = true;
-        await fs.writeFile(notifPath, JSON.stringify(notifs, null, 2));
-        res.json(sanitizeNotification(notifs[idx]));
+        const result = await notificationService.markAsRead(req.params.id, req.user.id);
+        if (result.error) return res.status(result.status || 500).json({ error: result.error });
+        res.json(result.notification);
     } catch (error) {
+        console.error('Error marking notification read:', error);
         res.status(500).json({ error: 'Failed to mark notification read' });
     }
 });
@@ -3232,34 +3627,11 @@ app.patch('/api/notifications/:id/read', authMiddleware, async (req, res) => {
  */
 const handleMarkAllNotificationsRead = async (req, res) => {
     try {
-        const userId = String(req.user.id);
-
-        if (NODE_ENV === 'production' || (await isDbConnected())) {
-            try {
-                await prisma.notification.updateMany({
-                    where: { userId, read: false },
-                    data: { read: true }
-                });
-                return res.json({ success: true, message: 'All notifications marked as read' });
-            } catch (err) {
-                if (NODE_ENV === 'production') {
-                    console.error('[Mark All Read DB Error]:', err.message);
-                    return res.status(500).json({ error: 'Failed to mark notifications read' });
-                }
-            }
-        }
-
-        const notifPath = getFilePath('notifications');
-        let notifs = [];
-        try { notifs = JSON.parse(await fs.readFile(notifPath, 'utf-8')); } catch {}
-        notifs.forEach(n => {
-            if (String(n.userId) === userId) n.read = true;
-        });
-        await fs.writeFile(notifPath, JSON.stringify(notifs, null, 2));
-
-        res.json({ success: true, message: 'All notifications marked as read' });
+        const result = await notificationService.markAllAsRead(req.user.id);
+        res.json(result);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to mark all read' });
+        console.error('Error marking all notifications read:', error);
+        res.status(500).json({ error: 'Failed to mark notifications read' });
     }
 };
 app.post('/api/notifications/read-all', authMiddleware, handleMarkAllNotificationsRead);
@@ -3270,38 +3642,11 @@ app.patch('/api/notifications/read-all', authMiddleware, handleMarkAllNotificati
  */
 app.delete('/api/notifications/:id', authMiddleware, async (req, res) => {
     try {
-        const notifId = String(req.params.id);
-        const userId = String(req.user.id);
-
-        if (NODE_ENV === 'production' || (await isDbConnected())) {
-            try {
-                const notif = await prisma.notification.findUnique({ where: { id: notifId } });
-                if (!notif) return res.status(404).json({ error: 'Notification not found' });
-                if (String(notif.userId) !== userId) {
-                    return res.status(403).json({ error: 'Not authorized to delete this notification' });
-                }
-                await prisma.notification.delete({ where: { id: notifId } });
-                return res.json({ success: true, message: 'Notification deleted' });
-            } catch (err) {
-                if (NODE_ENV === 'production') {
-                    console.error('[Delete Notification DB Error]:', err.message);
-                    return res.status(500).json({ error: 'Failed to delete notification' });
-                }
-            }
-        }
-
-        const notifPath = getFilePath('notifications');
-        let notifs = JSON.parse(await fs.readFile(notifPath, 'utf-8'));
-        const notif = notifs.find(n => String(n.id) === notifId);
-        if (!notif) return res.status(404).json({ error: 'Notification not found' });
-        if (String(notif.userId) !== userId) {
-            return res.status(403).json({ error: 'Not authorized to delete this notification' });
-        }
-
-        notifs = notifs.filter(n => String(n.id) !== notifId);
-        await fs.writeFile(notifPath, JSON.stringify(notifs, null, 2));
-        res.json({ success: true, message: 'Notification deleted' });
+        const result = await notificationService.deleteNotification(req.params.id, req.user.id);
+        if (result.error) return res.status(result.status || 500).json({ error: result.error });
+        res.json({ success: true, message: result.message });
     } catch (error) {
+        console.error('Error deleting notification:', error);
         res.status(500).json({ error: 'Failed to delete notification' });
     }
 });
@@ -4323,11 +4668,14 @@ app.get('/api/:table', async (req, res) => {
 app.use((err, req, res, next) => {
     const statusCode = err.status || err.statusCode || 500;
     const isProd = NODE_ENV === 'production';
+    const requestId = req.id || 'unknown';
     
-    console.error(`[Error] ${req.method} ${req.originalUrl}:`, isProd ? err.message : err);
+    const safeMethod = String(req.method).replace(/[\r\n]/g, '');
+    console.error(`[Error][${requestId}] ${safeMethod}:`, err.message || 'Error occurred');
 
     res.status(statusCode).json({
-        error: isProd ? (statusCode === 500 ? 'An unexpected server error occurred' : err.message) : err.message,
+        error: isProd ? (statusCode === 500 ? 'An unexpected server error occurred' : err.message) : (err.message || 'An error occurred'),
+        requestId,
         ...(isProd ? {} : { stack: err.stack })
     });
 });
@@ -4339,6 +4687,14 @@ let serverInstance = null;
 
 if (require.main === module) {
     (async () => {
+        // Phase 19: Build verification check on startup
+        try {
+            const { verifyBuild } = require('./scripts/verify-build');
+            verifyBuild({ exitOnError: NODE_ENV === 'production', silent: false });
+        } catch (bvErr) {
+            console.warn('⚠️ [Build Verification Warning]:', bvErr.message);
+        }
+
         await verifyDatabaseConnectivity();
         serverInstance = app.listen(PORT, '0.0.0.0', () => {
             console.log(`=======================================================`);

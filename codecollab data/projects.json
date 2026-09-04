@@ -1,5 +1,214 @@
 [
   {
+    "id": "proj_1788559807950_bfa2a2",
+    "title": "Next-Gen Distributed Engine v2",
+    "category": "Systems & Rust",
+    "difficulty": "Advanced",
+    "techStack": [
+      "Rust",
+      "Tokio",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
+    "description": "A revolutionary asynchronous compute framework.",
+    "readme": "# Hardened Architecture Overview\n\n- Zero Trust Security\n- High Throughput\n\n```bash\nmake run\n```",
+    "githubUrl": "",
+    "isPinned": false,
+    "isDemo": false,
+    "progress": 75,
+    "ownerId": "1788559807039",
+    "updatedAt": "2026-09-04T22:10:08.046Z"
+  },
+  {
+    "id": "proj_1788559749574_5ffe42",
+    "title": "Next-Gen Distributed Engine v2",
+    "category": "Systems & Rust",
+    "difficulty": "Advanced",
+    "techStack": [
+      "Rust",
+      "Tokio",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
+    "description": "A revolutionary asynchronous compute framework.",
+    "readme": "# Hardened Architecture Overview\n\n- Zero Trust Security\n- High Throughput\n\n```bash\nmake run\n```",
+    "githubUrl": "",
+    "isPinned": false,
+    "isDemo": false,
+    "progress": 75,
+    "ownerId": "1788559748687",
+    "updatedAt": "2026-09-04T22:09:09.672Z"
+  },
+  {
+    "id": "proj_1788558562835_ee47f1",
+    "title": "Next-Gen Distributed Engine v2",
+    "category": "Systems & Rust",
+    "difficulty": "Advanced",
+    "techStack": [
+      "Rust",
+      "Tokio",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
+    "description": "A revolutionary asynchronous compute framework.",
+    "readme": "# Hardened Architecture Overview\n\n- Zero Trust Security\n- High Throughput\n\n```bash\nmake run\n```",
+    "githubUrl": "",
+    "isPinned": false,
+    "isDemo": false,
+    "progress": 75,
+    "ownerId": "1788558561971",
+    "updatedAt": "2026-09-04T21:49:22.923Z"
+  },
+  {
+    "id": "proj_1788558554379_c2d7dd",
+    "title": "Next-Gen Distributed Engine v2",
+    "category": "Systems & Rust",
+    "difficulty": "Advanced",
+    "techStack": [
+      "Rust",
+      "Tokio",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
+    "description": "A revolutionary asynchronous compute framework.",
+    "readme": "# Hardened Architecture Overview\n\n- Zero Trust Security\n- High Throughput\n\n```bash\nmake run\n```",
+    "githubUrl": "",
+    "isPinned": false,
+    "isDemo": false,
+    "progress": 75,
+    "ownerId": "1788558553553",
+    "updatedAt": "2026-09-04T21:49:14.478Z"
+  },
+  {
+    "id": "proj_1788558345425_7b5a0b",
+    "title": "Next-Gen Distributed Engine v2",
+    "category": "Systems & Rust",
+    "difficulty": "Advanced",
+    "techStack": [
+      "Rust",
+      "Tokio",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
+    "description": "A revolutionary asynchronous compute framework.",
+    "readme": "# Hardened Architecture Overview\n\n- Zero Trust Security\n- High Throughput\n\n```bash\nmake run\n```",
+    "githubUrl": "",
+    "isPinned": false,
+    "isDemo": false,
+    "progress": 75,
+    "ownerId": "1788558344495",
+    "updatedAt": "2026-09-04T21:45:45.517Z"
+  },
+  {
+    "id": "proj_1788553736335_4ab6db",
+    "title": "Next-Gen Distributed Engine v2",
+    "category": "Systems & Rust",
+    "difficulty": "Advanced",
+    "techStack": [
+      "Rust",
+      "Tokio",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
+    "description": "A revolutionary asynchronous compute framework.",
+    "readme": "# Hardened Architecture Overview\n\n- Zero Trust Security\n- High Throughput\n\n```bash\nmake run\n```",
+    "githubUrl": "",
+    "isPinned": false,
+    "isDemo": false,
+    "progress": 75,
+    "ownerId": "1788553732492",
+    "updatedAt": "2026-09-04T20:28:56.695Z"
+  },
+  {
+    "id": "proj_1788552613930_736ddf",
+    "title": "Next-Gen Distributed Engine v2",
+    "category": "Systems & Rust",
+    "difficulty": "Advanced",
+    "techStack": [
+      "Rust",
+      "Tokio",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
+    "description": "A revolutionary asynchronous compute framework.",
+    "readme": "# Hardened Architecture Overview\n\n- Zero Trust Security\n- High Throughput\n\n```bash\nmake run\n```",
+    "githubUrl": "",
+    "isPinned": false,
+    "isDemo": false,
+    "progress": 75,
+    "ownerId": "1788552613109",
+    "updatedAt": "2026-09-04T20:10:14.013Z"
+  },
+  {
+    "id": "proj_1788552602998_799477",
+    "title": "Next-Gen Distributed Engine v2",
+    "category": "Systems & Rust",
+    "difficulty": "Advanced",
+    "techStack": [
+      "Rust",
+      "Tokio",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
+    "description": "A revolutionary asynchronous compute framework.",
+    "readme": "# Hardened Architecture Overview\n\n- Zero Trust Security\n- High Throughput\n\n```bash\nmake run\n```",
+    "githubUrl": "",
+    "isPinned": false,
+    "isDemo": false,
+    "progress": 75,
+    "ownerId": "1788552602100",
+    "updatedAt": "2026-09-04T20:10:03.086Z"
+  },
+  {
+    "id": "proj_1788552222555_ddc65d",
+    "title": "Next-Gen Distributed Engine v2",
+    "category": "Systems & Rust",
+    "difficulty": "Advanced",
+    "techStack": [
+      "Rust",
+      "Tokio",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
+    "description": "A revolutionary asynchronous compute framework.",
+    "readme": "# Hardened Architecture Overview\n\n- Zero Trust Security\n- High Throughput\n\n```bash\nmake run\n```",
+    "githubUrl": "",
+    "isPinned": false,
+    "isDemo": false,
+    "progress": 75,
+    "ownerId": "1788552213566",
+    "updatedAt": "2026-09-04T20:03:42.657Z"
+  },
+  {
+    "id": "proj_1788552018796_2af0e3",
+    "title": "Production Hardened Engine",
+    "category": "Infrastructure",
+    "difficulty": "Advanced",
+    "techStack": [
+      "Node.js",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
+    "description": "Updated project description by legitimate owner.",
+    "readme": "A mission critical distributed computing system.",
+    "githubUrl": "https://github.com/codecollab/hardened-engine",
+    "isPinned": false,
+    "isDemo": false,
+    "progress": 0,
+    "ownerId": "1788552018229",
+    "updatedAt": "2026-09-04T20:00:18.832Z"
+  },
+  {
     "id": "proj_1788284671447_a1b7c6",
     "title": "Production Hardened Engine",
     "category": "Infrastructure",

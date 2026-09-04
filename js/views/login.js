@@ -51,10 +51,10 @@ export function render_login() {
         </div>
         
         <div class="mt-md grid grid-cols-2 gap-sm">
-            <button class="py-sm bg-surface-container border border-white/5 hover:bg-surface-variant rounded-lg flex items-center justify-center gap-xs text-sm transition-colors">
+            <button type="button" data-oauth="github" class="py-sm bg-surface-container border border-white/5 hover:bg-surface-variant rounded-lg flex items-center justify-center gap-xs text-sm transition-colors cursor-pointer">
                 <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" class="w-4 h-4 filter invert opacity-80" alt="GitHub"> GitHub
             </button>
-            <button class="py-sm bg-surface-container border border-white/5 hover:bg-surface-variant rounded-lg flex items-center justify-center gap-xs text-sm transition-colors">
+            <button type="button" data-oauth="google" class="py-sm bg-surface-container border border-white/5 hover:bg-surface-variant rounded-lg flex items-center justify-center gap-xs text-sm transition-colors cursor-pointer">
                 <span class="text-blue-500 font-bold">G</span> Google
             </button>
         </div>

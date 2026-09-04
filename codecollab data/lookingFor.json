@@ -1,5 +1,20 @@
 [
   {
+    "id": "match_1788552247082_8a1a3a",
+    "userId": "1788552244157",
+    "lookingFor": "Rust Core Engineer",
+    "for": "Building High-Performance Distributed DB",
+    "commitment": "Part-time (10 hrs/wk)",
+    "requiredSkills": [
+      "Rust",
+      "Tokio",
+      "Raft"
+    ],
+    "availability": "Evenings & Weekends",
+    "context": "Looking for a systems dev to collaborate on consensus layer.",
+    "createdAt": "2026-09-04T20:04:07.082Z"
+  },
+  {
     "id": "match_1788022783572_2b3c1f",
     "userId": "1788022781878",
     "lookingFor": "Rust Core Engineer",

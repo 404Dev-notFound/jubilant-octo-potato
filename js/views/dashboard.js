@@ -373,13 +373,13 @@ export async function initDashboard() {
                     }
 
                     assignedHtml += `
-                        <div class="flex items-start gap-sm group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors" onclick="window.location.hash='issues?projectId=${issue.projectId || ''}'">
+                        <a href="#issues?projectId=${encodeURIComponent(issue.projectId || '')}" class="flex items-start gap-sm group hover:bg-white/5 p-2 rounded-lg transition-colors">
                             <span class="material-symbols-outlined ${priorityColor} text-[18px] mt-0.5">adjust</span>
                             <div class="flex-1 min-w-0">
                                 <div class="text-sm text-on-surface group-hover:text-primary transition-colors truncate font-medium">${escapeHtml(issue.title)}</div>
                                 <div class="text-xs text-on-surface-variant mt-1 truncate">#${idx + 1} • ${escapeHtml(projectName)} • <span class="${priorityColor} font-bold">${issue.priority || 'MEDIUM'}</span></div>
                             </div>
-                        </div>
+                        </a>
                     `;
                 });
                 assignedContainer.innerHTML = assignedHtml;

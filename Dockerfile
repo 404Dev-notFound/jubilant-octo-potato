@@ -19,8 +19,8 @@ RUN npm ci
 # Copy full application source code
 COPY . .
 
-# Ensure Prisma client is generated for container architecture
-RUN node scripts/run-prisma.js generate
+# Run full production build (Prisma generate, Tailwind CSS compile, and build verification)
+RUN npm run build
 
 # Prune devDependencies for production
 RUN npm prune --production
@@ -46,9 +46,12 @@ COPY --from=builder --chown=codecollab:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=codecollab:nodejs /app/scripts ./scripts
 COPY --from=builder --chown=codecollab:nodejs /app/load-env.js ./load-env.js
 COPY --from=builder --chown=codecollab:nodejs /app/server.js ./server.js
+COPY --from=builder --chown=codecollab:nodejs /app/src ./src
 COPY --from=builder --chown=codecollab:nodejs /app/css ./css
 COPY --from=builder --chown=codecollab:nodejs /app/js ./js
 COPY --from=builder --chown=codecollab:nodejs /app/index.html ./index.html
+COPY --from=builder --chown=codecollab:nodejs /app/favicon.svg ./favicon.svg
+COPY --from=builder --chown=codecollab:nodejs /app/tailwind.config.js ./tailwind.config.js
 COPY --from=builder --chown=codecollab:nodejs /app/pre_deploy.md ./pre_deploy.md
 
 # Ensure data directory exists with write permissions for resilience

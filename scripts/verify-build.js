@@ -54,23 +54,33 @@ function verifyBuild(options = { exitOnError: true, silent: false }) {
         warnings.push(`Prisma Client not found at ${path.relative(rootDir, prismaGenPath)}. If running with database, execute 'npx prisma generate'.`);
     }
 
-    // 3. Check Core Frontend Assets
+    // 3. Check Core Frontend & Backend Assets
     const requiredAssets = [
         'index.html',
         'favicon.svg',
+        'tailwind.config.js',
         'css/design-system.css',
         'css/styles.css',
         'js/app.js',
         'js/session.js',
         'js/command_palette.js',
         'js/components.js',
-        'js/nebula.js'
+        'js/nebula.js',
+        'src/utils/cookieSecurity.js',
+        'src/utils/validation.js',
+        'src/utils/pagination.js',
+        'src/utils/preferenceMerge.js',
+        'src/utils/urlSecurity.js',
+        'src/services/sessionService.js',
+        'src/services/notificationService.js',
+        'src/services/oauthService.js',
+        'src/storage/jsonStorage.js'
     ];
 
     for (const asset of requiredAssets) {
         const assetPath = path.join(rootDir, asset);
         if (!fs.existsSync(assetPath)) {
-            issues.push(`Required frontend asset missing: ${asset}`);
+            issues.push(`Required application asset/module missing: ${asset}`);
         }
     }
 

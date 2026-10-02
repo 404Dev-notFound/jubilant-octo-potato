@@ -269,7 +269,7 @@ export function render_community() {
 // Community Interactive Controller
 // ----------------------------------------------------------------------------
 
-export async function initCommunity() {
+export async function initCommunity(projectId, urlParams) {
     let teamsData = [];
     let developersData = [];
     let lookingForData = [];
@@ -1378,5 +1378,20 @@ export async function initCommunity() {
     // Initialize
     await loadCommunityData();
     setupEventListeners();
+
+    // If developers or teams tab was targeted via URL parameter or route
+    if (window.location.hash.toLowerCase().includes('developer') || 
+        (urlParams && (urlParams.get('tab') === 'developers' || urlParams.get('section') === 'developers'))) {
+        const devTabBtn = document.querySelector('.community-tab-btn[data-tab="developers"]');
+        if (devTabBtn) {
+            devTabBtn.click();
+        }
+    } else if (window.location.hash.toLowerCase().includes('team') || 
+        (urlParams && (urlParams.get('tab') === 'teams' || urlParams.get('section') === 'teams'))) {
+        const teamsTabBtn = document.querySelector('.community-tab-btn[data-tab="teams"]');
+        if (teamsTabBtn) {
+            teamsTabBtn.click();
+        }
+    }
 }
 

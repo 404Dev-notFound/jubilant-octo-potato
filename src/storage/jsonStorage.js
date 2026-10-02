@@ -47,12 +47,33 @@ function acquireLock(filePath, fn) {
         });
 }
 
+// In-memory cache keyed by resolved file path: Map<string, { mtimeMs: number, data: any }>
+const jsonMemoryCache = new Map();
+
 /**
- * Read and parse JSON from disk.
+ * Read and parse JSON from disk with high-performance mtime caching.
  * Throws JsonCorruptionError if file contains invalid JSON.
  */
 async function readJson(filePath, defaultValue = undefined) {
     const resolvedPath = path.resolve(filePath);
+
+    let stat;
+    try {
+        stat = await fs.stat(resolvedPath);
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            if (defaultValue !== undefined) {
+                return JSON.parse(JSON.stringify(defaultValue));
+            }
+            throw err;
+        }
+        throw err;
+    }
+
+    const cached = jsonMemoryCache.get(resolvedPath);
+    if (cached && cached.mtimeMs === stat.mtimeMs) {
+        return JSON.parse(JSON.stringify(cached.data));
+    }
 
     let content;
     try {
@@ -76,7 +97,12 @@ async function readJson(filePath, defaultValue = undefined) {
     }
 
     try {
-        return JSON.parse(trimmed);
+        const parsed = JSON.parse(trimmed);
+        jsonMemoryCache.set(resolvedPath, {
+            mtimeMs: stat.mtimeMs,
+            data: parsed
+        });
+        return JSON.parse(JSON.stringify(parsed));
     } catch (err) {
         throw new JsonCorruptionError(resolvedPath, err);
     }
@@ -122,6 +148,17 @@ async function writeJsonAtomic(filePath, data) {
             } else {
                 throw renameErr;
             }
+        }
+
+        // Update in-memory cache with new data and refreshed stat
+        try {
+            const newStat = await fs.stat(resolvedPath);
+            jsonMemoryCache.set(resolvedPath, {
+                mtimeMs: newStat.mtimeMs,
+                data: JSON.parse(JSON.stringify(data))
+            });
+        } catch {
+            jsonMemoryCache.delete(resolvedPath);
         }
     } catch (err) {
         // Clean up temp file on failure

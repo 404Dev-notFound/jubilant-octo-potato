@@ -22,7 +22,7 @@ const rateLimit = require('express-rate-limit');
 const fs = require('fs/promises');
 const path = require('path');
 
-// Modular hardening and security utilities
+// Centralized Cybersecurity Architecture & Modular Security Layer
 const cookieParser = require('cookie-parser');
 const {
     COOKIE_NAMES,
@@ -30,19 +30,51 @@ const {
     setAuthCookies,
     clearAuthCookies,
     extractTokens,
-    csrfProtectionMiddleware
-} = require('./src/utils/cookieSecurity');
+    csrfProtectionMiddleware,
+    createHelmetMiddleware,
+    staticShieldMiddleware,
+    responseTimingMiddleware,
+    apiCachingPolicyMiddleware,
+    responseCompressionMiddleware,
+    getCorsOptions,
+    isOriginAllowed,
+    requestIdMiddleware,
+    payloadErrorHandlerMiddleware,
+    createAuthMiddleware,
+    createOptionalAuthMiddleware,
+    apiLimiter,
+    authLimiter,
+    passwordChangeLimiter,
+    safeMergePreferences,
+    safeMergeUserRecord,
+    EDITABLE_PREFERENCE_FIELDS,
+    sanitizeLinkMap,
+    sanitizeUserObj,
+    validateUrl,
+    isSafeUrl,
+    sanitizeSafeUrl,
+    validateSchema,
+    validateBody,
+    PROJECT_SCHEMA,
+    ISSUE_SCHEMA,
+    SIGNUP_SCHEMA,
+    LOGIN_SCHEMA,
+    CHANGE_PASSWORD_SCHEMA,
+    UPDATE_PROFILE_SCHEMA,
+    GOOGLE_AUTH_SCHEMA,
+    GITHUB_AUTH_SCHEMA,
+    DUMMY_BCRYPT_HASH,
+    hashPassword,
+    comparePassword,
+    compareDecoyPassword,
+    sanitizeLogString
+} = require('./cyber-security');
+
 const { SessionService } = require('./src/services/sessionService');
 const { NotificationService, sanitizeNotification } = require('./src/services/notificationService');
 const { OAuthService } = require('./src/services/oauthService');
 const { readJson, modifyJson, writeJson, JsonCorruptionError } = require('./src/storage/jsonStorage');
-const { safeMergePreferences, safeMergeUserRecord, EDITABLE_PREFERENCE_FIELDS, sanitizeLinkMap } = require('./src/utils/preferenceMerge');
-const { validateUrl, isSafeUrl, sanitizeSafeUrl } = require('./src/utils/urlSecurity');
-const { validateSchema, validateBody, PROJECT_SCHEMA, ISSUE_SCHEMA, SIGNUP_SCHEMA, LOGIN_SCHEMA, CHANGE_PASSWORD_SCHEMA, UPDATE_PROFILE_SCHEMA, GOOGLE_AUTH_SCHEMA, GITHUB_AUTH_SCHEMA } = require('./src/utils/validation');
 const { parsePagination, attachPaginationHeaders, paginateArray } = require('./src/utils/pagination');
-
-// Safe constant-time decoy hash to eliminate authentication timing enumeration (Phase 2.8)
-const DUMMY_BCRYPT_HASH = '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy';
 
 const PORT = process.env.PORT || 3000;
 let JWT_SECRET = (process.env.JWT_SECRET || '').trim();
@@ -98,114 +130,20 @@ if (NODE_ENV === 'production') {
 // Strictly validates inbound X-Request-Id (alphanumeric, -, _, 1..64 chars)
 // Prevents log forging and newline injection, sets response header
 // ------------------------------------------------------------------------------
-app.use((req, res, next) => {
-    const inboundId = req.headers['x-request-id'];
-    if (typeof inboundId === 'string' && /^[a-zA-Z0-9_\-]{1,64}$/.test(inboundId.trim())) {
-        req.id = inboundId.trim();
-    } else {
-        req.id = uuidv4();
-    }
-    res.setHeader('X-Request-Id', req.id);
-    next();
-});
+// Request Correlation ID Middleware (Phases 2.10 & 2.5)
+app.use(requestIdMiddleware);
 
-// Security headers with Helmet (Strict CSP without unsafe-inline for scripts) (Phases 15 & 18)
-app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: [
-                "'self'",
-                "'sha256-eGFYqAHm7QB8cassdFBbBxhusmh76P1pfh3ymxPZOUw='",
-                "https://unpkg.com",
-                "https://accounts.google.com"
-            ],
-            styleSrc: [
-                "'self'",
-                "'unsafe-inline'", // Allowed for CSS variables & theme styling
-                "https://fonts.googleapis.com"
-            ],
-            fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
-            imgSrc: ["'self'", "data:", "https:", "blob:"],
-            connectSrc: [
-                "'self'",
-                "https://jubilant-octo-potato-production.up.railway.app",
-                "https://opensource-projects.netlify.app",
-                "https://*.supabase.co",
-                "https://unpkg.com",
-                "https://accounts.google.com"
-            ],
-            frameSrc: ["'self'", "https://accounts.google.com"],
-            frameAncestors: ["'none'"],
-            objectSrc: ["'none'"],
-            baseUri: ["'self'"]
-        }
-    },
-    crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-    crossOriginOpenerPolicy: false
-}));
+// High-precision Server-Timing & X-Response-Time headers (DevTools performance profiling)
+app.use(responseTimingMiddleware);
 
-// ------------------------------------------------------------------------------
+// High-performance native zlib response compression for JSON/text > 1KB
+app.use(responseCompressionMiddleware);
+
+// Production security headers with Helmet (Strict CSP without unsafe-inline for scripts) (Phases 15 & 18)
+app.use(createHelmetMiddleware());
+
 // Production-Grade CORS Configuration (With Robust Origin Normalization)
-// ------------------------------------------------------------------------------
-// Default explicitly trusted production, staging, and development origins
-const DEFAULT_ALLOWED_ORIGINS = [
-    'https://opensource-projects.netlify.app',
-    'https://jubilant-octo-potato-production.up.railway.app',
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'http://localhost:8080',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:5500'
-];
-
-// Helper to normalize origins (strips trailing slashes, trims whitespace, lowercases)
-const normalizeOrigin = (urlStr) => {
-    if (!urlStr || typeof urlStr !== 'string') return '';
-    return urlStr.trim().replace(/\/+$/, '').toLowerCase();
-};
-
-// Parse CORS_ORIGIN environment variable robustly (splits comma-separated list, trims, strips slashes)
-const configuredOrigins = (CORS_ORIGIN === '*' ? ['*'] : CORS_ORIGIN.split(','))
-    .map(normalizeOrigin)
-    .filter(Boolean);
-
-const allowedOrigins = Array.from(new Set([
-    ...DEFAULT_ALLOWED_ORIGINS.map(normalizeOrigin),
-    ...configuredOrigins
-]));
-
-// Safe origin validator: supports exact normalized match, wildcard, and Netlify preview subdomains
-const isOriginAllowed = (origin) => {
-    if (!origin) return true; // Allow same-origin / server-to-server / curl / mobile apps
-    const normalized = normalizeOrigin(origin);
-    if (configuredOrigins.includes('*')) return true;
-    if (allowedOrigins.includes(normalized)) return true;
-
-    // Safely allow Netlify branch & deploy preview subdomains (e.g., https://deploy-preview-12--opensource-projects.netlify.app)
-    if (/^https:\/\/[a-z0-9-]+(\-\-[a-z0-9-]+)?\.netlify\.app$/.test(normalized)) {
-        return true;
-    }
-    return false;
-};
-
-const corsOptions = {
-    origin: (origin, callback) => {
-        if (isOriginAllowed(origin)) {
-            return callback(null, true);
-        }
-        return callback(null, false);
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'X-Request-Id', 'X-Refresh-Token'],
-    exposedHeaders: ['Content-Range', 'X-Content-Range', 'X-Request-Id', 'X-Total-Count', 'X-Page', 'X-Limit', 'X-Total-Pages'],
-    maxAge: 86400 // Cache preflight response for 24 hours
-};
-
-app.use(cors(corsOptions));
+app.use(cors(getCorsOptions(CORS_ORIGIN)));
 
 // Body parsers with payload limits
 app.use(express.json({ limit: '5mb' }));
@@ -215,51 +153,14 @@ app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 app.use(cookieParser());
 app.use(csrfProtectionMiddleware(isOriginAllowed));
 
-// ------------------------------------------------------------------------------
 // Malformed Request & Payload Error Handler (Phases 2.5 & 2.11)
-// Clean 400 for malformed JSON, 413 for oversized payloads, zero reflection of inputs
-// ------------------------------------------------------------------------------
-app.use((err, req, res, next) => {
-    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-        return res.status(400).json({ error: 'Malformed JSON payload', requestId: req.id });
-    }
-    if (err.type === 'entity.too.large' || err.status === 413) {
-        return res.status(413).json({ error: 'Payload too large', requestId: req.id });
-    }
-    next(err);
-});
+app.use(payloadErrorHandlerMiddleware);
 
-// ------------------------------------------------------------------------------
-// HTTP Caching Policy Middleware (Phase 15)
-// API endpoints are private-by-default to prevent proxy/shared caching leaks
-// ------------------------------------------------------------------------------
-app.use((req, res, next) => {
-    if (req.path.startsWith('/api/')) {
-        res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
-        res.setHeader('Vary', 'Authorization, Accept');
-    }
-    next();
-});
+// Intelligent HTTP Caching Policy (Private no-store for auth vs Conditional ETags for public catalogs)
+app.use(apiCachingPolicyMiddleware);
 
-// ------------------------------------------------------------------------------
 // Static Directory Shielding (Section 10.B)
-// Strictly blocks direct HTTP access to datastore, schema, backend code, and config
-// ------------------------------------------------------------------------------
-const BLOCKED_STATIC_REGEX = /^\/(codecollab\s+data|prisma|scripts|test|\.env|\.git|src)(\/|$)/i;
-app.use((req, res, next) => {
-    let decodedPath = req.path;
-    try {
-        decodedPath = decodeURIComponent(req.path);
-    } catch {
-        return res.status(400).json({ error: 'Malformed request path', requestId: req.id });
-    }
-    if (BLOCKED_STATIC_REGEX.test(decodedPath) || decodedPath.includes('..') || decodedPath.startsWith('/.env')) {
-        return res.status(403).json({ error: 'Access denied to restricted path', requestId: req.id });
-    }
-    next();
-});
+app.use(staticShieldMiddleware);
 
 // Serve static frontend assets with appropriate caching
 app.use(express.static(__dirname, {
@@ -271,35 +172,12 @@ app.use(express.static(__dirname, {
         }
     }
 }));
+// Alias /views and /forms directly for robust SPA dynamic import resolution across all base URLs
+app.use('/views', express.static(path.join(__dirname, 'js', 'views')));
+app.use('/forms', express.static(path.join(__dirname, 'js', 'forms')));
 
-// Rate Limiting for auth routes (Phase 6 & Section 10.C)
-const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 500,
-    standardHeaders: true,
-    legacyHeaders: false,
-    skip: () => process.env.NODE_ENV === 'test',
-    message: { error: 'Too many requests, please try again later.' }
-});
+// Tiered rate limiting policies (General API, Auth, Password Changes)
 app.use('/api/', apiLimiter);
-
-const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    standardHeaders: true,
-    legacyHeaders: false,
-    skip: () => process.env.NODE_ENV === 'test',
-    message: { error: 'Too many authentication attempts, please try again later.' }
-});
-const passwordChangeLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 15,
-    standardHeaders: true,
-    legacyHeaders: false,
-    skip: () => process.env.NODE_ENV === 'test',
-    message: { error: 'Too many password change attempts, please try again later.' }
-});
-
 app.use('/api/auth/', authLimiter);
 app.use('/api/auth/change-password', passwordChangeLimiter);
 
@@ -374,7 +252,9 @@ async function verifyDatabaseConnectivity() {
 // ------------------------------------------------------------------------------
 // Health & Observability Endpoints
 // ------------------------------------------------------------------------------
-app.get(['/health', '/healthz'], async (req, res) => {
+// Previous production configuration - kept for deployment
+// app.get(['/health', '/healthz'], async (req, res) => {
+app.get(['/health', '/healthz', '/api/health', '/api/healthz'], async (req, res) => {
     let dbStatus = 'disconnected';
     if (prisma) {
         const connected = await isDbConnected(true);
@@ -391,38 +271,12 @@ app.get(['/health', '/healthz'], async (req, res) => {
 });
 
 // ------------------------------------------------------------------------------
-// Authentication Middleware (Dual Bearer Header + HttpOnly Cookie Support)
 // ------------------------------------------------------------------------------
-function authMiddleware(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    let token = null;
-
-    if (authHeader) {
-        const parts = authHeader.split(' ');
-        if (parts.length !== 2 || parts[0] !== 'Bearer') {
-            return res.status(401).json({ error: 'Invalid token format. Expected Bearer <token>' });
-        }
-        token = parts[1];
-    } else {
-        const { accessToken } = extractTokens(req);
-        token = accessToken;
-    }
-
-    if (!token) {
-        return res.status(401).json({ error: 'No authorization token provided' });
-    }
-
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
-        if (err) {
-            if (err.name === 'TokenExpiredError') {
-                return res.status(401).json({ error: 'Session token has expired', code: 'TOKEN_EXPIRED' });
-            }
-            return res.status(401).json({ error: 'Invalid or expired session token', code: 'TOKEN_INVALID' });
-        }
-        req.user = decoded; // { id, email, role, name }
-        next();
-    });
-}
+// Authentication Middleware (Dual Bearer Header + HttpOnly Cookie Support)
+// Initialized from centralized cyber-security package
+// ------------------------------------------------------------------------------
+const authMiddleware = createAuthMiddleware(JWT_SECRET);
+const optionalAuthMiddleware = createOptionalAuthMiddleware(JWT_SECRET);
 
 // Authoritative user display-name resolver (Phase 4.3)
 async function resolveUserName(userId, fallback = 'Developer') {
@@ -475,30 +329,6 @@ const getFilePath = (table) => {
     return path.join(DATA_DIR, `${normalized}.json`);
 };
 const getStatsPath = () => path.join(DATA_DIR, 'stats.json');
-
-// Reusable user sanitizer (Zero-Email, No Passwords, Zero Mobile Leakage)
-function sanitizeUserObj(u, fallbackName = 'Developer') {
-    if (!u) return null;
-    const { password, passwordHash, email, phoneNumber, mobileNumber, phone, ...safeUser } = u;
-    const prefs = (typeof u.profile?.preferences === 'object' && u.profile?.preferences !== null) ? u.profile.preferences : {};
-    return {
-        id: String(safeUser.id || ''),
-        name: safeUser.name || (safeUser.profile?.firstName ? `${safeUser.profile.firstName} ${safeUser.profile.lastName || ''}`.trim() : fallbackName),
-        title: safeUser.title || prefs.title || safeUser.role || 'Developer',
-        avatarUrl: sanitizeSafeUrl(safeUser.avatarUrl || safeUser.profile?.avatarUrl || '', ''),
-        verifiedSkills: Array.isArray(safeUser.verifiedSkills) ? safeUser.verifiedSkills : (Array.isArray(prefs.verifiedSkills) ? prefs.verifiedSkills : []),
-        skills: Array.isArray(safeUser.skills) ? safeUser.skills : (Array.isArray(prefs.skills) ? prefs.skills : []),
-        bio: safeUser.bio || prefs.bio || '',
-        availability: safeUser.availability || prefs.availability || 'Available Now',
-        lookingFor: safeUser.lookingFor || prefs.lookingFor || 'Open for collaboration',
-        socialLinks: sanitizeLinkMap(safeUser.socialLinks || prefs.socialLinks || {}),
-        location: safeUser.location || prefs.location || '',
-        rating: typeof safeUser.rating === 'number' ? safeUser.rating : (typeof prefs.rating === 'number' ? prefs.rating : 5.0),
-        upvotes: typeof safeUser.upvotes === 'number' ? safeUser.upvotes : (typeof prefs.upvotes === 'number' ? prefs.upvotes : 0),
-        upvoters: Array.isArray(safeUser.upvoters) ? safeUser.upvoters : (Array.isArray(prefs.upvoters) ? prefs.upvoters : []),
-        followers: Array.isArray(safeUser.followers) ? safeUser.followers : (Array.isArray(prefs.followers) ? prefs.followers : [])
-    };
-}
 
 // ------------------------------------------------------------------------------
 // Centralized Domain Services (Notification & OAuth)
@@ -2456,10 +2286,12 @@ app.delete('/api/projects/:projectId/members/:userId', authMiddleware, async (re
 
 /*
  * List All Accessible Issues
+ * Public project issues are readable by everyone (guests and authenticated users).
+ * Private project issues strictly require authenticated member authorization.
  */
-app.get('/api/issues', authMiddleware, async (req, res) => {
+app.get('/api/issues', optionalAuthMiddleware, async (req, res) => {
     try {
-        const currentUserId = String(req.user.id);
+        const currentUserId = req.user ? String(req.user.id) : null;
         const targetProjectId = (req.query.projectId && String(req.query.projectId).trim() !== '' && String(req.query.projectId) !== 'all') 
             ? String(req.query.projectId).trim() 
             : null;
@@ -2476,6 +2308,9 @@ app.get('/api/issues', authMiddleware, async (req, res) => {
         if (targetProjectId) {
             const isPrivate = await checkProjectPrivate(targetProjectId);
             if (isPrivate) {
+                if (!currentUserId) {
+                    return res.status(401).json({ error: 'Authentication required to view private project issues' });
+                }
                 const authorized = await isProjectAuthorized(targetProjectId, currentUserId);
                 if (!authorized) {
                     return res.status(403).json({ error: 'Forbidden: You do not have permission to view issues for this private project' });
@@ -2502,7 +2337,7 @@ app.get('/api/issues', authMiddleware, async (req, res) => {
                     const isPrivate = await checkProjectPrivate(i.projectId);
                     if (!isPrivate) {
                         accessible.push(i);
-                    } else {
+                    } else if (currentUserId) {
                         const authorized = await isProjectAuthorized(i.projectId, currentUserId);
                         if (authorized) accessible.push(i);
                     }
@@ -2537,7 +2372,7 @@ app.get('/api/issues', authMiddleware, async (req, res) => {
             const isPrivate = await checkProjectPrivate(t.projectId);
             if (!isPrivate) {
                 accessibleTasks.push(t);
-            } else {
+            } else if (currentUserId) {
                 const authorized = await isProjectAuthorized(t.projectId, currentUserId);
                 if (authorized) accessibleTasks.push(t);
             }
@@ -2555,13 +2390,16 @@ app.get('/api/issues', authMiddleware, async (req, res) => {
 /*
  * List Issues for Specific Project (Authorization Enforced)
  */
-app.get('/api/projects/:projectId/issues', authMiddleware, async (req, res) => {
+app.get('/api/projects/:projectId/issues', optionalAuthMiddleware, async (req, res) => {
     try {
         const projectId = String(req.params.projectId);
-        const currentUserId = String(req.user.id);
+        const currentUserId = req.user ? String(req.user.id) : null;
 
         const isPrivate = await checkProjectPrivate(projectId);
         if (isPrivate) {
+            if (!currentUserId) {
+                return res.status(401).json({ error: 'Authentication required to view private project issues' });
+            }
             const authorized = await isProjectAuthorized(projectId, currentUserId);
             if (!authorized) {
                 return res.status(403).json({ error: 'Forbidden: You do not have permission to view issues for this private project' });
@@ -3957,6 +3795,8 @@ app.get('/api/teams', async (req, res) => {
                         description: t.description || '',
                         leadId: t.leadId,
                         lead,
+                        leadName: lead?.name || 'Team Lead',
+                        membersCount: memberIds.length > 0 ? memberIds.length : 1,
                         members: memberIds.length > 0 ? memberIds : [t.leadId],
                         memberDetails: memberDetails.length > 0 ? memberDetails : [lead],
                         assignedProjects: t.assignedProjects || [],
@@ -4004,6 +3844,8 @@ app.get('/api/teams', async (req, res) => {
                 description: t.description || '',
                 leadId: t.leadId,
                 lead,
+                leadName: lead?.name || 'Team Lead',
+                membersCount: (Array.isArray(t.members) && t.members.length > 0) ? t.members.length : 1,
                 members: t.members || [],
                 memberDetails,
                 assignedProjects: t.assignedProjects || [],
@@ -4649,7 +4491,7 @@ app.get('/api/:table', async (req, res) => {
     try {
         const allowedTables = ['organizations', 'teams', 'stats', 'community'];
         if (!allowedTables.includes(req.params.table)) {
-            return res.status(403).json({ error: 'Access to this table is forbidden via generic endpoint' });
+            return res.status(404).json({ error: `API endpoint '/api/${req.params.table}' not found`, requestId: req.id });
         }
         await fs.mkdir(DATA_DIR, { recursive: true });
         const filePath = getFilePath(req.params.table);
@@ -4663,6 +4505,19 @@ app.get('/api/:table', async (req, res) => {
 });
 
 // ------------------------------------------------------------------------------
+// Centralized 404 Handler for Unmatched API Endpoints (Phase 2.11)
+// Standards-compliant JSON 404 for any undefined route under /api
+// ------------------------------------------------------------------------------
+app.use('/api', (req, res) => {
+    res.status(404).json({
+        error: `Endpoint '${req.method} ${req.originalUrl}' not found`,
+        method: req.method,
+        path: req.originalUrl,
+        requestId: req.id
+    });
+});
+
+// ------------------------------------------------------------------------------
 // Centralized Production Error Handler
 // ------------------------------------------------------------------------------
 app.use((err, req, res, next) => {
@@ -4673,10 +4528,16 @@ app.use((err, req, res, next) => {
     const safeMethod = String(req.method).replace(/[\r\n]/g, '');
     console.error(`[Error][${requestId}] ${safeMethod}:`, err.message || 'Error occurred');
 
+    // Never leak database connection strings or credentials
+    let sanitizedMessage = err.message || 'An error occurred';
+    if (typeof sanitizedMessage === 'string') {
+        sanitizedMessage = sanitizedMessage.replace(/postgres(ql)?:\/\/[^@\s]+@[^\s/]+/gi, 'postgresql://[REDACTED]@[REDACTED]');
+    }
+
     res.status(statusCode).json({
-        error: isProd ? (statusCode === 500 ? 'An unexpected server error occurred' : err.message) : (err.message || 'An error occurred'),
+        error: (statusCode === 500 && isProd) ? 'An unexpected server error occurred' : sanitizedMessage,
         requestId,
-        ...(isProd ? {} : { stack: err.stack })
+        ...(isProd ? {} : { stack: (err.stack || '').replace(/postgres(ql)?:\/\/[^@\s]+@[^\s/]+/gi, 'postgresql://[REDACTED]@[REDACTED]') })
     });
 });
 
@@ -4684,6 +4545,7 @@ app.use((err, req, res, next) => {
 // Process Lifecycle & Server Startup
 // ------------------------------------------------------------------------------
 let serverInstance = null;
+let devFrontendServer = null;
 
 if (require.main === module) {
     (async () => {
@@ -4703,12 +4565,31 @@ if (require.main === module) {
             console.log(`🗄️ Primary Datastore: ${NODE_ENV === 'production' ? 'Supabase PostgreSQL (Authoritative)' : (isDatabaseAvailable ? 'PostgreSQL (Dual Storage)' : 'Local File Storage')}`);
             console.log(`=======================================================`);
         });
+
+        // In local development, also serve frontend assets on port 8080 to guarantee robust local dev serving
+        if (NODE_ENV !== 'production' && String(PORT) !== '8080') {
+            try {
+                devFrontendServer = app.listen(8080, '0.0.0.0', () => {
+                    console.log(`💻 Local Frontend Server also active on http://localhost:8080`);
+                });
+                devFrontendServer.on('error', (err) => {
+                    if (err.code === 'EADDRINUSE') {
+                        console.log(`ℹ️ Port 8080 is already handled by external dev-server.`);
+                    } else {
+                        console.warn(`⚠️ Dev frontend server notice on port 8080:`, err.message);
+                    }
+                });
+            } catch (_) {}
+        }
     })();
 }
 
 // Graceful Shutdown
 function gracefulShutdown(signal) {
     console.log(`\nReceived ${signal}. Gracefully shutting down...`);
+    if (devFrontendServer) {
+        try { devFrontendServer.close(); } catch (_) {}
+    }
     if (serverInstance) {
         serverInstance.close(async () => {
             console.log('HTTP server closed.');

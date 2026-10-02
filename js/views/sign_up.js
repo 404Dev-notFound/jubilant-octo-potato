@@ -29,7 +29,7 @@ export function render_sign_up() {
                 <label class="block text-xs font-bold text-on-surface-variant mb-xs">MOBILE NUMBER</label>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">phone</span>
-                    <input type="tel" name="mobileNumber" class="w-full bg-surface-container border border-white/10 rounded-lg pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-tertiary transition-colors" placeholder="+1 234 567 8900" pattern="[+]?[0-9\\s\\-()]{7,20}" title="Please enter a valid mobile number (7-20 digits)" required>
+                    <input type="tel" name="mobileNumber" class="w-full bg-surface-container border border-white/10 rounded-lg pl-xl pr-md py-sm text-sm text-on-surface outline-none focus:border-tertiary transition-colors" placeholder="+1 234 567 8900" pattern="[+]?[0-9\\s\\-\\(\\)]{7,20}" title="Please enter a valid mobile number (7-20 digits)" required>
                 </div>
             </div>
 

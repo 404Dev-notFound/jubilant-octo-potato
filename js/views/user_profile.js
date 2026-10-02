@@ -139,6 +139,30 @@ export async function initUserProfile(targetUserId = null) {
     let currentUser = null;
     try { if (currentUserStr) currentUser = JSON.parse(currentUserStr); } catch (e) {}
 
+    // If viewing own profile but not logged in, show friendly guest prompt without firing 401 request
+    if (!targetUserId && !currentUser) {
+        const container = document.querySelector('main');
+        if (container) {
+            container.innerHTML = `
+            <div class="p-12 text-center bg-surface-container-low/40 rounded-3xl border border-white/10 backdrop-blur-md max-w-lg mx-auto mt-12">
+                <div class="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mx-auto mb-4">
+                    <span class="material-symbols-outlined text-[32px]">person</span>
+                </div>
+                <h2 class="text-xl font-bold text-on-surface mb-2">Sign in to view your profile</h2>
+                <p class="text-xs text-on-surface-variant mb-6">You are browsing as a guest. Please sign in or create an account to view and edit your developer profile, skills, and projects.</p>
+                <div class="flex items-center justify-center gap-3">
+                    <button data-form="login_form" class="px-5 py-2.5 bg-primary text-on-primary rounded-xl text-sm font-bold shadow-lg shadow-primary/25 hover:scale-105 transition-all cursor-pointer">
+                        Sign In
+                    </button>
+                    <button data-form="sign_up_form" class="px-5 py-2.5 bg-surface-container hover:bg-surface-variant text-on-surface border border-white/10 rounded-xl text-sm font-bold transition-all cursor-pointer">
+                        Sign Up
+                    </button>
+                </div>
+            </div>`;
+        }
+        return;
+    }
+
     const isSelf = !targetUserId || (currentUser && String(currentUser.id) === String(targetUserId));
     const endpoint = isSelf ? '/api/users/profile' : `/api/users/${targetUserId}`;
 

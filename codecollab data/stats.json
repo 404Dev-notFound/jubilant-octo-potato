@@ -1,6 +1,10 @@
 {
-  "cumulativeLogins": 68,
-  "cumulativeVisits": 154,
-  "cumulativeIssues": 23,
-  "totalLOC": 53881
+  "activeTeams": 6,
+  "totalDevelopers": 20,
+  "lookingForRequests": 4,
+  "totalUpvotes": 1387,
+  "cumulativeLogins": 346,
+  "cumulativeIssues": 7,
+  "activeProjects": 11,
+  "prsMerged": 38
 }

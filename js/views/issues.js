@@ -212,12 +212,26 @@ export async function initIssues(initialProjectId) {
                 const issues = await res.json();
                 renderBoard(issues);
             } else if (res.status === 401) {
-                console.warn('User not authenticated to load issues.');
-            } else {
-                console.error('API returned error loading issues:', res.status);
+                renderBoardAuthMessage('Authentication Required', 'Please sign in to view issues for this private project.');
+            } else if (res.status === 403) {
+                renderBoardAuthMessage('Access Restricted', 'You do not have permission to view issues for this private project.');
             }
         } catch(e) {
-            console.error('Failed to load issues:', e);
+            renderBoardAuthMessage('Error Loading Issues', 'Unable to retrieve issues at this time.');
+        }
+    }
+
+    function renderBoardAuthMessage(title, subtitle) {
+        const board = document.getElementById('kanban-board');
+        if (board) {
+            board.innerHTML = `
+                <div class="col-span-full py-16 text-center bg-surface-container-low/40 rounded-3xl border border-white/5 my-4">
+                    <span class="material-symbols-outlined text-[48px] text-primary mb-2 block">lock</span>
+                    <h3 class="text-lg font-bold text-on-surface">${escapeHtml(title)}</h3>
+                    <p class="text-xs text-on-surface-variant max-w-sm mx-auto mt-1 mb-4">${escapeHtml(subtitle)}</p>
+                    <button data-form="login_form" class="px-5 py-2 bg-primary text-on-primary rounded-xl text-xs font-bold hover:scale-105 transition-all">Sign In</button>
+                </div>
+            `;
         }
     }
 

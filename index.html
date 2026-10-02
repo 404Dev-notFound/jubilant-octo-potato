@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="api-base-url" content="https://jubilant-octo-potato-production.up.railway.app">
+    <!-- Runtime Environment Configuration (CSP-compliant external script) -->
+    <script src="js/env.js"></script>
+    <!-- Previous production configuration - kept for deployment -->
+    <!-- <meta name="api-base-url" content="https://jubilant-octo-potato-production.up.railway.app"> -->
+    <meta name="api-base-url" content="http://localhost:3000">
     <title>CODECOLLAB - Open Source Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Geist:wght@400;600;700&amp;family=Oleo+Script:wght@400;700&amp;display=swap" rel="stylesheet"/>
@@ -125,64 +129,104 @@
         </div>
     </div>
     
-    <!-- Comprehensive Footer -->
+    <!-- Compact Responsive Footer -->
     <footer class="bg-transparent border-t border-white/10 mt-auto relative z-10">
-        <div class="max-w-[1400px] mx-auto px-lg py-xl">
-            <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-xl">
-                <div class="lg:col-span-2">
-                    <a href="#home" class="flex items-center gap-sm mb-md">
-                        <span class="material-symbols-outlined text-primary text-[24px]">terminal</span>
-                        <span class="text-[20px] font-normal font-medium text-on-surface" style="font-family: 'Bandito', cursive, sans-serif; font-weight: 400;">CODECOLLAB</span>
+        <div class="max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-5">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-6 gap-y-4 md:gap-y-5 lg:gap-x-7 items-start">
+                <!-- Branding -->
+                <div>
+                    <a href="#home" class="flex items-center gap-1.5 mb-1.5 group w-fit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded" title="CodeCollab Home">
+                        <span class="material-symbols-outlined text-primary text-[20px] group-hover:scale-105 transition-transform">terminal</span>
+                        <span class="text-[17px] font-normal font-medium text-on-surface tracking-tight" style="font-family: 'Bandito', cursive, sans-serif; font-weight: 400;">CODECOLLAB</span>
                     </a>
-                    <p class="text-on-surface-variant text-sm mb-lg max-w-sm">
-                        Connecting developers, maintainers, and organizations through open-source collaboration and intelligent code review.
+                    <p class="text-on-surface-variant text-[11px] leading-relaxed mb-2">
+                        Connecting developers, maintainers &amp; organizations through open-source collaboration.
                     </p>
-                    <div class="flex gap-sm">
-                        <a href="#" class="group w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-all duration-300 border border-transparent hover:border-primary/50 hover:shadow-[0_0_15px_rgba(107,250,216,0.3)]"><span class="material-symbols-outlined text-[18px] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-secondary group-hover:to-tertiary transition-all duration-300">code</span></a>
-                        <a href="#" class="group w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-all duration-300 border border-transparent hover:border-primary/50 hover:shadow-[0_0_15px_rgba(107,250,216,0.3)]"><span class="material-symbols-outlined text-[18px] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-secondary group-hover:to-tertiary transition-all duration-300">forum</span></a>
-                        <a href="#" class="group w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-all duration-300 border border-transparent hover:border-primary/50 hover:shadow-[0_0_15px_rgba(107,250,216,0.3)]"><span class="material-symbols-outlined text-[18px] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-secondary group-hover:to-tertiary transition-all duration-300">public</span></a>
+                    <div class="flex gap-1.5">
+                        <a href="https://github.com/404Dev-notFound/jubilant-octo-potato" target="_blank" rel="noopener noreferrer" class="group w-6 h-6 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-all duration-300 border border-transparent hover:border-primary/50 hover:shadow-[0_0_10px_rgba(107,250,216,0.3)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary" title="Source Code" aria-label="Source Code"><span class="material-symbols-outlined text-[13px] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-secondary group-hover:to-tertiary transition-all duration-300">code</span></a>
+                        <a href="#community" class="group w-6 h-6 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-all duration-300 border border-transparent hover:border-primary/50 hover:shadow-[0_0_10px_rgba(107,250,216,0.3)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary" title="Discussions" aria-label="Discussions"><span class="material-symbols-outlined text-[13px] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-secondary group-hover:to-tertiary transition-all duration-300">forum</span></a>
+                        <a href="#explore" class="group w-6 h-6 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-all duration-300 border border-transparent hover:border-primary/50 hover:shadow-[0_0_10px_rgba(107,250,216,0.3)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary" title="Explore Community" aria-label="Explore Community"><span class="material-symbols-outlined text-[13px] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-secondary group-hover:to-tertiary transition-all duration-300">public</span></a>
                     </div>
                 </div>
                 
+                <!-- Platform -->
                 <div>
-                    <h4 class="font-bold text-on-surface mb-md">Platform</h4>
-                    <ul class="space-y-sm text-sm text-on-surface-variant">
-                        <li><a href="#explore" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300">Explore Projects</a></li>
-                        <li><a href="#ai_workspace" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300">AI Workspace</a></li>
-                        <li><a href="#organizations" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300">Organizations</a></li>
-                        <li><a href="#leaderboard" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300">Leaderboard</a></li>
+                    <h4 class="font-semibold text-on-surface mb-1.5 text-xs uppercase tracking-wider">Platform</h4>
+                    <ul class="space-y-1 text-xs text-on-surface-variant">
+                        <li><a href="#explore" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">Explore Projects</a></li>
+                        <li><a href="#ai_workspace" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">AI Workspace</a></li>
+                        <li><a href="#organizations" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">Organizations</a></li>
+                        <li><a href="#leaderboard" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">Leaderboard</a></li>
                     </ul>
                 </div>
                 
+                <!-- Resources -->
                 <div>
-                    <h4 class="font-bold text-on-surface mb-md">Resources</h4>
-                    <ul class="space-y-sm text-sm text-on-surface-variant">
-                        <li><a href="#documentation" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300">Documentation</a></li>
-                        <li><a href="#learning_center" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300">Learning Center</a></li>
-                        <li><a href="#events" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300">Events & Hackathons</a></li>
-                        <li><a href="#community" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300">Community Forum</a></li>
+                    <h4 class="font-semibold text-on-surface mb-1.5 text-xs uppercase tracking-wider">Resources</h4>
+                    <ul class="space-y-1 text-xs text-on-surface-variant">
+                        <li><a href="#documentation" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">Documentation</a></li>
+                        <li><a href="#learning_center" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">Learning Center</a></li>
+                        <li><a href="#events" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">Events &amp; Hackathons</a></li>
+                        <li><a href="#community" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">Community Forum</a></li>
+                        <li><a href="#notifications" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">Mentions</a></li>
+                    </ul>
+                </div>
+
+                <!-- flowCTRL Ecosystem -->
+                <div>
+                    <h4 class="font-semibold text-on-surface mb-1.5 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(219,184,255,0.6)]"></span>
+                        flowCTRL Ecosystem
+                    </h4>
+                    <ul class="space-y-1 text-xs text-on-surface-variant">
+                        <li>
+                            <a href="https://ats-resume-analysis.netlify.app/" target="_blank" rel="noopener noreferrer" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">
+                                <span>ATS Resume Check</span>
+                                <span class="material-symbols-outlined text-[13px] opacity-70">open_in_new</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://fluffy-spoon-score.vercel.app/" target="_blank" rel="noopener noreferrer" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded">
+                                <span>Mental Health Check</span>
+                                <span class="material-symbols-outlined text-[13px] opacity-70">open_in_new</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a id="flowctrl-roadmaps-link" href="#" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-tertiary rounded cursor-pointer">
+                                <span>flowCTRL — Roadmaps</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 
+                <!-- Company -->
                 <div>
-                    <h4 class="font-bold text-on-surface mb-md">Company</h4>
-                    <ul class="space-y-sm text-sm text-on-surface-variant">
-                        <li><a href="#about" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300">About Us</a></li>
-                        <li><a href="#contact" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300">Contact</a></li>
-                        <li><a href="#terms" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300">Terms of Service</a></li>
-                        <li><a href="#privacy" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300">Privacy Policy</a></li>
+                    <h4 class="font-semibold text-on-surface mb-1.5 text-xs uppercase tracking-wider">Company</h4>
+                    <ul class="space-y-1 text-xs text-on-surface-variant">
+                        <li><a href="#about" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">About Us</a></li>
+                        <li><a href="#contact" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal -->
+                <div>
+                    <h4 class="font-semibold text-on-surface mb-1.5 text-xs uppercase tracking-wider">Legal</h4>
+                    <ul class="space-y-1 text-xs text-on-surface-variant">
+                        <li><a href="#terms" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">Terms &amp; Conditions</a></li>
+                        <li><a href="#privacy" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">Privacy Policy</a></li>
+                        <li><a href="#security" class="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-primary hover:via-secondary hover:to-tertiary transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded">Security</a></li>
                     </ul>
                 </div>
             </div>
             
-            <div class="h-[1px] bg-white/5 w-full my-lg"></div>
+            <div class="h-[1px] bg-white/5 w-full mt-3.5 mb-2.5"></div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-y-sm text-xs text-on-surface-variant mt-sm items-center">
-                <p class="text-center md:text-left">&copy; 2026 CodeCollab Inc. All rights reserved.</p>
-                <p class="text-center text-primary font-medium tracking-wide">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-1 text-[11px] text-on-surface-variant/70">
+                <p class="text-center sm:text-left">&copy; 2026 CodeCollab Inc. All rights reserved.</p>
+                <a href="#about" class="text-center text-primary font-medium tracking-wide hover:underline cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded px-1 transition-colors">
                     Scripted by Dev
-                </p>
-                <p class="text-center md:text-right">Version 2.0.0-rc1</p>
+                </a>
+                <p class="text-center sm:text-right">Version 2.0.1</p>
             </div>
         </div>
     </footer>
@@ -196,13 +240,12 @@
     <!-- Shared Toast Container -->
     <div id="toast-container" class="fixed bottom-lg right-lg z-[100] flex flex-col gap-sm"></div>
 
-    <script src="js/env.js"></script>
-    <script src="js/components.js"></script>
-    <script src="js/components/onboarding_guidance.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/components.js?v=local"></script>
+    <script src="js/components/onboarding_guidance.js?v=local"></script>
+    <script src="js/app.js?v=local"></script>
     
-    <script src="js/session.js"></script>
-    <script src="js/command_palette.js"></script>
-    <script type="module" src="js/nebula.js"></script>
+    <script src="js/session.js?v=local"></script>
+    <script src="js/command_palette.js?v=local"></script>
+    <script type="module" src="js/nebula.js?v=local"></script>
 </body>
 </html>

@@ -1,3 +1,30 @@
+// Immediate global resolution of getApiBaseUrl for local development before DOMContentLoaded
+if (typeof window !== 'undefined') {
+    window.getApiBaseUrl = function () {
+        const isLocal = window.location && (
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname === '0.0.0.0' ||
+            window.location.hostname === '::1' ||
+            window.location.hostname === '[::1]' ||
+            window.location.hostname === '' ||
+            window.location.protocol === 'file:'
+        );
+        if (isLocal) {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    const stored = localStorage.getItem('CODECOLLAB_API_BASE_URL');
+                    if (stored && stored.includes('railway.app')) {
+                        localStorage.removeItem('CODECOLLAB_API_BASE_URL');
+                    }
+                }
+            } catch (_) {}
+            return 'http://localhost:3000';
+        }
+        return (window.__ENV__?.API_BASE_URL || 'https://jubilant-octo-potato-production.up.railway.app').replace(/\/+$/, '');
+    };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const appContent = document.getElementById('app-content');
     const nebulaBg = document.getElementById('nebula-bg');
@@ -55,6 +82,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // API URL Discovery & Production-Ready Request Client
     // --------------------------------------------------------------------------
     window.getApiBaseUrl = function () {
+        // Priority 0: Local development enforcement (Always routes to local backend on localhost/127.0.0.1)
+        const isLocalHostEnvironment = typeof window !== 'undefined' && window.location && (
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname === '0.0.0.0' ||
+            window.location.hostname === '::1' ||
+            window.location.hostname === '[::1]' ||
+            window.location.hostname === '' ||
+            window.location.protocol === 'file:'
+        );
+        if (isLocalHostEnvironment) {
+            // Clean up any stale Railway override from localStorage that might linger in developer browser
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    const stored = localStorage.getItem('CODECOLLAB_API_BASE_URL');
+                    if (stored && stored.includes('railway.app')) {
+                        localStorage.removeItem('CODECOLLAB_API_BASE_URL');
+                    }
+                }
+            } catch (_) {}
+            return 'http://localhost:3000';
+        }
+
         // Priority 1: Explicit LocalStorage override (for local testing/staging overrides)
         const customStorageUrl = (typeof localStorage !== 'undefined') ? (localStorage.getItem('CODECOLLAB_API_BASE_URL') || '').trim() : '';
         if (customStorageUrl) return customStorageUrl.replace(/\/+$/, '');
@@ -82,6 +132,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Priority 5: Current Origin fallback
         const originUrl = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null') ? window.location.origin : '';
+        // Previous production configuration - kept for deployment
+        // return (originUrl || 'https://jubilant-octo-potato-production.up.railway.app').replace(/\/+$/, '');
+        if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+            return 'http://localhost:3000';
+        }
         return (originUrl || 'https://jubilant-octo-potato-production.up.railway.app').replace(/\/+$/, '');
     };
 
@@ -199,13 +254,128 @@ document.addEventListener('DOMContentLoaded', () => {
         return refreshPromise;
     }
 
+    // --------------------------------------------------------------------------
+    // Client-Side Safe Storage & Caching Layer
+    // --------------------------------------------------------------------------
+    // Safely caches non-sensitive, frequently reused public catalog data
+    // (platform stats, project catalog, team listings, community developers).
+    // Sensitive authentication tokens, passwords, and private user details
+    // are strictly excluded and protected by ambient HttpOnly cookies.
+    const ClientDataCache = {
+        _memory: new Map(),
+        _storagePrefix: 'cc_pub_cache_',
+        _cacheablePaths: [
+            '/api/stats',
+            '/api/projects',
+            '/api/teams',
+            '/api/community/developers',
+            '/api/community/looking-for'
+        ],
+
+        isCacheable(endpoint, method = 'GET') {
+            if (method !== 'GET') return false;
+            const pathOnly = endpoint.split('?')[0].toLowerCase();
+            return this._cacheablePaths.some(p => pathOnly === p || pathOnly.startsWith(`${p}/`));
+        },
+
+        get(endpoint) {
+            const now = Date.now();
+            const inMem = this._memory.get(endpoint);
+            if (inMem && inMem.expiresAt > now) {
+                return inMem.data;
+            }
+
+            try {
+                if (typeof sessionStorage !== 'undefined') {
+                    const stored = sessionStorage.getItem(`${this._storagePrefix}${endpoint}`);
+                    if (stored) {
+                        const parsed = JSON.parse(stored);
+                        if (parsed && parsed.expiresAt > now) {
+                            this._memory.set(endpoint, parsed);
+                            return parsed.data;
+                        } else {
+                            sessionStorage.removeItem(`${this._storagePrefix}${endpoint}`);
+                        }
+                    }
+                }
+            } catch (_) {}
+            return null;
+        },
+
+        set(endpoint, data, ttlMs = 45000) {
+            const entry = { data, expiresAt: Date.now() + ttlMs };
+            this._memory.set(endpoint, entry);
+            try {
+                if (typeof sessionStorage !== 'undefined') {
+                    sessionStorage.setItem(`${this._storagePrefix}${endpoint}`, JSON.stringify(entry));
+                }
+            } catch (_) {}
+        },
+
+        invalidate(pattern) {
+            for (const key of this._memory.keys()) {
+                if (!pattern || key.includes(pattern)) {
+                    this._memory.delete(key);
+                }
+            }
+            try {
+                if (typeof sessionStorage !== 'undefined') {
+                    for (let i = sessionStorage.length - 1; i >= 0; i--) {
+                        const key = sessionStorage.key(i);
+                        if (key && key.startsWith(this._storagePrefix)) {
+                            if (!pattern || key.includes(pattern)) {
+                                sessionStorage.removeItem(key);
+                            }
+                        }
+                    }
+                }
+            } catch (_) {}
+        },
+
+        clear() {
+            this._memory.clear();
+            try {
+                if (typeof sessionStorage !== 'undefined') {
+                    for (let i = sessionStorage.length - 1; i >= 0; i--) {
+                        const key = sessionStorage.key(i);
+                        if (key && key.startsWith(this._storagePrefix)) {
+                            sessionStorage.removeItem(key);
+                        }
+                    }
+                }
+            } catch (_) {}
+        }
+    };
+    window.ClientDataCache = ClientDataCache;
+
     // In-flight GET request deduplication map to prevent redundant concurrent queries
     const inFlightGetRequests = new Map();
 
     window.apiFetch = async function (endpoint, options = {}) {
-        const baseUrl = window.getApiBaseUrl();
         const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-        const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${cleanEndpoint}`;
+
+        // Local development enforcement: unconditionally route all API requests to http://localhost:3000 on localhost
+        const isLocalHostReq = typeof window !== 'undefined' && window.location && (
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname === '0.0.0.0' ||
+            window.location.hostname === '::1' ||
+            window.location.hostname === '[::1]' ||
+            window.location.hostname === '' ||
+            window.location.protocol === 'file:'
+        );
+
+        let url;
+        if (isLocalHostReq) {
+            if (endpoint.startsWith('http')) {
+                url = endpoint.replace(/https?:\/\/[a-zA-Z0-9-]+\.up\.railway\.app/g, 'http://localhost:3000');
+            } else {
+                url = `http://localhost:3000${cleanEndpoint}`;
+            }
+        } else {
+            const baseUrl = window.getApiBaseUrl();
+            url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${cleanEndpoint}`;
+        }
         const method = (options.method || 'GET').toUpperCase();
 
         const headers = { ...options.headers };
@@ -223,6 +393,21 @@ document.addEventListener('DOMContentLoaded', () => {
             headers['Authorization'] = `Bearer ${currentToken}`;
         }
 
+        // Invalidate client cache on state-mutating requests
+        if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+            if (cleanEndpoint.includes('/projects')) {
+                ClientDataCache.invalidate('/api/projects');
+                ClientDataCache.invalidate('/api/stats');
+            } else if (cleanEndpoint.includes('/teams')) {
+                ClientDataCache.invalidate('/api/teams');
+                ClientDataCache.invalidate('/api/stats');
+            } else if (cleanEndpoint.includes('/community') || cleanEndpoint.includes('/looking-for')) {
+                ClientDataCache.invalidate('/api/community');
+            } else {
+                ClientDataCache.clear();
+            }
+        }
+
         const fetchOptions = {
             credentials: 'include', // Send and receive HttpOnly cookies across origins & localhost
             cache: 'no-store',
@@ -230,8 +415,22 @@ document.addEventListener('DOMContentLoaded', () => {
             headers
         };
 
-        // Deduplicate identical concurrent in-flight GET requests
         const isGet = method === 'GET' && !options.body && !options._isRetry;
+
+        // Check Client-Side Safe Storage Cache for unauthenticated public catalog queries
+        const isPublicCacheable = isGet && !options.bypassCache && !currentToken && ClientDataCache.isCacheable(cleanEndpoint);
+        if (isPublicCacheable) {
+            const cachedData = ClientDataCache.get(cleanEndpoint);
+            if (cachedData !== null) {
+                return new Response(JSON.stringify(cachedData), {
+                    status: 200,
+                    statusText: 'OK',
+                    headers: { 'Content-Type': 'application/json', 'X-Client-Cache': 'HIT' }
+                });
+            }
+        }
+
+        // Deduplicate identical concurrent in-flight GET requests
         const dedupKey = isGet ? `${url}|${headers['Authorization'] || ''}` : null;
 
         if (isGet && inFlightGetRequests.has(dedupKey)) {
@@ -265,6 +464,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw enrichedError;
             }
 
+            // Populate safe client-side cache on successful public responses
+            if (response && response.ok && isPublicCacheable) {
+                try {
+                    const clonedForCache = response.clone();
+                    clonedForCache.json().then(data => {
+                        if (data) ClientDataCache.set(cleanEndpoint, data);
+                    }).catch(() => {});
+                } catch (_) {}
+            }
+
             if (response.status === 401) {
                 // Attempt single-flight refresh for expired tokens if not already retried
                 const isAuthRoute = cleanEndpoint.includes('/api/auth/refresh') || cleanEndpoint.includes('/api/auth/login') || cleanEndpoint.includes('/api/auth/signup') || cleanEndpoint.includes('/api/auth/me');
@@ -280,6 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         });
                     } catch (refreshErr) {
+                        const hadSession = Boolean((window.Session && window.Session.getSession && window.Session.getSession()) || localStorage.getItem('currentUser'));
                         if (refreshErr.status === 401 || refreshErr.status === 403 || refreshErr.message === 'NO_REFRESH_TOKEN') {
                             if (window.Session && window.Session.clearSession) {
                                 window.Session.clearSession();
@@ -287,32 +497,32 @@ document.addEventListener('DOMContentLoaded', () => {
                                 localStorage.removeItem('currentUser');
                             }
                             if (window.updateAuthUI) window.updateAuthUI();
-                            if (window.UI && window.UI.showToast) {
+                            if (hadSession && window.UI && window.UI.showToast && !options.silent) {
                                 window.UI.showToast('Session expired. Please log in again.', 'error');
                             }
-                            throw new Error('Session expired');
                         }
-                        throw refreshErr;
+                        return response;
                     }
                 } else if (isAuthRoute) {
                     return response;
                 }
 
+                const hadSession = Boolean((window.Session && window.Session.getSession && window.Session.getSession()) || localStorage.getItem('currentUser'));
                 if (window.Session && window.Session.clearSession) {
                     window.Session.clearSession();
                 } else {
                     localStorage.removeItem('currentUser');
                 }
                 if (window.updateAuthUI) window.updateAuthUI();
-                if (window.UI && window.UI.showToast) {
+                if (hadSession && window.UI && window.UI.showToast && !options.silent) {
                     window.UI.showToast('Session expired. Please log in again.', 'error');
                 }
-                throw new Error('Session expired');
+                return response;
             } else if (response.status === 403) {
-                if (window.UI && window.UI.showToast) {
+                if (window.UI && window.UI.showToast && !options.silent) {
                     window.UI.showToast('You do not have permission to perform this action.', 'error');
                 }
-                throw new Error('Forbidden');
+                return response;
             }
 
             return response;
@@ -405,36 +615,48 @@ document.addEventListener('DOMContentLoaded', () => {
         window.updateNotificationBadge();
     };
 
-    // Session restore from cookie on startup/reload
+    // Session restore from cookie on startup/reload (Single-flight debounced)
+    let restoreSessionInFlightPromise = null;
     window.restoreSession = async function () {
-        try {
-            const res = await window.apiFetch('/api/auth/me', { method: 'GET' });
-            if (res && res.ok) {
-                const data = await res.json();
-                if (data && data.authenticated && data.user) {
-                    const currentSession = (window.Session && window.Session.getSession) ? window.Session.getSession() : {};
-                    const merged = {
-                        ...currentSession,
-                        ...data.user,
-                        user: data.user
-                    };
-                    if (window.Session && window.Session.setSession) {
-                        window.Session.setSession(merged);
-                    } else {
-                        localStorage.setItem('currentUser', JSON.stringify(merged));
-                    }
-                    window.updateAuthUI();
-                    return merged;
-                }
-            }
-        } catch (e) {
-            // Unauthenticated or network error, let updateAuthUI reflect state
+        if (restoreSessionInFlightPromise) {
+            return restoreSessionInFlightPromise;
         }
-        return null;
+        restoreSessionInFlightPromise = (async () => {
+            try {
+                const res = await window.apiFetch('/api/auth/me', { method: 'GET', silent: true });
+                if (res && res.ok) {
+                    const data = await res.json();
+                    if (data && data.authenticated && data.user) {
+                        const currentSession = (window.Session && window.Session.getSession) ? window.Session.getSession() : {};
+                        const merged = {
+                            ...currentSession,
+                            ...data.user,
+                            user: data.user
+                        };
+                        if (window.Session && window.Session.setSession) {
+                            window.Session.setSession(merged);
+                        } else {
+                            localStorage.setItem('currentUser', JSON.stringify(merged));
+                        }
+                        window.updateAuthUI();
+                        return merged;
+                    }
+                }
+            } catch (e) {
+                // Unauthenticated or network error, let updateAuthUI reflect state
+            }
+            return null;
+        })().finally(() => {
+            restoreSessionInFlightPromise = null;
+        });
+        return restoreSessionInFlightPromise;
     };
 
     window.logout = async function () {
         try {
+            if (window.ClientDataCache) {
+                window.ClientDataCache.clear();
+            }
             const sess = (window.Session && window.Session.getSession) ? window.Session.getSession() : null;
             const refreshToken = sess?.refreshToken;
             const baseUrl = window.getApiBaseUrl();
@@ -659,6 +881,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const cleanHash = hash.replace(/^\/+|\/+$/g, '');
         let rawViewName = cleanHash.split('?')[0].toLowerCase().replace(/-/g, '_');
         if (rawViewName === 'community_hub') rawViewName = 'community';
+        if (rawViewName === 'developers' || rawViewName === 'developers_&_coding_mates' || rawViewName === 'coding_mates') rawViewName = 'community';
+        if (rawViewName === 'teams' || rawViewName === 'guilds') rawViewName = 'community';
         if (rawViewName === 'home_explore') rawViewName = 'explore';
         if (rawViewName === 'profile') rawViewName = 'user_profile';
         if (rawViewName === 'user-profile') rawViewName = 'user_profile';
@@ -842,6 +1066,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const link = e.target.closest('a');
         if (link) {
             const href = link.getAttribute('href');
+
+            if (link.id === 'flowctrl-roadmaps-link') {
+                e.preventDefault();
+                const url = window.__ENV__?.FLOWCTRL_ROADMAPS_URL || window.FLOWCTRL_ROADMAPS_URL;
+                if (url) {
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                    return;
+                }
+                if (window.UI?.showToast) {
+                    window.UI.showToast('flowCTRL Roadmaps is currently in active development.', 'info');
+                }
+                return;
+            }
 
             if (link.id === 'logout-btn') {
                 e.preventDefault();

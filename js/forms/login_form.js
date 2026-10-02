@@ -21,7 +21,7 @@ export function render_login_form() {
 
             <div>
                 <label class="block text-sm font-label-sm text-on-surface mb-xs">Mobile Number</label>
-                <input type="tel" name="mobileNumber" required placeholder="+1 234 567 8900" pattern="[+]?[0-9\\s\\-()]{7,20}" title="Please enter a valid mobile number (7-20 digits)" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-primary transition-colors">
+                <input type="tel" name="mobileNumber" required placeholder="+1 234 567 8900" pattern="[+]?[0-9\\s\\-\\(\\)]{7,20}" title="Please enter a valid mobile number (7-20 digits)" class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-sm text-on-surface outline-none focus:border-primary transition-colors">
             </div>
             
             <div>

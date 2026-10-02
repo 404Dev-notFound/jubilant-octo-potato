@@ -80,7 +80,7 @@ class OAuthService {
             console.error('Google OAuth token verification failed:', err.message);
             const isTimeout = err.message && err.message.includes('timeout');
             return {
-                status: isTimeout ? 504 : 401,
+                status: isTimeout ? 503 : 401,
                 data: { error: isTimeout ? 'Google authentication timed out' : 'Failed to verify Google token' }
             };
         }

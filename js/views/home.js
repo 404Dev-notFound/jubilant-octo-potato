@@ -56,11 +56,26 @@ export function render_home() {
     
     <!-- Hero Stats -->
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-lg mt-24 w-full max-w-5xl border-t border-white/5 pt-xl">
-        <div><div id="stat-developers" class="text-headline-lg font-display text-primary font-bold">0</div><div class="text-sm text-on-surface-variant">Developers</div></div>
-        <div><div id="stat-projects" class="text-headline-lg font-display text-secondary font-bold">0</div><div class="text-sm text-on-surface-variant">Projects</div></div>
-        <div><div id="stat-prs" class="text-headline-lg font-display text-tertiary font-bold">0K+</div><div class="text-sm text-on-surface-variant">PRs Merged</div></div>
-        <div><div id="stat-opensource" class="text-headline-lg font-display text-error font-bold">100%</div><div class="text-sm text-on-surface-variant">Open Source</div></div>
-        <div><div id="stat-issues" class="text-headline-lg font-display text-primary font-bold">0</div><div class="text-sm text-on-surface-variant">Issues</div></div>
+        <a href="#community" class="block cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded-lg">
+            <div id="stat-developers" class="text-headline-lg font-display text-primary font-bold">35</div>
+            <div class="text-sm text-on-surface-variant">Developers</div>
+        </a>
+        <a href="#explore" class="block cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded-lg">
+            <div id="stat-projects" class="text-headline-lg font-display text-secondary font-bold">11</div>
+            <div class="text-sm text-on-surface-variant">Projects</div>
+        </a>
+        <a href="#pull_requests" class="block cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-tertiary rounded-lg">
+            <div id="stat-prs" class="text-headline-lg font-display text-tertiary font-bold">38+</div>
+            <div class="text-sm text-on-surface-variant">PRs Merged</div>
+        </a>
+        <div>
+            <div id="stat-opensource" class="text-headline-lg font-display text-error font-bold">100%</div>
+            <div class="text-sm text-on-surface-variant">Open Source</div>
+        </div>
+        <a href="#issues" class="block cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded-lg">
+            <div id="stat-issues" class="text-headline-lg font-display text-primary font-bold">7</div>
+            <div class="text-sm text-on-surface-variant">Issues</div>
+        </a>
     </div>
 </div>`;
 }

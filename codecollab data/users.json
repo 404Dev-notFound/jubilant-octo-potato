@@ -1,24 +1,24 @@
 [
   {
     "id": "1785998502411",
-    "createdAt": "2026-08-06T06:41:42.411Z",
     "name": "Dev Goel",
-    "title": "Principal Systems Architect & Core Contributor",
     "email": "dev@gmail.com",
     "password": "$2b$10$920Vh1NdC10pCD6tADiCmOPD6WWi4tVz7c2jsVUK1myP0gHenM0.u",
+    "phoneNumber": "97676587352",
     "role": "Lead Architect",
+    "title": "Principal Systems Architect & Core Contributor",
     "bio": "Building memory-safe distributed runtimes and high-concurrency systems.",
     "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "Rust",
-      "Tokio",
-      "WebAssembly",
-      "Distributed Systems"
-    ],
     "skills": [
       "Rust",
       "Go",
       "Kubernetes",
+      "WebAssembly",
+      "Distributed Systems"
+    ],
+    "verifiedSkills": [
+      "Rust",
+      "Tokio",
       "WebAssembly",
       "Distributed Systems"
     ],
@@ -44,44 +44,22 @@
       "linkedin": "https://linkedin.com",
       "website": "https://codecollab.dev"
     },
-    "projects": [
-      "Distributed Cache Engine",
-      "Zero-Copy RPC Gateway",
-      "CodeCollab CLI"
-    ],
-    "progress": 0,
-    "potion": 0,
     "username": "devgoel06",
     "location": "delhi, india",
     "education": "M.S. Computer Science, Stanford University",
     "experience": "8+ years in Systems Engineering",
-    "interests": [
-      "Distributed Systems",
-      "Compilers",
-      "Async I/O",
-      "Performance"
-    ],
-    "updatedAt": "2026-08-21T19:02:00.616Z",
-    "hoursPerWeek": "10-20 hrs/wk",
-    "collaborationType": "Fullstack Developer",
-    "timezone": "UTC+5:30"
+    "createdAt": "2026-08-06T06:41:42.411Z"
   },
   {
     "id": "1786746884946",
-    "createdAt": "2026-08-14T22:34:44.946Z",
-    "name": "Alice Wonder",
-    "title": "AI/ML Engineer & PyTorch Specialist",
+    "name": "devansh mishra",
     "email": "alice_1786746884843@example.com",
     "password": "$2b$10$Sj2AT5QyHOvcliHrCL9NU..r9GMvLc.TgfavQN1UdqzVdwT0VnMTG",
+    "phoneNumber": null,
     "role": "AI Researcher",
+    "title": "AI/ML Engineer & PyTorch Specialist",
     "bio": "Specialized in LLM fine-tuning, embeddings ranking, and multi-agent coordination frameworks. Passionate about bringing intelligent code analysis to open-source.",
     "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "Python",
-      "PyTorch",
-      "FastAPI",
-      "LangChain"
-    ],
     "skills": [
       "Python",
       "PyTorch",
@@ -90,6 +68,12 @@
       "HuggingFace",
       "PostgreSQL",
       "Docker"
+    ],
+    "verifiedSkills": [
+      "Python",
+      "PyTorch",
+      "FastAPI",
+      "LangChain"
     ],
     "rating": 4.9,
     "upvotes": 274,
@@ -109,29 +93,22 @@
       "twitter": "https://x.com/alicewonder_ai",
       "website": "https://alicewonder.dev"
     },
-    "projects": [
-      "CodeCollab AI Reviewer",
-      "Prompt Orchestration Framework"
-    ],
-    "progress": 0,
-    "potion": 0
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-08-14T22:34:44.946Z"
   },
   {
     "id": "1786747907456",
-    "createdAt": "2026-08-14T22:51:47.456Z",
-    "name": "Bob Smith",
-    "title": "Creative Frontend Engineer & WebGL Dev",
+    "name": "simran kaur",
     "email": "bob_1786747907286@example.com",
     "password": "$2b$10$/kbO/zNKt2J.RJp7413tEOK3fT8g2IiEIF7m7NmrpG1ERQPXvZx9u",
+    "phoneNumber": null,
     "role": "Frontend Specialist",
+    "title": "Creative Frontend Engineer & WebGL Dev",
     "bio": "Designing buttery-smooth interfaces, particle physics scenes, and high-performance interactive components with React and Three.js.",
     "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "React",
-      "TypeScript",
-      "Three.js",
-      "TailwindCSS"
-    ],
     "skills": [
       "React",
       "TypeScript",
@@ -140,6 +117,12 @@
       "WebGL",
       "Next.js",
       "Figma"
+    ],
+    "verifiedSkills": [
+      "React",
+      "TypeScript",
+      "Three.js",
+      "TailwindCSS"
     ],
     "rating": 4.8,
     "upvotes": 218,
@@ -159,29 +142,22 @@
       "twitter": "https://x.com/bobsmith_design",
       "website": "https://bobsmith.design"
     },
-    "projects": [
-      "Rose Nebula Canvas",
-      "Modern Design Tokens CLI"
-    ],
-    "progress": 0,
-    "potion": 0
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-08-14T22:51:47.456Z"
   },
   {
     "id": "1786978624580",
-    "createdAt": "2026-08-17T14:57:04.580Z",
     "name": "Mehak Patel",
-    "title": "Cloud Native & DevOps Engineer",
     "email": "mehak@gmail.com",
     "password": "$2b$10$U9l3JNR5QBY0DAkPln1xgufI1KWw3Z9fG.nINzYMB771Ev31FG.cm",
+    "phoneNumber": null,
     "role": "DevOps Architect",
+    "title": "Cloud Native & DevOps Engineer",
     "bio": "Automating Kubernetes deployments, infrastructure-as-code, and continuous benchmarking pipelines. Core maintainer of CloudMesh DevOps Guild.",
     "avatarUrl": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "Kubernetes",
-      "Go",
-      "Terraform",
-      "GitHub Actions"
-    ],
     "skills": [
       "Kubernetes",
       "Go",
@@ -190,6 +166,12 @@
       "Docker",
       "Prometheus",
       "Helm"
+    ],
+    "verifiedSkills": [
+      "Kubernetes",
+      "Go",
+      "Terraform",
+      "GitHub Actions"
     ],
     "rating": 4.9,
     "upvotes": 189,
@@ -209,29 +191,22 @@
       "twitter": "https://x.com/mehak_cloud",
       "website": "https://mehakpatel.dev"
     },
-    "projects": [
-      "K8s Edge Controller",
-      "Prometheus Metrics Exporter"
-    ],
-    "progress": 0,
-    "potion": 0
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-08-17T14:57:04.580Z"
   },
   {
     "id": "1786990429294",
-    "createdAt": "2026-08-17T18:13:49.294Z",
     "name": "Adarsh Gupta",
-    "title": "Fullstack Engineer & OSS Evangelist",
     "email": "sandeepguptadeep@gmail.com",
     "password": "$2b$10$umXKXLJqS4DW53TUDCC8bOBLCz99v6RwgxGmaFoSQzNg5SpmowiKe",
+    "phoneNumber": null,
     "role": "Fullstack Developer",
+    "title": "Fullstack Engineer & OSS Evangelist",
     "bio": "Building developer tools, GraphQL APIs, and collaborative real-time editors. Eager to connect with fellow builders and contribute to cutting-edge web projects.",
     "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "Node.js",
-      "TypeScript",
-      "GraphQL",
-      "React"
-    ],
     "skills": [
       "Node.js",
       "TypeScript",
@@ -240,6 +215,12 @@
       "PostgreSQL",
       "TailwindCSS",
       "Redis"
+    ],
+    "verifiedSkills": [
+      "Node.js",
+      "TypeScript",
+      "GraphQL",
+      "React"
     ],
     "rating": 4.8,
     "upvotes": 156,
@@ -256,29 +237,22 @@
       "twitter": "https://x.com/adarsh_codes",
       "website": "https://adarshgupta.io"
     },
-    "projects": [
-      "CodeCollab AI Reviewer",
-      "GraphQL Federation Gateway"
-    ],
-    "progress": 0,
-    "potion": 0
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-08-17T18:13:49.294Z"
   },
   {
     "id": "1786828340958",
-    "createdAt": "2026-08-15T21:12:20.958Z",
-    "name": "Dev Engineer",
-    "title": "Backend & Database Optimization Specialist",
+    "name": "yash thakur",
     "email": "devuser_1786828340661@example.com",
     "password": "$2b$10$JSIa1bS1o2icHUooaInAMOci17CrdqOV3HRdAQps5X5gUd.LwO4B2",
+    "phoneNumber": null,
     "role": "user",
+    "title": "Backend & Database Optimization Specialist",
     "bio": "Focused on query tuning, caching architectures, and data consistency models in high-load distributed databases.",
     "avatarUrl": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "PostgreSQL",
-      "Redis",
-      "Node.js",
-      "Docker"
-    ],
     "skills": [
       "PostgreSQL",
       "Redis",
@@ -286,6 +260,12 @@
       "Docker",
       "Prisma",
       "Express"
+    ],
+    "verifiedSkills": [
+      "PostgreSQL",
+      "Redis",
+      "Node.js",
+      "Docker"
     ],
     "rating": 4.7,
     "upvotes": 114,
@@ -302,28 +282,22 @@
       "linkedin": "https://linkedin.com/in/devuser-db",
       "website": "https://devuser.tech"
     },
-    "projects": [
-      "Rose Nebula Canvas"
-    ],
-    "progress": 0,
-    "potion": 0
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-08-15T21:12:20.958Z"
   },
   {
     "id": "1786377283959",
-    "createdAt": "2026-08-10T15:54:43.959Z",
     "name": "Elena Rostova",
-    "title": "Security Researcher & Code Auditor",
     "email": "test1786377283729@example.com",
     "password": "$2b$10$Hz7GX9rQCuRVp2XwbbZSfenN5SvpGVaBpqEodj.XCmZbCo/Fzao4i",
+    "phoneNumber": null,
     "role": "Security Engineer",
+    "title": "Security Researcher & Code Auditor",
     "bio": "Auditing smart contracts, static analysis tools, and dependency pipelines. Helping open-source teams harden their security posture.",
     "avatarUrl": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "Cybersecurity",
-      "Python",
-      "Rust",
-      "Static Analysis"
-    ],
     "skills": [
       "Cybersecurity",
       "Python",
@@ -331,6 +305,12 @@
       "Static Analysis",
       "Cryptography",
       "Linux"
+    ],
+    "verifiedSkills": [
+      "Cybersecurity",
+      "Python",
+      "Rust",
+      "Static Analysis"
     ],
     "rating": 4.8,
     "upvotes": 98,
@@ -346,932 +326,399 @@
       "github": "https://github.com/elenarostova-sec",
       "linkedin": "https://linkedin.com/in/elenarostova-sec"
     },
-    "projects": [
-      "K8s Edge Controller"
-    ],
-    "progress": 0,
-    "potion": 0
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-08-10T15:54:43.959Z"
   },
   {
     "id": "1",
     "name": "dev",
     "email": "dev@codecollab.io",
-    "availability": "Available Now",
-    "lookingFor": "Building distributed systems in Rust and Go",
-    "timezone": "UTC+5:30",
-    "hoursPerWeek": "15-20 hrs/wk",
-    "collaborationType": "Systems & Rust Specialist",
-    "updatedAt": "2026-08-20T20:39:35.297Z",
+    "password": null,
+    "phoneNumber": null,
+    "role": "Developer",
+    "title": "Developer",
+    "bio": "",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "skills": [],
+    "verifiedSkills": [],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
     "followers": [
       "2"
-    ]
+    ],
+    "availability": "Available Now",
+    "lookingFor": "Building distributed systems in Rust and Go",
+    "socialLinks": {},
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-08-27T22:29:39.857Z"
   },
   {
-    "id": "1787355731659",
-    "createdAt": "2026-08-21T23:42:11.659Z",
-    "name": "Alice Developer",
-    "email": "alice_notif_test@example.com",
-    "password": "$2b$10$F1Vc6ppool.au1/fSLhnwuYpHLR2wbRHrlmvXMK7znVb.8H6RAASO",
-    "role": "user",
-    "progress": 0,
-    "potion": 0
-  },
-  {
-    "id": "1787355758873",
-    "createdAt": "2026-08-21T23:42:38.873Z",
-    "name": "Bob Developer",
-    "email": "bob_notif_test@example.com",
-    "password": "$2b$10$ySPTWkgAMGz6TscAbpwBUeX4ELPO4Tdv4qtBVxqcQojR1zQtczvgS",
-    "role": "user",
-    "progress": 0,
-    "potion": 0,
+    "id": "1788288383920",
+    "name": "SAKSHAM CHAUHAN",
+    "email": "sakshamchauhan003@gmail.com",
+    "password": "$2b$10$56cpQKrC4k/HFEZcYFjdre7s.2AtfoJKmTl7TVa1eLYwSdhVxss.2",
+    "phoneNumber": "+91 8383801663",
+    "role": "Developer",
+    "title": "Developer",
+    "bio": "CSE student, building ML & DL programs and looking forward to build with like minded people Fueled by an unhealthy amount of coffee, curiosity, and the occasional “one more bug” at 2 AM.\n",
+    "avatarUrl": "",
+    "skills": [],
+    "verifiedSkills": [],
+    "rating": 5,
+    "upvotes": 1,
     "upvoters": [
-      "1787355731659"
+      "1788157157228"
     ],
-    "upvotes": 1
-  },
-  {
-    "id": "1787865817408",
-    "name": "Alice Developer",
-    "email": "test_alice_1787865816775@example.com",
-    "password": "$2b$10$jVLlHCJ/YQcx/vxvde7zUui2XcoFbE9.9WDQ7Fra/ukLqTZuUDutW",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
     "followers": [],
     "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T21:23:37.408Z"
+    "lookingFor": "Open for collaboration",
+    "socialLinks": {},
+    "username": "",
+    "location": "New Delhi, India",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-09-01T18:46:24.411Z"
   },
   {
-    "id": "1787865817851",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1787865816775@example.com",
-    "password": "$2b$10$0eBxAIoRD4sEzUjX9Li/8uoCgvh5E/1pp/ME6Nn.Gx.XICdbm0uPu",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T21:23:37.851Z"
-  },
-  {
-    "id": "1787865818166",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1787865816775@example.com",
-    "password": "$2b$10$SrLigQr4iSvGl9F.EtWbT.78BU/hS9DeCoXsWAm0irK2sl7Ce9A1i",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T21:23:38.167Z"
-  },
-  {
-    "id": "1787865836833",
-    "name": "Alice Developer",
-    "email": "test_alice_1787865836666@example.com",
-    "password": "$2b$10$H7SynJLGJ7b17yDZaHdVGuyMcoOf6wPfklGNbO0trz2fK7FVKMyC6",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T21:23:56.833Z"
-  },
-  {
-    "id": "1787865836984",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1787865836666@example.com",
-    "password": "$2b$10$t5QfrJSiItA7QoTHk8KrQOsC1yngq4M5FgJMOBLirGA2wItew5c9W",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T21:23:56.984Z"
-  },
-  {
-    "id": "1787865837126",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1787865836666@example.com",
-    "password": "$2b$10$lJP6dPES/b2q161mX7gSX.3fuXhwAd7zGMOQDajn6pLQuBDi5HB1S",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T21:23:57.126Z"
-  },
-  {
-    "id": "1787867523661",
-    "name": "Alice Developer",
-    "email": "test_alice_1787867523523@example.com",
-    "password": "$2b$10$.sdHr7e.tKoVLtQXJ2IhtOFVA70IharjUwll86QjVcgekQopAKfDi",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T21:52:03.661Z"
-  },
-  {
-    "id": "1787867523764",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1787867523523@example.com",
-    "password": "$2b$10$fHO453Ja2H2uuYj4HbIiYucmX/o1hSG54WU8oLqV47LkKoukuaXx6",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T21:52:03.764Z"
-  },
-  {
-    "id": "1787867523863",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1787867523523@example.com",
-    "password": "$2b$10$bTdWVWHMQNcExZVGBWXsz.qjrcQ.v4oTQNKgGSozkFqcGQ76e.Hmy",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T21:52:03.863Z"
-  },
-  {
-    "id": "1787867749150",
-    "name": "Alice Developer",
-    "email": "test_alice_1787867749034@example.com",
-    "password": "$2b$10$tERKjnsnxNOdKXvYRuDGFesWFz3K3MCMW2G0jP719vU/zs7i8iKEW",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T21:55:49.150Z"
-  },
-  {
-    "id": "1787867749249",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1787867749034@example.com",
-    "password": "$2b$10$GLM/v8HSWa/8TDJs2t8soukpjiOoz92BYdqk3/7wiS9SCuCp695lu",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T21:55:49.249Z"
-  },
-  {
-    "id": "1787867749339",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1787867749034@example.com",
-    "password": "$2b$10$SR35mJEa97P2Ua7V8ts74Oj5Dqh2VHmsXhyhdSHlq7.LdiN1Ozj3u",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T21:55:49.339Z"
-  },
-  {
-    "id": "1787868717039",
-    "name": "Alice Developer",
-    "email": "test_alice_1787868716921@example.com",
-    "password": "$2b$10$Pxf6JIwBq.IpEEh.xs6YJOTsCk9.ol/62hYEfjST/u9jRoNYAFREW",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T22:11:57.039Z"
-  },
-  {
-    "id": "1787868717144",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1787868716921@example.com",
-    "password": "$2b$10$cl1JwFtUBH2u2YXTd4j8BeVO5mKPutnYW88AMTOWCJ.FgRdQ3/azq",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T22:11:57.144Z"
-  },
-  {
-    "id": "1787868717239",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1787868716921@example.com",
-    "password": "$2b$10$rLQA8hrYRj4JHE.H28ZYA.XTdPiGkRjqLwcQ7BA7ewB.IwT/5mXbG",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T22:11:57.239Z"
-  },
-  {
-    "id": "1787869979709",
-    "name": "Alice Developer",
-    "email": "test_alice_1787869979580@example.com",
-    "password": "$2b$10$ilzReyOPcW6BpSNH6ZDh3ent.TaNzREr1fpAJDQpyppXZVDK.qCKe",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T22:32:59.709Z"
-  },
-  {
-    "id": "1787869979814",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1787869979580@example.com",
-    "password": "$2b$10$/LuA4dQOWvGLw6z6fY9EheYhAYiTDD2s6sAccMFx0py4b2hwPbEJG",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T22:32:59.814Z"
-  },
-  {
-    "id": "1787869979906",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1787869979580@example.com",
-    "password": "$2b$10$NuWu3rzgsHatV334M.T5LembmUbWH.ZWSt75GvqjmKvq7T3BouCoG",
-    "role": "user",
-    "title": "Fullstack Developer",
-    "bio": "Passionate developer building and collaborating on open-source code.",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "verifiedSkills": [
-      "JavaScript",
-      "React"
-    ],
-    "skills": [
-      "JavaScript",
-      "React",
-      "Node.js"
-    ],
-    "rating": 5,
-    "upvotes": 0,
-    "upvoters": [],
-    "followers": [],
-    "availability": "Available Now",
-    "lookingFor": "Open for collaboration on exciting projects",
-    "socialLinks": {
-      "github": "https://github.com"
-    },
-    "projects": [
-      "CodeCollab"
-    ],
-    "createdAt": "2026-08-27T22:32:59.906Z"
-  },
-  {
-    "id": "1788022765204",
-    "name": "Alice Developer",
-    "email": "test_alice_1788022765079@example.com",
-    "password": "$2b$10$76.KUvglrAQAAR4u/2nq9uoHl0mNSz6jplwpGH3XejD.lrA0WLxXS",
+    "id": "1788157157228",
+    "name": "harshit sharma",
+    "email": "harshitbhati7509@gmail.com",
+    "password": "$2b$10$xLkjrnSbmtp332VAiJjgaur9M2trr3UqH8kxrsqOI.4pMXFcLEz5a",
+    "phoneNumber": "1234567890",
     "role": "Developer",
     "title": "Developer",
+    "bio": "I am a passionate and motivated tech enthusiast with a strong interest in software development, emerging technologies, and problem-solving. I enjoy learning new",
+    "avatarUrl": "",
     "skills": [],
     "verifiedSkills": [],
-    "bio": "",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
     "rating": 5,
     "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
     "availability": "Available Now",
-    "lookingFor": "Looking for collaboration",
+    "lookingFor": "Open for collaboration",
     "socialLinks": {},
-    "createdAt": "2026-08-29T16:59:25.208Z"
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-08-31T06:19:17.974Z"
   },
   {
-    "id": "1788022765386",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1788022765079@example.com",
-    "password": "$2b$10$hDp6C2MJxdKFpc/0.f7l7OtCFg3GmKhP7bbF5.L35ChkKpEJVTrP6",
+    "id": "1788187201989",
+    "name": "samiran das",
+    "email": "samirantsk2020@gmail.com",
+    "password": "$2b$10$YFWKt93dqkgyzQAPwYlLnuhNJCyDxWl/BxxSPGMEoWhsS3A.tB9zK",
+    "phoneNumber": "8822683839",
     "role": "Developer",
     "title": "Developer",
+    "bio": "",
+    "avatarUrl": "",
     "skills": [],
     "verifiedSkills": [],
-    "bio": "",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
     "rating": 5,
-    "upvotes": 0,
+    "upvotes": 2,
+    "upvoters": [
+      "1788157157228",
+      "1785998502411"
+    ],
+    "followers": [],
     "availability": "Available Now",
-    "lookingFor": "Looking for collaboration",
+    "lookingFor": "Open for collaboration",
     "socialLinks": {},
-    "createdAt": "2026-08-29T16:59:25.388Z"
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-08-31T14:40:03.908Z"
   },
   {
-    "id": "1788022765475",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1788022765079@example.com",
-    "password": "$2b$10$iamaSI17flGX4G4QqVDAO.zi.L.lRmX0NUL8/FUYDSmWiHto.74Lm",
+    "id": "1788187572522",
+    "name": "Hiya Mahandru",
+    "email": "hiyamahandru@gmail.com",
+    "password": "$2b$10$TPm467RP1/aTpoC.8TU6ZeS2mqhdLExnaX/zOD7HSTkLHM3qEXTVu",
+    "phoneNumber": "8527958801",
     "role": "Developer",
     "title": "Developer",
+    "bio": "",
+    "avatarUrl": "",
     "skills": [],
     "verifiedSkills": [],
-    "bio": "",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
     "rating": 5,
-    "upvotes": 0,
+    "upvotes": 1,
+    "upvoters": [
+      "1788157157228"
+    ],
+    "followers": [],
     "availability": "Available Now",
-    "lookingFor": "Looking for collaboration",
+    "lookingFor": "Open for collaboration",
     "socialLinks": {},
-    "createdAt": "2026-08-29T16:59:25.477Z"
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-08-31T14:46:13.225Z"
   },
   {
-    "id": "1788022781878",
+    "id": "1788192977702",
+    "name": "Akash Tiwari",
+    "email": "akashtiwari4518@gmail.com",
+    "password": "$2b$10$cJmjqMDR/2DdVzbySulmUOJz2lRMd4aExgBaIHt.Bhcag/Vs2ssMi",
+    "phoneNumber": "+917017916484",
+    "role": "Developer",
+    "title": "Developer",
+    "bio": "",
+    "avatarUrl": "",
+    "skills": [],
+    "verifiedSkills": [],
+    "rating": 5,
+    "upvotes": 2,
+    "upvoters": [
+      "1788157157228",
+      "1785998502411"
+    ],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration",
+    "socialLinks": {},
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-08-31T16:16:18.441Z"
+  },
+  {
+    "id": "1788243239832",
+    "name": "Lakshita Dutta",
+    "email": "lakshitadutta24@gmail.com",
+    "password": "$2b$10$OYX6V/GcXu0uz7L3xoBi5eL.4/xkXP7u6KNok3HJDgixWMOEY1UVW",
+    "phoneNumber": "+919310881528",
+    "role": "Developer",
+    "title": "Developer",
+    "bio": "",
+    "avatarUrl": "",
+    "skills": [],
+    "verifiedSkills": [],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration",
+    "socialLinks": {},
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-09-01T06:14:00.559Z"
+  },
+  {
+    "id": "1788243347493",
+    "name": "Aman Pandey",
+    "email": "urba.ferrari@gmail.com",
+    "password": "$2b$10$Ip/FFKeRUreLe8SnV5jySurpinyNqKaYWeNfQyOT5PHQtHtphCkaa",
+    "phoneNumber": "9821580531",
+    "role": "Developer",
+    "title": "Developer",
+    "bio": "",
+    "avatarUrl": "",
+    "skills": [],
+    "verifiedSkills": [],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration",
+    "socialLinks": {},
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-09-01T06:15:47.968Z"
+  },
+  {
+    "id": "1788283522451",
+    "name": "adarsh thakur",
+    "email": "adarshthakur9801523808@gmail.com",
+    "password": "$2b$10$06tHDUNh/mN3FJnAnrn4ZuJ1gOZNZFr4vynluAA4RyqiVpRazdbQG",
+    "phoneNumber": "8797256864",
+    "role": "Developer",
+    "title": "Developer",
+    "bio": "",
+    "avatarUrl": "",
+    "skills": [],
+    "verifiedSkills": [],
+    "rating": 5,
+    "upvotes": 1,
+    "upvoters": [
+      "1788157157228"
+    ],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration",
+    "socialLinks": {},
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-09-01T17:25:22.925Z"
+  },
+  {
+    "id": "1788592617452",
+    "name": "Sandeep gupta",
+    "email": "shree9999003828@gmail.com",
+    "password": "$2b$10$DMpLZFhcO9EBW.fgITxXyePWPRKnm3NiazTV6t3tH/GeV/LsIhM9i",
+    "phoneNumber": "+919717899191",
+    "role": "Developer",
+    "title": "Developer",
+    "bio": "",
+    "avatarUrl": "",
+    "skills": [],
+    "verifiedSkills": [],
+    "rating": 5,
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration",
+    "socialLinks": {},
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-09-05T07:16:59.353Z"
+  },
+  {
+    "id": "1789279072532",
+    "name": "Abhishek Kumar",
+    "email": "kr.abhi295@gmail.com",
+    "password": "$2b$10$2oeP8XVMx0Jgy9cxs2oVuem7oK6ZrKuIUaEOh4NHRZbIZtiITvxH2",
+    "phoneNumber": "9821186389",
+    "role": "Developer",
+    "title": "Developer",
+    "bio": "",
+    "avatarUrl": "",
+    "skills": [],
+    "verifiedSkills": [],
+    "rating": 5,
+    "upvotes": 1,
+    "upvoters": [
+      "1785998502411"
+    ],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration",
+    "socialLinks": {},
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-09-13T05:57:53.022Z"
+  },
+  {
+    "id": "1789635669203",
+    "name": "ARPIT MEHRAL",
+    "email": "4154arpitmehrl@gmail.com",
+    "password": "$2b$10$PP7yTnGO8uvOUk13BkEKlOx1De68WlbLz765oY.oMqFCPK5pXMf3.",
+    "phoneNumber": "8178356457",
+    "role": "Developer",
+    "title": "Developer",
+    "bio": "",
+    "avatarUrl": "",
+    "skills": [],
+    "verifiedSkills": [],
+    "rating": 5,
+    "upvotes": 1,
+    "upvoters": [
+      "1785998502411"
+    ],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration",
+    "socialLinks": {},
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-09-17T09:01:09.915Z"
+  },
+  {
+    "id": "1788285636776",
+    "name": "Sanskriti Karn",
+    "email": "sanskritikarn123@gmail.com",
+    "password": "$2b$10$6g8FqHWeyy7n5Xden/uMEuWstrogKGAeksn5UmlkdLKqzdc7yiJqy",
+    "phoneNumber": "+919318472657",
+    "role": "Developer",
+    "title": "Developer",
+    "bio": "",
+    "avatarUrl": "",
+    "skills": [],
+    "verifiedSkills": [],
+    "rating": 5,
+    "upvotes": 1,
+    "upvoters": [
+      "1788157157228"
+    ],
+    "followers": [],
+    "availability": "Available Now",
+    "lookingFor": "Open for collaboration",
+    "socialLinks": {},
+    "username": "",
+    "location": "",
+    "education": "",
+    "experience": "",
+    "createdAt": "2026-09-01T18:00:37.484Z"
+  },
+  {
+    "id": "1790951939691",
     "name": "Alice Developer",
-    "email": "test_alice_1788022781766@example.com",
-    "password": "$2b$10$8Fb72Q/9kYoMzzgWK4Xo9OCeUC2Jtc8qCAyYbPnxCW77BybatM1vW",
-    "role": "Developer",
-    "title": "Developer",
-    "skills": [],
-    "verifiedSkills": [],
-    "bio": "",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "rating": 5,
-    "upvotes": 0,
-    "availability": "Available Now",
-    "lookingFor": "Looking for collaboration",
-    "socialLinks": {},
-    "createdAt": "2026-08-29T16:59:41.881Z"
-  },
-  {
-    "id": "1788022782059",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1788022781766@example.com",
-    "password": "$2b$10$vlgT2i0UBUc9vQMSSx75o.25pl9.PL9QugmCO4osKM0BjUGjvn5wm",
-    "role": "Developer",
-    "title": "Developer",
-    "skills": [],
-    "verifiedSkills": [],
-    "bio": "",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "rating": 5,
-    "upvotes": 0,
-    "availability": "Available Now",
-    "lookingFor": "Looking for collaboration",
-    "socialLinks": {},
-    "createdAt": "2026-08-29T16:59:42.061Z"
-  },
-  {
-    "id": "1788022782208",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1788022781766@example.com",
-    "password": "$2b$10$2tPSj4sdt7brfVehTeI/Puf2cDb94K9QDHyj6bK1mCD4.FbXj7OHe",
-    "role": "Developer",
-    "title": "Developer",
-    "skills": [],
-    "verifiedSkills": [],
-    "bio": "",
-    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    "rating": 5,
-    "upvotes": 0,
-    "availability": "Available Now",
-    "lookingFor": "Looking for collaboration",
-    "socialLinks": {},
-    "createdAt": "2026-08-29T16:59:42.210Z"
-  },
-  {
-    "id": "1788552018229",
-    "name": "Alice Developer",
-    "email": "test_alice_1788552018098@example.com",
-    "password": "$2b$10$XX8c7O.4JMKdWyTVjUcwx.zJDmzo1QAAejLlLJXb1EuBKVUh4E7bO",
+    "email": "test_alice_1790951939555@example.com",
+    "password": "$2b$10$/b9xH1smWyFT7bK4XeOtduyNsqbqlMJi8nKKQuHMv4dkj1Zo2o5Gq",
     "phoneNumber": "+1 234 567 8900",
     "role": "Developer",
-    "createdAt": "2026-09-04T20:00:18.231Z"
-  },
-  {
-    "id": "1788552018435",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1788552018098@example.com",
-    "password": "$2b$10$jfVzYEWfcaEpMU9xNXGjCegXmdvOG.xy5vVkTsRvcCZqwiyJTcH7e",
-    "phoneNumber": "+1 987 654 3210",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:00:18.436Z"
-  },
-  {
-    "id": "1788552018535",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1788552018098@example.com",
-    "password": "$2b$10$rY3XsjC3qsnyn/isyOxzoukjvTnu17lNxfksbudrslLR4NRrXIuk6",
-    "phoneNumber": "+1 555 123 4567",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:00:18.537Z"
-  },
-  {
-    "id": "1788552213566",
-    "name": "Alice Developer",
-    "email": "test_alice_1788552213430@example.com",
-    "password": "$2b$10$ElRiJRo.SaCC.Ha8LtSCruf/YCs9TMFw5O5bBSzt6TzlzXqoptXeO",
-    "phoneNumber": "+1 234 567 8900",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:03:33.569Z",
+    "createdAt": "2026-10-02T14:38:59.693Z",
     "upvoters": [
-      "1788552213799"
+      "1790951939897"
     ],
     "upvotes": 1,
     "followers": [
-      "1788552213799"
+      "1790951939897"
     ]
   },
   {
-    "id": "1788552213799",
+    "id": "1790951939897",
     "name": "Bob Maintainer",
-    "email": "test_bob_1788552213430@example.com",
-    "password": "$2b$10$GBgvO2rhcbZj3UxGLSTeUOkf0YxNrRt5qH5VO9kMaNEIPjE8uW2iC",
+    "email": "test_bob_1790951939555@example.com",
+    "password": "$2b$10$1NuGGO3lGD0aBrxoOhbXJO./wFaTidHNj6ngHJntQpnSEXDpggXX2",
     "phoneNumber": "+1 987 654 3210",
     "role": "Developer",
-    "createdAt": "2026-09-04T20:03:33.801Z"
+    "createdAt": "2026-10-02T14:38:59.899Z"
   },
   {
-    "id": "1788552213904",
+    "id": "1790951940013",
     "name": "Charlie Contributor",
-    "email": "test_charlie_1788552213430@example.com",
-    "password": "$2b$10$1ExIZj2hKL3zEI7sfg3S6e6Fdfe7emqO6/tZoC1DeOpBwsUe.uFIO",
+    "email": "test_charlie_1790951939555@example.com",
+    "password": "$2b$10$Bh4f0ocdGDIIMXjRb1x9ZuABTqPFRK/FeCMTM/fTyPAPOiW6bTHbq",
     "phoneNumber": "+1 555 123 4567",
     "role": "Developer",
-    "createdAt": "2026-09-04T20:03:33.906Z"
+    "createdAt": "2026-10-02T14:39:00.015Z"
   },
   {
-    "id": "1788552244157",
-    "name": "Alice Developer",
-    "email": "test_alice_1788552244031@example.com",
-    "password": "$2b$10$x2MFoYONFDNycAJt.WAQm.bLgMYvJZDGJ/wMlFTNPolgvv1fGEHa2",
-    "phoneNumber": "+1 234 567 8900",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:04:04.160Z"
-  },
-  {
-    "id": "1788552244354",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1788552244031@example.com",
-    "password": "$2b$10$W1ydiwIJYDhEK/Ogm./p6eISk9UepfnWI7IX0geCN6dm1NBQAU2fS",
-    "phoneNumber": "+1 987 654 3210",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:04:04.356Z"
-  },
-  {
-    "id": "1788552244454",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1788552244031@example.com",
-    "password": "$2b$10$58bog3fZJq96BE6xu3Y5D.s6TzTRpXdlT3LI1e4lcjXmzDGlFDaSq",
-    "phoneNumber": "+1 555 123 4567",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:04:04.456Z"
-  },
-  {
-    "id": "1788552602100",
-    "name": "Alice Developer",
-    "email": "test_alice_1788552601984@example.com",
-    "password": "$2b$10$Aq7lg.76x041LAkMVQeWHucY8KF0axPrTCZaDB1QtznJkqM6weucW",
-    "phoneNumber": "+1 234 567 8900",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:10:02.104Z",
-    "upvoters": [
-      "1788552602365"
-    ],
-    "upvotes": 1,
-    "followers": [
-      "1788552602365"
-    ]
-  },
-  {
-    "id": "1788552602365",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1788552601984@example.com",
-    "password": "$2b$10$fXU6PJ0aJslyoBbsYvhnveP/A28RWZYXbitgcdELDRKr3wsVHSZ7y",
-    "phoneNumber": "+1 987 654 3210",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:10:02.367Z"
-  },
-  {
-    "id": "1788552602471",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1788552601984@example.com",
-    "password": "$2b$10$e6DbvZlYImMVygEV/3K6qOeCj0TAKcH3qxWV2jE3PTusXPJdIT6Qu",
-    "phoneNumber": "+1 555 123 4567",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:10:02.473Z"
-  },
-  {
-    "id": "1788552613109",
-    "name": "Alice Developer",
-    "email": "test_alice_1788552612995@example.com",
-    "password": "$2b$10$L0kvc1AwLCJgREuFvVsc..HM.GWufY.KeDvj1Xe2u8CjCdu1RAgrm",
-    "phoneNumber": "+1 234 567 8900",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:10:13.111Z",
-    "upvoters": [
-      "1788552613305"
-    ],
-    "upvotes": 1,
-    "followers": [
-      "1788552613305"
-    ]
-  },
-  {
-    "id": "1788552613305",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1788552612995@example.com",
-    "password": "$2b$10$AlqA5wDe8IkJ49o99uNjW.R2xsejX8KoATkwNFj05KQb64QqWB33u",
-    "phoneNumber": "+1 987 654 3210",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:10:13.307Z"
-  },
-  {
-    "id": "1788552613419",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1788552612995@example.com",
-    "password": "$2b$10$k8dGsiVz4QOFxpN.o7AbUOdQvwowxMYQt/sErGRGPQmtNdv.T.NJi",
-    "phoneNumber": "+1 555 123 4567",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:10:13.421Z"
-  },
-  {
-    "id": "1788553732492",
-    "name": "Alice Developer",
-    "email": "test_alice_1788553732227@example.com",
-    "password": "$2b$10$wrXra8d/o6gKw6be4Iyx6.hxicTdWY9tyzqXPcZUOZEwotJIxKhOq",
-    "phoneNumber": "+1 234 567 8900",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:28:52.540Z",
-    "upvoters": [
-      "1788553733220"
-    ],
-    "upvotes": 1,
-    "followers": [
-      "1788553733220"
-    ]
-  },
-  {
-    "id": "1788553733220",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1788553732227@example.com",
-    "password": "$2b$10$dw1F/jroeha.DqxFqa0lq.HiU4Ot/sd3.EOz.uqVeH2bd1OZtp5si",
-    "phoneNumber": "+1 987 654 3210",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:28:53.245Z"
-  },
-  {
-    "id": "1788553733680",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1788553732227@example.com",
-    "password": "$2b$10$qndfii9IKPM5Bwd720WDxux6ET69sY62CN.T00NvN.eKvkx1MlRQy",
-    "phoneNumber": "+1 555 123 4567",
-    "role": "Developer",
-    "createdAt": "2026-09-04T20:28:53.725Z"
-  },
-  {
-    "id": "1788558273666",
+    "id": "1790951955962",
     "name": "Cookie Test Developer",
-    "email": "cookie_user_1788558273543@example.com",
-    "password": "$2b$10$SEQTtWQ8/Wx8hsHazD5P6ubNSDTsaKtmNGtANFARRMJBTyw1nd/u2",
+    "email": "cookie_user_1790951955664@example.com",
+    "password": "$2b$10$/vFHc86mAHASPSqLXnFRge4pFBpZWOI9hk.qbdzRX9utPQ92SFdtS",
     "phoneNumber": "+1234567890",
     "role": "Developer",
-    "createdAt": "2026-09-04T21:44:33.669Z",
+    "createdAt": "2026-10-02T14:39:15.988Z",
     "bio": "Legitimate Cookie Authenticated Update",
     "upvotes": 0,
     "upvoters": [],
@@ -1282,16 +729,50 @@
       "upvoters": [],
       "followers": []
     },
-    "updatedAt": "2026-09-04T21:44:33.709Z"
+    "updatedAt": "2026-10-02T14:39:16.601Z"
   },
   {
-    "id": "1788558331642",
+    "id": "1790952882410",
+    "name": "Alice Developer",
+    "email": "test_alice_1790952882252@example.com",
+    "password": "$2b$10$9NuXCawrovP0wnaFstuHneSeaPpc8N1YNyIfffbtQrzVKkk66LMVq",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-10-02T14:54:42.413Z",
+    "upvoters": [
+      "1790952882688"
+    ],
+    "upvotes": 1,
+    "followers": [
+      "1790952882688"
+    ]
+  },
+  {
+    "id": "1790952882688",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1790952882252@example.com",
+    "password": "$2b$10$vBMYFGI3EllI.Kv7VwoE4.7RrbzicMsPlW0FLfInmapz.yjf6LFgi",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-10-02T14:54:42.691Z"
+  },
+  {
+    "id": "1790952882826",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1790952882252@example.com",
+    "password": "$2b$10$QY57Fpw03gLsjp6ResLiLOBz7GHol8//txQ.XEv55NelGM76DAoxC",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-10-02T14:54:42.828Z"
+  },
+  {
+    "id": "1790952905364",
     "name": "Cookie Test Developer",
-    "email": "cookie_user_1788558331535@example.com",
-    "password": "$2b$10$qoP1l.ayaes0v2cMnxXVIu7MlhifpGJqYtRsHPSEVTVR4yae1ArXa",
+    "email": "cookie_user_1790952905070@example.com",
+    "password": "$2b$10$S2kGzEp0DEdaTptqW1fKnu/TbJYrjghqwZWuTTk1EKw6tjXJA9YFy",
     "phoneNumber": "+1234567890",
     "role": "Developer",
-    "createdAt": "2026-09-04T21:45:31.644Z",
+    "createdAt": "2026-10-02T14:55:05.383Z",
     "bio": "Legitimate Cookie Authenticated Update",
     "upvotes": 0,
     "upvoters": [],
@@ -1302,50 +783,50 @@
       "upvoters": [],
       "followers": []
     },
-    "updatedAt": "2026-09-04T21:45:31.686Z"
+    "updatedAt": "2026-10-02T14:55:05.516Z"
   },
   {
-    "id": "1788558344495",
+    "id": "1790953014817",
     "name": "Alice Developer",
-    "email": "test_alice_1788558344369@example.com",
-    "password": "$2b$10$dzpclIs/u3Vr6JW530LZveDvXdR0djkvxodtNam521Lzhmu1fl6qS",
+    "email": "test_alice_1790953014436@example.com",
+    "password": "$2b$10$7rl5fxT7S3IwkVMZ1GVjDOsdqbUAooUqUUAqPd/IT5M4WoQDyC5LC",
     "phoneNumber": "+1 234 567 8900",
     "role": "Developer",
-    "createdAt": "2026-09-04T21:45:44.498Z",
+    "createdAt": "2026-10-02T14:56:54.987Z",
     "upvoters": [
-      "1788558344696"
+      "1790953016911"
     ],
     "upvotes": 1,
     "followers": [
-      "1788558344696"
+      "1790953016911"
     ]
   },
   {
-    "id": "1788558344696",
+    "id": "1790953016911",
     "name": "Bob Maintainer",
-    "email": "test_bob_1788558344369@example.com",
-    "password": "$2b$10$.BsbNJej0QV5V.M7mdfk8O27iuv/hT5OxdxxbB8DHEwB1MV662aP6",
+    "email": "test_bob_1790953014436@example.com",
+    "password": "$2b$10$VvjIsIxBIIcTMORsWmJnP.tNg.1GrZ93.zkwKjKHvPOdj3xsDFU..",
     "phoneNumber": "+1 987 654 3210",
     "role": "Developer",
-    "createdAt": "2026-09-04T21:45:44.698Z"
+    "createdAt": "2026-10-02T14:56:57.082Z"
   },
   {
-    "id": "1788558344916",
+    "id": "1790953018583",
     "name": "Charlie Contributor",
-    "email": "test_charlie_1788558344369@example.com",
-    "password": "$2b$10$Qsai9wMFTGQrO5lPwKRAFOGB6N1J78LSVs778DMluFaelO69/h9di",
+    "email": "test_charlie_1790953014436@example.com",
+    "password": "$2b$10$pBgLKZh1.i5bVJ3u5kogl.siOd4fQOs1M9q03w6aacMKFqsKR./vC",
     "phoneNumber": "+1 555 123 4567",
     "role": "Developer",
-    "createdAt": "2026-09-04T21:45:44.917Z"
+    "createdAt": "2026-10-02T14:56:58.724Z"
   },
   {
-    "id": "1788558549042",
+    "id": "1790953062753",
     "name": "Cookie Test Developer",
-    "email": "cookie_user_1788558548937@example.com",
-    "password": "$2b$10$Q7.6Mq7mbjxC02qXauligOUc/xU0ViLiWWDKjkuQhVcWI7ZJ2zE1q",
+    "email": "cookie_user_1790953062462@example.com",
+    "password": "$2b$10$sE.APrqPj1SIeY7njAGa0O.7CBOVkwOnBXqPL4m7K/3A1yF1YQL5m",
     "phoneNumber": "+1234567890",
     "role": "Developer",
-    "createdAt": "2026-09-04T21:49:09.044Z",
+    "createdAt": "2026-10-02T14:57:42.856Z",
     "bio": "Legitimate Cookie Authenticated Update",
     "upvotes": 0,
     "upvoters": [],
@@ -1356,152 +837,50 @@
       "upvoters": [],
       "followers": []
     },
-    "updatedAt": "2026-09-04T21:49:09.085Z"
+    "updatedAt": "2026-10-02T14:57:43.685Z"
   },
   {
-    "id": "1788558553553",
+    "id": "1790953290799",
     "name": "Alice Developer",
-    "email": "test_alice_1788558553433@example.com",
-    "password": "$2b$10$i4p6JfmZlUuN/aBpVWTTZeNo5RYVSJv4gXRDG8zEAx7FZZ4/lmUwO",
+    "email": "test_alice_1790953290426@example.com",
+    "password": "$2b$10$VIa326vkQnDHHaZVzy/0C.dPeC0EaXDrwC2QV0iNIXJPsaGhVa0Hq",
     "phoneNumber": "+1 234 567 8900",
     "role": "Developer",
-    "createdAt": "2026-09-04T21:49:13.556Z",
+    "createdAt": "2026-10-02T15:01:30.917Z",
     "upvoters": [
-      "1788558553758"
+      "1790953292046"
     ],
     "upvotes": 1,
     "followers": [
-      "1788558553758"
+      "1790953292046"
     ]
   },
   {
-    "id": "1788558553758",
+    "id": "1790953292046",
     "name": "Bob Maintainer",
-    "email": "test_bob_1788558553433@example.com",
-    "password": "$2b$10$/vO9WnslGoMHdi5IcVwz0u1dAWJQI/g/XB6fsltFZhfouGWAbhyvm",
+    "email": "test_bob_1790953290426@example.com",
+    "password": "$2b$10$TJwlzzAAHZ7WqCZb2S6Huee8PdK9VgUFfVO7hsaJocXf2gshd.ZCq",
     "phoneNumber": "+1 987 654 3210",
     "role": "Developer",
-    "createdAt": "2026-09-04T21:49:13.760Z"
+    "createdAt": "2026-10-02T15:01:32.139Z"
   },
   {
-    "id": "1788558553859",
+    "id": "1790953292766",
     "name": "Charlie Contributor",
-    "email": "test_charlie_1788558553433@example.com",
-    "password": "$2b$10$gXW4jmQaHUwk7hZKXtvP5eGZwRmfdlkKEYt/N6cTqxu2kxvKloVQa",
+    "email": "test_charlie_1790953290426@example.com",
+    "password": "$2b$10$r4BD20lMJOipMvfSO1hH.umJQMHwvPEJ/OheRf9NX29weUDuAIIJW",
     "phoneNumber": "+1 555 123 4567",
     "role": "Developer",
-    "createdAt": "2026-09-04T21:49:13.861Z"
+    "createdAt": "2026-10-02T15:01:32.884Z"
   },
   {
-    "id": "1788558561971",
-    "name": "Alice Developer",
-    "email": "test_alice_1788558561864@example.com",
-    "password": "$2b$10$.wdS81.FlNq/qCGp5cYdtOIBS.VCtU4Qmok9NZAAjhRkpfPFReW4G",
-    "phoneNumber": "+1 234 567 8900",
-    "role": "Developer",
-    "createdAt": "2026-09-04T21:49:21.974Z",
-    "upvoters": [
-      "1788558562169"
-    ],
-    "upvotes": 1,
-    "followers": [
-      "1788558562169"
-    ]
-  },
-  {
-    "id": "1788558562169",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1788558561864@example.com",
-    "password": "$2b$10$F/HVbOnQjD4qVHpncqrpVeb5aw3AnHmSZaU1CRvyMTpB1/OCHAAZC",
-    "phoneNumber": "+1 987 654 3210",
-    "role": "Developer",
-    "createdAt": "2026-09-04T21:49:22.171Z"
-  },
-  {
-    "id": "1788558562271",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1788558561864@example.com",
-    "password": "$2b$10$YKFDSO02U3cjbnthVFUJ0u7/ccjqAAOwLNws/Mx4e.PaPoGBQFTBa",
-    "phoneNumber": "+1 555 123 4567",
-    "role": "Developer",
-    "createdAt": "2026-09-04T21:49:22.273Z"
-  },
-  {
-    "id": "1788559748687",
-    "name": "Alice Developer",
-    "email": "test_alice_1788559748573@example.com",
-    "password": "$2b$10$DsyGZRoIucidfuZ/mIrRXO89UUEXrAVKB3SmaAZBTw0ic90DN47bO",
-    "phoneNumber": "+1 234 567 8900",
-    "role": "Developer",
-    "createdAt": "2026-09-04T22:09:08.694Z",
-    "upvoters": [
-      "1788559748901"
-    ],
-    "upvotes": 1,
-    "followers": [
-      "1788559748901"
-    ]
-  },
-  {
-    "id": "1788559748901",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1788559748573@example.com",
-    "password": "$2b$10$A4PaF8jwGmAdnwzed1LAdupc/IxZnTfTB079TNba89IikTVWfEO4q",
-    "phoneNumber": "+1 987 654 3210",
-    "role": "Developer",
-    "createdAt": "2026-09-04T22:09:08.903Z"
-  },
-  {
-    "id": "1788559749004",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1788559748573@example.com",
-    "password": "$2b$10$ZFUC1OWWIePx1P.r07n95enenaWIPhxhlLK7vZETmlv.wptU/umYi",
-    "phoneNumber": "+1 555 123 4567",
-    "role": "Developer",
-    "createdAt": "2026-09-04T22:09:09.006Z"
-  },
-  {
-    "id": "1788559807039",
-    "name": "Alice Developer",
-    "email": "test_alice_1788559806922@example.com",
-    "password": "$2b$10$MD02eMIbv5n2njBSERzZ6.okNJUoIRGRsKLkP/w5pi7l696geEKn2",
-    "phoneNumber": "+1 234 567 8900",
-    "role": "Developer",
-    "createdAt": "2026-09-04T22:10:07.042Z",
-    "upvoters": [
-      "1788559807262"
-    ],
-    "upvotes": 1,
-    "followers": [
-      "1788559807262"
-    ]
-  },
-  {
-    "id": "1788559807262",
-    "name": "Bob Maintainer",
-    "email": "test_bob_1788559806922@example.com",
-    "password": "$2b$10$UhzeDTvPuRVflWPegZ2yMOCNzPhCsiRl8U/8qWTFvXCcGXWr7Wsy6",
-    "phoneNumber": "+1 987 654 3210",
-    "role": "Developer",
-    "createdAt": "2026-09-04T22:10:07.263Z"
-  },
-  {
-    "id": "1788559807389",
-    "name": "Charlie Contributor",
-    "email": "test_charlie_1788559806922@example.com",
-    "password": "$2b$10$KLqou9.1.nwssARzMuFGdea2z/D9cU/Rf0Tz8CE0DnTVxT.aMG49m",
-    "phoneNumber": "+1 555 123 4567",
-    "role": "Developer",
-    "createdAt": "2026-09-04T22:10:07.391Z"
-  },
-  {
-    "id": "1788559809263",
+    "id": "1790953318582",
     "name": "Cookie Test Developer",
-    "email": "cookie_user_1788559809155@example.com",
-    "password": "$2b$10$ydB1uSnsEZ7RSAPlCMwm8OieoF6cTtte4Oxva7vlzXOnDFxUipH0S",
+    "email": "cookie_user_1790953318073@example.com",
+    "password": "$2b$10$EQhcZws4h/uBANAW7FDq1eM6XgS7X1rUdmauM.uM3467PuCXKXe5S",
     "phoneNumber": "+1234567890",
     "role": "Developer",
-    "createdAt": "2026-09-04T22:10:09.265Z",
+    "createdAt": "2026-10-02T15:01:58.723Z",
     "bio": "Legitimate Cookie Authenticated Update",
     "upvotes": 0,
     "upvoters": [],
@@ -1512,6 +891,60 @@
       "upvoters": [],
       "followers": []
     },
-    "updatedAt": "2026-09-04T22:10:09.308Z"
+    "updatedAt": "2026-10-02T15:02:00.565Z"
+  },
+  {
+    "id": "1790955013049",
+    "name": "Alice Developer",
+    "email": "test_alice_1790955012706@example.com",
+    "password": "$2b$10$KXchd05qo7plqC39Knh4D.FIdHdDvwzOulU6y1723Vjlwg6VqHH2i",
+    "phoneNumber": "+1 234 567 8900",
+    "role": "Developer",
+    "createdAt": "2026-10-02T15:30:13.060Z",
+    "upvoters": [
+      "1790955013520"
+    ],
+    "upvotes": 1,
+    "followers": [
+      "1790955013520"
+    ]
+  },
+  {
+    "id": "1790955013520",
+    "name": "Bob Maintainer",
+    "email": "test_bob_1790955012706@example.com",
+    "password": "$2b$10$aLmH.80rbb1Cs8gf2HREOObO.IPt7R8RflTCjFnsKnTXfDPT0DZyW",
+    "phoneNumber": "+1 987 654 3210",
+    "role": "Developer",
+    "createdAt": "2026-10-02T15:30:13.521Z"
+  },
+  {
+    "id": "1790955013707",
+    "name": "Charlie Contributor",
+    "email": "test_charlie_1790955012706@example.com",
+    "password": "$2b$10$nsBuiTZ3uL3o1xu.qU2Z6OgAAgrXyhLYR.UD9gFJbxZ54Ao3aIjvC",
+    "phoneNumber": "+1 555 123 4567",
+    "role": "Developer",
+    "createdAt": "2026-10-02T15:30:13.710Z"
+  },
+  {
+    "id": "1790955035700",
+    "name": "Cookie Test Developer",
+    "email": "cookie_user_1790955034910@example.com",
+    "password": "$2b$10$QmYiBhvZPZGgCDJOAvAoku44BOlYPm40u8RIXGQqS9rC1fVRSpUIy",
+    "phoneNumber": "+1234567890",
+    "role": "Developer",
+    "createdAt": "2026-10-02T15:30:35.789Z",
+    "bio": "Legitimate Cookie Authenticated Update",
+    "upvotes": 0,
+    "upvoters": [],
+    "followers": [],
+    "preferences": {
+      "bio": "Legitimate Cookie Authenticated Update",
+      "upvotes": 0,
+      "upvoters": [],
+      "followers": []
+    },
+    "updatedAt": "2026-10-02T15:30:37.164Z"
   }
 ]

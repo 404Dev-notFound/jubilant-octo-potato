@@ -13,7 +13,9 @@
     "db:migrate-data": "node scripts/migrate-data-to-postgres.js",
     "db:seed": "node prisma/seed.js",
     "db:studio": "node scripts/run-prisma.js studio",
-    "test": "node test/production-verification.test.js && node test/security-and-hardening.test.js"
+    "test": "node test/production-verification.test.js && node test/security-and-hardening.test.js && node cyber-security/tests/security-suite.test.js && node test/performance-verification.test.js",
+    "test:security": "node cyber-security/tests/security-suite.test.js && node test/security-network-audit.js",
+    "test:perf": "node test/performance-verification.test.js"
   },
   "repository": {
     "type": "git",
